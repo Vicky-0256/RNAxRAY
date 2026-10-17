@@ -62,7 +62,9 @@
     rawReads: null,
     loading: null,
     error: null,
-    theme: window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
+    // dark by default; the theme button switches, and a restored session
+    // keeps the visitor's choice
+    theme: "dark",
     density: "comfortable",
     toastTimer: null,
     pointerActionPending: false,
