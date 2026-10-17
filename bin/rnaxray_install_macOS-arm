@@ -15,13 +15,11 @@ source_config_file() {
         */zsh)
             echo 'export PATH=$PATH:'"$PWD/bin" >> ~/.zshrc
             echo 'alias RNAxRay='"$PWD" >> ~/.zshrc
-            echo 'alias RNAxRay='"$PWD" >> ~/.zshrc
             echo "Sourcing .zshrc"
             source ~/.zshrc
             ;;
         */bash)
             echo 'export PATH=$PATH:'"$PWD/bin" >> ~/.bashrc
-            echo 'alias RNAxRay='"$PWD" >> ~/.bashrc
             echo 'alias RNAxRay='"$PWD" >> ~/.bashrc
             echo "Sourcing .bashrc"
             if [ -f ~/.bashrc ]; then

@@ -114,4 +114,4 @@ The browser's ViennaRNA and CPLfold runtimes are built by `scripts/build-vienna-
 
 ## Licence
 
-CPLfold is distributed under GPL-2.0-or-later, with LinearFold's licence; see `third_party/cplfold/LICENSES` and `THIRD_PARTY_NOTICES.md`. The bundled ViennaRNA, Bowtie2, Pyodide and other components keep their own licences, listed with their files.
+CPLfold (`third_party/cplfold`) combines CPLfold's own code with a LinearFold-derived parser and a HotKnots-derived (GPL-2.0-or-later) energy evaluator. It does not yet have one resolved licence for that combination; see [`third_party/cplfold/THIRD_PARTY_NOTICES.md`](third_party/cplfold/THIRD_PARTY_NOTICES.md), with the upstream texts in `third_party/cplfold/LICENSES`. The bundled ViennaRNA, Bowtie2, Pyodide and other components keep their own licences, listed with their files.
