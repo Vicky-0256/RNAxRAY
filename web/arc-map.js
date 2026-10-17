@@ -809,6 +809,8 @@
   function svg(arcMap, model, colours) {
     const c = Object.assign({ ink: "#222222", muted: "#6b7280", line: "#c7ced6", a: "#d64541", b: "#2b6cc4", shared: "#8c8c8c",
       up: "#c62828", down: "#1f4e9e", track: ["#d9d9d9", "#bdbdbd"], background: "#ffffff" }, colours || {});
+    // one-colour structures: the ink in print, the structure colour on screen
+    c.structure = c.structure || c.ink;
     const s = arcMap;
     const width = 1000;
     const left = 16;
@@ -854,10 +856,10 @@
     const setB = new Set(model.pairsB.map(function (p) { return p[0] + ":" + p[1]; }));
     const mono = s.mono;
     const layers = [
-      { pairs: model.pairsA.filter(function (p) { return !setB.has(p[0] + ":" + p[1]); }), up: true, colour: mono ? c.ink : c.a },
-      { pairs: model.pairsB.filter(function (p) { return !setA.has(p[0] + ":" + p[1]); }), up: false, colour: mono ? c.ink : c.b },
-      { pairs: model.pairsA.filter(function (p) { return setB.has(p[0] + ":" + p[1]); }), up: true, colour: mono ? c.ink : c.shared },
-      { pairs: model.pairsB.filter(function (p) { return setA.has(p[0] + ":" + p[1]); }), up: false, colour: mono ? c.ink : c.shared }
+      { pairs: model.pairsA.filter(function (p) { return !setB.has(p[0] + ":" + p[1]); }), up: true, colour: mono ? c.structure : c.a },
+      { pairs: model.pairsB.filter(function (p) { return !setA.has(p[0] + ":" + p[1]); }), up: false, colour: mono ? c.structure : c.b },
+      { pairs: model.pairsA.filter(function (p) { return setB.has(p[0] + ":" + p[1]); }), up: true, colour: mono ? c.structure : c.shared },
+      { pairs: model.pairsB.filter(function (p) { return setA.has(p[0] + ":" + p[1]); }), up: false, colour: mono ? c.structure : c.shared }
     ];
     layers.forEach(function (layer) {
       const d = layer.pairs.filter(visible).map(function (p) { return arcPath(p[0], p[1], layer.up, false); }).join("");
@@ -901,10 +903,10 @@
       escapeXml((s.labelOne || (s.a && s.a.name) || "Structure A") + " position (nt)") + "</text>");
     const legend = [];
     if (s.a) {
-      legend.push([mono ? c.ink : c.a, "A · " + s.a.name + (twoSided && model.pairsB.length ? " (above)" : "")]);
+      legend.push([mono ? c.structure : c.a, "A · " + s.a.name + (twoSided && model.pairsB.length ? " (above)" : "")]);
     }
     if (s.b) {
-      legend.push([mono ? c.ink : c.b, "B · " + s.b.name + " (below)"]);
+      legend.push([mono ? c.structure : c.b, "B · " + s.b.name + " (below)"]);
     }
     if (model.overlay.some(function (o) { return o.up; })) {
       legend.push([c.up, "higher in " + (s.labelOne || "condition one")]);
@@ -947,11 +949,31 @@
     }).join("|");
   }
 
+  // On screen the figure takes the site's theme: its surface, ink and lines,
+  // structures in the primary colour (as on the RNA Structure page and the
+  // landing illustration) and the conditions' red and blue, brighter on dark.
+  // The downloaded SVG keeps svg()'s white publication palette. Without a
+  // document (the Node checks) the screen uses it too.
+  function screenColours() {
+    if (typeof document === "undefined" || typeof getComputedStyle !== "function") {
+      return null;
+    }
+    const style = getComputedStyle(document.documentElement);
+    const token = function (name) { return style.getPropertyValue(name).trim(); };
+    const dark = document.documentElement.dataset.theme === "dark";
+    return {
+      ink: token("--ink"), muted: token("--muted"), line: token("--line-strong"), background: token("--surface-subtle"),
+      structure: token("--primary"), a: dark ? "#e8605a" : "#d64541", b: dark ? "#4c8fe8" : "#2b6cc4", shared: token("--muted"),
+      up: dark ? "#e8605a" : "#c62828", down: dark ? "#4c8fe8" : "#1f4e9e", track: [token("--line"), token("--line-strong")]
+    };
+  }
+
   function cachedModel(s) {
-    const key = stateKey(s);
+    const colours = screenColours();
+    const key = stateKey(s) + "|" + JSON.stringify(colours);
     if (!lastCard || lastCard.key !== key) {
       const model = build(s);
-      lastCard = { key: key, model: model, svg: model.ready ? svg(s, model) : "" };
+      lastCard = { key: key, model: model, svg: model.ready ? svg(s, model, colours) : "" };
     }
     return lastCard;
   }
@@ -996,7 +1018,7 @@
       control("Condition two", "labelTwo", s.labelTwo, "label, e.g. ZASI"),
       select("Condition one cells are on", "oneOn", s.oneOn, [["a", "A's reference"], ["b", "B's reference"]]),
       select("Condition two cells are on", "twoOn", s.twoOn, [["a", "A's reference"], ["b", "B's reference"]]),
-      select("Structures", "mono", s.mono ? "mono" : "colour", [["mono", "One colour (black)"], ["colour", "A red, B blue"]]),
+      select("Structures", "mono", s.mono ? "mono" : "colour", [["mono", "One colour"], ["colour", "A red, B blue"]]),
       // empty means the whole structure: the placeholder says so in words,
       // so that an empty field does not read as a disabled one
       control("From (nt)", "start", s.start, "Start (1)"),

@@ -643,12 +643,14 @@
     const previousNav = typeof app.querySelector === "function" ? app.querySelector(".mobile-nav") : null;
     const navScrollLeft = previousNav ? previousNav.scrollLeft : 0;
     const previousPage = renderedPage;
+    // the theme is set first: cards that read theme colours while building
+    // their markup (the arc map) must see the new one
+    document.documentElement.dataset.theme = state.theme;
     app.innerHTML = workspaceOpen ? renderWorkspace() : renderLanding();
     renderedPage = workspaceOpen ? state.activePage : null;
     if (workspaceOpen) {
       revealActiveMobileNav(navScrollLeft, previousPage !== renderedPage);
     }
-    document.documentElement.dataset.theme = state.theme;
     app.dataset.density = state.density;
     const themeColor = document.querySelector('meta[name="theme-color"]');
     if (themeColor) {
