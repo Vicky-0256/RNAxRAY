@@ -3,6 +3,12 @@ RNA structure, on your own computer. Your data is not uploaded anywhere. The
 only network use is the optional RNAcentral lookup, which is off until you
 turn it on in Preferences.
 
+## What's new in 0.1.6
+
+- **The logo's colors**: buttons, selections and links take the new
+  RNAxRay colors, electric blue in light mode and cyan in dark mode, as on
+  RNAxRay Web. Status colors and chart colors are unchanged.
+
 ## What's new in 0.1.5
 
 - **New RNAxRay logo**: the new wordmark in the sidebar and on the start

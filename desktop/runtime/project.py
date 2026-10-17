@@ -29,7 +29,7 @@ _SCHEMA = re.compile(r"^[0-9]+\.[0-9]+$")
 _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}T")
 
 
-DEFAULT_APP_VERSION = "0.1.5"
+DEFAULT_APP_VERSION = "0.1.6"
 SCHEMA_VERSION = "2.0"
 SUPPORTED_MAJOR = 2
 READ_FORMATS = ("fastq", "fastq.gz", "fasta", "fasta.gz", "sam", "hyb")

@@ -102,7 +102,7 @@ class UiStateAndVersionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(os.environ, {}, clear=False):
             os.environ.pop("RNAXRAY_APP_VERSION", None)
             manifest = json.loads(new_project(Path(tmp) / "p", "P").read_text())
-            self.assertEqual(manifest["application"]["version"], "0.1.5")
+            self.assertEqual(manifest["application"]["version"], "0.1.6")
 
     def test_project_made_by_hyb2_desktop_still_validates(self):
         with tempfile.TemporaryDirectory() as tmp:
