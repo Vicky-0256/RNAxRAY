@@ -450,7 +450,7 @@
           ["Total coverage", formatNumber(results.totalCoverage)]
         ]) : '<div class="report-empty">Generate Viewpoint coverage from the workspace to include its result here.</div>') + '</div>',
         "</div>",
-        ready ? '<div class="report-visual-wrap"><div class="report-subsection-heading"><h3>Printable coverage profile</h3><span class="report-note-inline">' + escape(results.rna || viewpoint.rna || "RNA") + '</span></div>' + visualBlock(renderCoverageSvg(results.bins, results.max, "#00a09d", viewpoint.selection && viewpoint.selection.start, results.rna || viewpoint.rna, viewpoint.measure === "support" ? "Cluster support" : "Records"), results.bins.length > MAX_VISUAL_BINS ? "Coverage bars downsampled to " + formatNumber(MAX_VISUAL_BINS) + " buckets for printing." : "") + dataNote(context, "tables/viewpoint_bins.tsv") + '</div>' : "",
+        ready ? '<div class="report-visual-wrap"><div class="report-subsection-heading"><h3>Printable coverage profile</h3><span class="report-note-inline">' + escape(results.rna || viewpoint.rna || "RNA") + '</span></div>' + visualBlock(renderCoverageSvg(results.bins, results.max, "#0060fe", viewpoint.selection && viewpoint.selection.start, results.rna || viewpoint.rna, viewpoint.measure === "support" ? "Cluster support" : "Records"), results.bins.length > MAX_VISUAL_BINS ? "Coverage bars downsampled to " + formatNumber(MAX_VISUAL_BINS) + " buckets for printing." : "") + dataNote(context, "tables/viewpoint_bins.tsv") + '</div>' : "",
         results && results.binSizeAdjusted ? '<p class="report-note" data-cites="S05"><span class="report-cite">S05</span> The requested resolution was adjusted to ' + formatNumber(results.binSize) + ' nt to keep the browser profile within its maximum bin count.</p>' : ""
       ].join("")
     );
@@ -491,7 +491,7 @@
           ["Profile resolution", formatNumber(results.profileBinSize) + " nt"]
         ]) : '<div class="report-empty">Explore a region from the workspace to include its result here.</div>') + '</div>',
         "</div>",
-        results && results.profile && results.profile.length ? '<div class="report-visual-wrap"><div class="report-subsection-heading"><h3>Printable region profile</h3><span class="report-note-inline">' + escape(region.rna || "RNA") + '</span></div>' + visualBlock(renderCoverageSvg(results.profile, maxSeriesValue(results.profile), "#00a09d", null, region.rna, "Arm support"), results.profile.length > MAX_VISUAL_BINS ? "Profile bars downsampled to " + formatNumber(MAX_VISUAL_BINS) + " buckets for printing." : "") + dataNote(context, "tables/region_profile.tsv") + '</div>' : "",
+        results && results.profile && results.profile.length ? '<div class="report-visual-wrap"><div class="report-subsection-heading"><h3>Printable region profile</h3><span class="report-note-inline">' + escape(region.rna || "RNA") + '</span></div>' + visualBlock(renderCoverageSvg(results.profile, maxSeriesValue(results.profile), "#0060fe", null, region.rna, "Arm support"), results.profile.length > MAX_VISUAL_BINS ? "Profile bars downsampled to " + formatNumber(MAX_VISUAL_BINS) + " buckets for printing." : "") + dataNote(context, "tables/region_profile.tsv") + '</div>' : "",
         '<div class="report-grid report-region-tables">',
         '<div class="report-subsection"><h3>Top partners</h3>' + (partnerRows.length ? table([long("Partner"), num("Records"), num("Support")], partnerRows) : '<div class="report-empty">No partner records are available for this region.</div>') + dataNote(context, "tables/region_partners.tsv") + '</div>',
         '<div class="report-subsection"><h3>Matching record sample</h3>' + (recordRows.length ? table(["Sequence ID", long("RNA 1"), num("Region 1"), long("RNA 2"), num("Region 2"), num("Support")], recordRows) : '<div class="report-empty">No matching records are available for this region.</div>') + '</div>',
@@ -1265,7 +1265,7 @@
       const value = Math.max(0, number(bin.value));
       const height = maxValue ? value / maxValue * plot.height : 0;
       const selected = selectedStart != null && number(selectedStart) >= number(bin.start) && number(selectedStart) <= number(bin.end);
-      return '<rect x="' + fixed(plot.left + index * barWidth) + '" y="' + fixed(plot.top + plot.height - height) + '" width="' + fixed(Math.max(1, barWidth - 0.5)) + '" height="' + fixed(height) + '" fill="' + (selected ? "#6a4ff2" : color) + '"><title>' + escape(range(bin.start, bin.end) + "; value " + formatNumber(value)) + '</title></rect>';
+      return '<rect x="' + fixed(plot.left + index * barWidth) + '" y="' + fixed(plot.top + plot.height - height) + '" width="' + fixed(Math.max(1, barWidth - 0.5)) + '" height="' + fixed(height) + '" fill="' + (selected ? "#9c05f8" : color) + '"><title>' + escape(range(bin.start, bin.end) + "; value " + formatNumber(value)) + '</title></rect>';
     }).join("");
     return [
       '<svg class="report-svg report-coverage-svg" viewBox="0 0 760 212" role="img" aria-label="Printable coverage profile">',

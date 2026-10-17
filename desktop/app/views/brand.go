@@ -24,46 +24,48 @@ var (
 // logoAspect is the wordmark's width / height (its viewBox, 1940 x 389.67).
 const logoAspect = 1940 / 389.67
 
-// The RNAxRay accent of the web app (web/styles.css --teal, --teal-deep,
-// --primary-hover, --primary-foreground and, for text, --primary-ink),
-// replacing MyGo's blue and the system's accent color.
-var (
-	brandTeal      = ui.Hex("#00a09d")
-	brandTealDeep  = ui.Hex("#007b78")
-	brandNavy      = ui.Hex("#10263d")
-	brandInkLight  = ui.Hex("#007672")
-	brandInkDark   = ui.Hex("#35c3c0")
-	brandHoverLite = ui.Hex("#00b0ac")
-)
-
-// The navy-tinted neutrals of the web app, light and dark (web/styles.css
-// --surface, --canvas, --surface-subtle, --line, --ink, --muted and the
-// status colors). Background is the web's card surface (cards, sidebar,
+// The palette of the web app, light and dark (web/styles.css): the accent
+// from the logo's colors (--primary and its hover, pressed and foreground,
+// --primary-ink for text, --primary-soft), electric blue under white text
+// in light mode and cyan under navy text in dark mode, replacing MyGo's
+// blue and the system's accent color; the navy-tinted neutrals (--surface,
+// --canvas, --surface-subtle, --line, --ink, --muted) and the status
+// colors. Background is the web's card surface (cards, sidebar,
 // top bar), Surface its subtle surface (controls, insets) and brandCanvas
 // the page behind the cards.
 var (
 	brandLight = brandNeutrals{
-		background: ui.Hex("#ffffff"), canvas: ui.Hex("#f3f7f8"), soft: ui.Hex("#e3f7f6"),
+		accent: ui.Hex("#0060fe"), accentHover: ui.Hex("#0050d6"), accentPressed: ui.Hex("#0043b3"),
+		accentText: ui.Hex("#ffffff"), ink: ui.Hex("#0057e6"), selection: 0.25,
+		background: ui.Hex("#ffffff"), canvas: ui.Hex("#f3f7f8"), soft: ui.Hex("#e8f0ff"),
 		surface: ui.Hex("#f3f7f8"), surfaceHover: ui.Hex("#e9f1f3"), surfacePressed: ui.Hex("#dce7ec"),
 		border: ui.Hex("#dce7ec"), text: ui.Hex("#132c47"), textMuted: ui.Hex("#5b6c80"),
 		danger: ui.Hex("#b42318"), warning: ui.Hex("#9c5e12"), success: ui.Hex("#007b78"),
 		mutedStrong: ui.Hex("#38516a"), dangerSoft: ui.Hex("#fcecea"), warningSoft: ui.Hex("#fff4e3"),
+		successSoft: ui.Hex("#e3f7f6"),
 	}
 	brandDark = brandNeutrals{
-		background: ui.Hex("#132c47"), canvas: ui.Hex("#0c1a29"), soft: ui.Hex("#123f4b"),
+		accent: ui.Hex("#0be3ea"), accentHover: ui.Hex("#5ceef2"), accentPressed: ui.Hex("#08b8be"),
+		accentText: ui.Hex("#10263d"), ink: ui.Hex("#0be3ea"), selection: 0.35,
+		background: ui.Hex("#132c47"), canvas: ui.Hex("#0c1a29"), soft: ui.Hex("#0d3a52"),
 		surface: ui.Hex("#183650"), surfaceHover: ui.Hex("#21405e"), surfacePressed: ui.Hex("#2e4b66"),
 		border: ui.Hex("#2e4b66"), text: ui.Hex("#ecf1f8"), textMuted: ui.Hex("#9eb1c3"),
 		danger: ui.Hex("#f29c96"), warning: ui.Hex("#f5b867"), success: ui.Hex("#43d1b0"),
 		mutedStrong: ui.Hex("#c8d6e2"), dangerSoft: ui.Hex("#4a2524"), warningSoft: ui.Hex("#4a3518"),
+		successSoft: ui.Hex("#123f4b"),
 	}
 )
 
 type brandNeutrals struct {
+	accent, accentHover, accentPressed    ui.Color
+	accentText, ink                       ui.Color
+	selection                             float32 // alpha of the accent behind selected text
 	background, canvas, soft              ui.Color
 	surface, surfaceHover, surfacePressed ui.Color
 	border, text, textMuted               ui.Color
 	danger, warning, success              ui.Color
 	mutedStrong, dangerSoft, warningSoft  ui.Color
+	successSoft                           ui.Color
 }
 
 func brandOf(t *ui.Theme) *brandNeutrals {
@@ -81,14 +83,8 @@ func applyBrandTheme(c *ui.Context) {
 	t.Background, t.Surface, t.SurfaceHover, t.SurfacePressed = n.background, n.surface, n.surfaceHover, n.surfacePressed
 	t.Border, t.Text, t.TextMuted = n.border, n.text, n.textMuted
 	t.Danger, t.Warning, t.Success = n.danger, n.warning, n.success
-	t.Accent, t.AccentPressed, t.AccentText = brandTeal, brandTealDeep, brandNavy
-	if t.Dark {
-		t.AccentHover = brandInkDark
-		t.Selection, t.Focus = brandTeal.Alpha(0.4), brandInkDark.Alpha(0.6)
-	} else {
-		t.AccentHover = brandHoverLite
-		t.Selection, t.Focus = brandTeal.Alpha(0.25), brandTeal.Alpha(0.55)
-	}
+	t.Accent, t.AccentHover, t.AccentPressed, t.AccentText = n.accent, n.accentHover, n.accentPressed, n.accentText
+	t.Selection, t.Focus = n.accent.Alpha(n.selection), n.accent.Alpha(0.6)
 	// What MyGo's own theme does for Increase Contrast, on these colors.
 	if c.Preferences().HighContrast {
 		t.Border = t.Border.Mix(t.Text, 0.45)
@@ -101,7 +97,7 @@ func applyBrandTheme(c *ui.Context) {
 // brandCanvas is the page behind the cards (web --canvas).
 func brandCanvas(t *ui.Theme) ui.Color { return brandOf(t).canvas }
 
-// brandSoft is the light teal of a chosen item (web --primary-soft).
+// brandSoft is the tint behind a chosen item (web --primary-soft).
 func brandSoft(t *ui.Theme) ui.Color { return brandOf(t).soft }
 
 // Tones of a notice.
@@ -157,14 +153,9 @@ func ts(c *ui.Context, px float32) float32 {
 	return px * c.Theme().FontSize / baseFontSize
 }
 
-// brandInk is the accent for text, which plain teal is too light for on a
-// light background.
-func brandInk(t *ui.Theme) ui.Color {
-	if t.Dark {
-		return brandInkDark
-	}
-	return brandInkLight
-}
+// brandInk is the accent for text (web --primary-ink), a little deeper than
+// the fill in light mode.
+func brandInk(t *ui.Theme) ui.Color { return brandOf(t).ink }
 
 // brandLink is ui.Link in the accent for text.
 func brandLink(c *ui.Context, label string) ui.Element {

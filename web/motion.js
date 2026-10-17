@@ -551,13 +551,13 @@
         ink: cssVar("--ink", "#132c47"),
         muted: cssVar("--muted", "#607286"),
         line: cssVar("--line", "#dce7ec"),
-        teal: cssVar("--primary", "#00a09d"),
-        violet: cssVar("--accent", "#6a4ff2"),
+        teal: cssVar("--primary", "#0060fe"),
+        violet: cssVar("--accent", "#9c05f8"),
         surface: cssVar("--surface", "#ffffff"),
         dark: root.dataset.theme === "dark",
         bases: {
-          A: cssVar("--teal", "#00a09d"),
-          U: cssVar("--accent", "#6a4ff2"),
+          A: cssVar("--primary", "#0060fe"),
+          U: cssVar("--accent", "#9c05f8"),
           G: cssVar("--muted-strong", "#38516a"),
           C: cssVar("--warning", "#a96614")
         }

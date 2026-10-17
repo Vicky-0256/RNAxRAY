@@ -514,7 +514,7 @@
       const y = geometry.top + (Math.min(drag.y, drag.end.y) - geometry.yStart) / matrix.binSize * geometry.cellHeight;
       const width = (Math.abs(drag.x - drag.end.x) / matrix.binSize + 1) * geometry.cellWidth;
       const height = (Math.abs(drag.y - drag.end.y) / matrix.binSize + 1) * geometry.cellHeight;
-      context.fillStyle = "rgba(0,160,157,0.18)";
+      context.fillStyle = "rgba(0,96,254,0.18)";
       context.fillRect(x, y, width, height);
       context.strokeStyle = ink;
       context.lineWidth = 2;
@@ -3498,16 +3498,16 @@
         line: "#2e4b66",
         ink: "#ecf1f8",
         muted: "#9eb1c3",
-        primary: "#00a09d",
-        accent: "#a596ff"
+        primary: "#0be3ea",
+        accent: "#c97afd"
       }
       : {
         surface: "#ffffff",
         line: "#dce7ec",
         ink: "#132c47",
         muted: "#5b6c80",
-        primary: "#00a09d",
-        accent: "#6a4ff2"
+        primary: "#0060fe",
+        accent: "#9c05f8"
       };
     if (theme === "light" || theme === "dark" || typeof document === "undefined" || typeof getComputedStyle !== "function" || !document.documentElement) {
       return fallback;

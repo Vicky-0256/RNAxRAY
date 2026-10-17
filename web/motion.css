@@ -32,10 +32,10 @@
   --stagger-word: 90ms;
   --stagger-item: 60ms;
   --stagger-list: 30ms;
-  --hero-aura-a: color-mix(in srgb, var(--teal) 22%, transparent);
-  --hero-aura-b: color-mix(in srgb, var(--violet) 16%, transparent);
+  --hero-aura-a: color-mix(in srgb, var(--cyan) 24%, transparent);
+  --hero-aura-b: color-mix(in srgb, var(--purple) 14%, transparent);
   --stage-surface: color-mix(in srgb, var(--surface) 72%, transparent);
-  --gradient-ink: linear-gradient(100deg, var(--teal-deep) 0%, var(--teal) 38%, var(--violet) 72%, var(--teal) 100%);
+  --gradient-ink: linear-gradient(100deg, var(--blue) 0%, #3a35fd 40%, var(--purple) 74%, var(--blue) 100%);
 }
 
 /* 1 - e^(-zeta w t)(cos(wd t) + zeta w / wd sin(wd t)), sampled at 41 even
@@ -48,10 +48,10 @@
 }
 
 :root[data-theme="dark"] {
-  --hero-aura-a: color-mix(in srgb, var(--teal) 20%, transparent);
-  --hero-aura-b: color-mix(in srgb, #9a88ff 18%, transparent);
+  --hero-aura-a: color-mix(in srgb, var(--cyan) 18%, transparent);
+  --hero-aura-b: color-mix(in srgb, #c97afd 16%, transparent);
   --stage-surface: color-mix(in srgb, var(--surface) 60%, transparent);
-  --gradient-ink: linear-gradient(100deg, #35c3c0 0%, #43d1b0 36%, #b7aaff 72%, #35c3c0 100%);
+  --gradient-ink: linear-gradient(100deg, var(--cyan) 0%, #5fa8ff 38%, #c97afd 72%, var(--cyan) 100%);
 }
 
 /* ------------------------------------------------------------------ */
@@ -340,7 +340,7 @@
   position: absolute;
   inset: 0 0 auto;
   height: 3px;
-  background: linear-gradient(90deg, var(--teal), var(--violet));
+  background: var(--brand-gradient);
   content: "";
 }
 
@@ -439,7 +439,7 @@
 .progress-bar > span {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(90deg, var(--teal), var(--violet));
+  background: var(--brand-gradient);
   transition: width var(--dur-quick) var(--ease-out);
 }
 
@@ -661,7 +661,7 @@
   right: 0;
   left: 240px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--teal), var(--violet), transparent);
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), var(--purple), transparent);
   background-size: 50% 100%;
   background-repeat: no-repeat;
   content: "";

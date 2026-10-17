@@ -157,7 +157,7 @@ kbd {
   position: absolute;
   inset: 0 0 auto;
   height: 2px;
-  background: linear-gradient(90deg, var(--teal), var(--violet));
+  background: var(--brand-gradient);
   content: "";
 }
 
@@ -601,7 +601,7 @@ body.cmdk-locked {
   right: 0;
   left: 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--teal), var(--violet));
+  background: var(--brand-gradient);
   pointer-events: none;
   transform: scaleX(0);
   transform-origin: left center;

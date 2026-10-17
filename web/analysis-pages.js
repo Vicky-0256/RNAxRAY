@@ -1690,7 +1690,7 @@
     }).join("");
     const legend = window.RNAxRayUiKit && window.RNAxRayUiKit.legend ? window.RNAxRayUiKit.legend.html({
       kind: "sequential",
-      colorAt: function (t) { return "rgba(106, 79, 242, " + Math.max(0.08, t).toFixed(3) + ")"; },
+      colorAt: function (t) { return "rgba(156, 5, 248, " + Math.max(0.08, t).toFixed(3) + ")"; },
       min: 0,
       max: maximum,
       title: "log1p bonus",

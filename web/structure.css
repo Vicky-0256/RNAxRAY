@@ -975,11 +975,11 @@
 }
 
 .forna-structure-mount line.fornac-link[link_type="basepair"] {
-  stroke: #00a09d;
+  stroke: #0060fe;
 }
 
 .forna-structure-mount line.fornac-link[link_type="pseudoknot"] {
-  stroke: #6a4ff2;
+  stroke: #9c05f8;
   stroke-width: 2.5px;
   stroke-dasharray: 5 3;
 }

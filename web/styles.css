@@ -1,12 +1,14 @@
 :root {
   color-scheme: light;
-  --teal: #00a09d;
-  --teal-deep: #007b78;
-  --teal-soft: #e3f7f6;
-  --violet: #6a4ff2;
-  --violet-deep: #5138cc;
-  --violet-soft: #efecff;
+  /* The logo's colors (docs/brand/RNAxRay-SVG/README.md): cyan, electric
+     blue and purple. Cyan is too light for text or for fills under white
+     text on a light page, so light mode leads with the blue, dark mode
+     with the cyan under navy text. */
+  --cyan: #0be3ea;
+  --blue: #0060fe;
+  --purple: #9c05f8;
   --navy: #132c47;
+  --brand-gradient: linear-gradient(90deg, var(--cyan), var(--blue) 50%, var(--purple));
   --canvas: #f3f7f8;
   --surface: #ffffff;
   --surface-subtle: #f7fafb;
@@ -15,16 +17,16 @@
   --muted-strong: #38516a;
   --line: #dce7ec;
   --line-strong: #c2d3db;
-  --primary: var(--teal);
-  --primary-hover: #00b0ac;
-  /* Text on the teal button and teal used as text both clear WCAG 4.5:1. */
-  --primary-foreground: #10263d;
-  --primary-ink: #007672;
-  --primary-soft: var(--teal-soft);
-  --accent: var(--violet);
-  --accent-hover: var(--violet-deep);
-  --accent-soft: var(--violet-soft);
-  --success: var(--teal-deep);
+  --primary: var(--blue);
+  --primary-hover: #0050d6;
+  /* Text on the blue button and blue used as text both clear WCAG 4.5:1. */
+  --primary-foreground: #ffffff;
+  --primary-ink: #0057e6;
+  --primary-soft: #e8f0ff;
+  --accent: var(--purple);
+  --accent-hover: #7f04ca;
+  --accent-soft: #f4e8fe;
+  --success: #007b78;
   --success-soft: #e3f7f6;
   --warning: #9c5e12;
   --warning-soft: #fff4e3;
@@ -54,14 +56,14 @@
   --muted-strong: #c8d6e2;
   --line: #2e4b66;
   --line-strong: #45647e;
-  --primary: var(--teal);
-  --primary-hover: #35c3c0;
+  --primary: var(--cyan);
+  --primary-hover: #5ceef2;
   --primary-foreground: #10263d;
-  --primary-ink: #35c3c0;
-  --primary-soft: #123f4b;
-  --accent: #a596ff;
-  --accent-hover: #b7aaff;
-  --accent-soft: #302958;
+  --primary-ink: var(--cyan);
+  --primary-soft: #0d3a52;
+  --accent: #c97afd;
+  --accent-hover: #d897fe;
+  --accent-soft: #2a1c45;
   --success: #43d1b0;
   --success-soft: #123f4b;
   --warning: #f5b867;
@@ -547,10 +549,60 @@ a {
   justify-content: center;
 }
 
-.desktop-first-launch summary {
+.desktop-first-launch summary,
+.desktop-versions summary {
   cursor: pointer;
   color: var(--muted-strong);
   font-weight: 620;
+}
+
+.desktop-download-version {
+  color: var(--muted);
+}
+
+.desktop-download-version strong {
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-weight: 650;
+}
+
+.desktop-version-list {
+  display: grid;
+  gap: 10px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.desktop-version-list li {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 4px 10px;
+}
+
+.desktop-version-name {
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-weight: 650;
+}
+
+.desktop-version-date {
+  color: var(--muted);
+}
+
+.desktop-version-links {
+  color: var(--muted);
+}
+
+@media (max-width: 520px) {
+  .desktop-version-list li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .desktop-version-links {
+    grid-column: 1 / -1;
+  }
 }
 
 .desktop-first-launch p {
@@ -1120,7 +1172,7 @@ a {
   flex: 0 0 auto;
   min-height: 26px;
   padding: 4px 8px;
-  border: 1px solid color-mix(in srgb, var(--teal) 30%, var(--line));
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--line));
   border-radius: 999px;
   background: var(--primary-soft);
   color: var(--primary-ink);

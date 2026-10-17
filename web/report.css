@@ -5,7 +5,7 @@
   --report-line-strong: var(--line-strong);
   --report-surface: var(--surface);
   --report-subtle: var(--surface-subtle);
-  --report-teal: var(--teal);
+  --report-teal: var(--primary);
   --report-teal-ink: var(--primary-ink);
   --report-violet: var(--accent);
   width: min(100%, 1180px);
@@ -842,9 +842,9 @@
     --report-line-strong: #c2d3db;
     --report-surface: #fff;
     --report-subtle: #f7fafb;
-    --report-violet: #6a4ff2;
-    --report-teal: #00a09d;
-    --report-teal-ink: #007672;
+    --report-violet: #9c05f8;
+    --report-teal: #0060fe;
+    --report-teal-ink: #0057e6;
     width: 100%;
     color: #132c47;
     background: #fff;

@@ -52,9 +52,9 @@ func (a *App) navigation(c *ui.Context) {
 			for _, p := range Pages {
 				item := ui.SidebarItem(c, p.ID, nil, p.Number+"  "+p.Title)
 				if p.ID == page {
-					// The web app's chosen page: light teal, a teal bar on the left.
+					// The web app's chosen page: the accent's tint, its bar on the left.
 					item.Background(brandSoft(t)).TextColor(brandInk(t)).FontWeight(600).
-						BorderWidth(0, 0, 0, 3).BorderColor(brandTeal)
+						BorderWidth(0, 0, 0, 3).BorderColor(t.Accent)
 				}
 				if p.ID == "data" && len(a.Project.Samples) > 0 {
 					item.Children(func() { ui.Badge(c, fmt.Sprint(len(a.Project.Samples))) })
@@ -100,7 +100,7 @@ func (a *App) privacyChip(c *ui.Context) {
 	}
 	t := c.Theme()
 	label, tip := "Local only", "Your data stays on this computer: external lookups are off."
-	ink, bg, border := t.Success, brandSoft(t), t.Success.Mix(t.Border, 0.73)
+	ink, bg, border := t.Success, brandOf(t).successSoft, t.Success.Mix(t.Border, 0.73)
 	if a.lookup.on {
 		label, tip = "RNAcentral lookups on", "Only the identifier and species you enter are sent to RNAcentral; no sequence, structure or project data."
 		ink, bg, border = brandOf(t).mutedStrong, t.Surface, t.Border

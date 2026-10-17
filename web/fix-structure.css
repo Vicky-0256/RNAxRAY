@@ -964,6 +964,6 @@
 
 .sequence-blocks mark {
   border-radius: 2px;
-  background: color-mix(in srgb, var(--violet, #6a4ff2) 30%, transparent);
+  background: color-mix(in srgb, var(--accent, #9c05f8) 30%, transparent);
   color: inherit;
 }

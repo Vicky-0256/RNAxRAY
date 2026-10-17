@@ -1352,8 +1352,8 @@
   // image exports are drawn in the light theme whatever the page's theme
   // (as the other pages' exports): these are styles.css's light values
   const LIGHT_EXPORT_COLORS = {
-    primary: "#00a09d",
-    accent: "#6a4ff2",
+    primary: "#0060fe",
+    accent: "#9c05f8",
     muted: "#5b6c80",
     line: "#dce7ec",
     lineStrong: "#c2d3db",
