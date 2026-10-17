@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Render the RNAxRay app icons from the official SVGs in docs/brand/RNAxRay-SVG.
+"""Render the RNAxRay app icons from the official SVGs in docs/brand/RNAxRay-SVG
+(the brand kit, kept locally and not in the repository; the PNGs it writes are).
 
 Writes
 

@@ -1,12 +1,12 @@
 # RNAxRay Web — brand notes
 
 Name, logo, palette and voice shared with RNAxRay Desktop:
-`../docs/brand-guidelines.md`. This file adds what is specific to the web app.
+the brand guidelines (kept outside this repository). This file adds what is specific to the web app.
 
 ## Current asset state
 
 - **Product:** RNAxRay Web, a browser-local workspace for HYB RNA interaction files.
-- **Logo:** \`assets/rnaxray-wordmark.svg\` is the light-theme RNAxRay wordmark; \`assets/rnaxray-wordmark-dark.svg\` is used automatically for the dark theme; \`assets/favicon.svg\` is the tab icon. Sources and placement: \`../docs/brand-guidelines.md\`.
+- **Logo:** \`assets/rnaxray-wordmark.svg\` is the light-theme RNAxRay wordmark; \`assets/rnaxray-wordmark-dark.svg\` is used automatically for the dark theme; \`assets/favicon.svg\` is the tab icon. Placement follows the brand guidelines.
 - **External network assets:** none at runtime. The deployed artifact self-hosts pinned ViennaRNA, Pyodide, NumPy, and CPLfold files; it deliberately loads no remote images, fonts, scripts, analytics, or CDN resources after deployment.
 
 ## Design system
@@ -15,7 +15,7 @@ Name, logo, palette and voice shared with RNAxRay Desktop:
 - **Primary viewport:** desktop research workflows at laptop distance; tablet and phone layouts preserve loading and summary reading.
 - **Visual temperature:** restrained, precise, and trustworthy.
 - **Capacity:** dense analysis controls after a file is loaded; generous whitespace before loading.
-- **Palette:** the logo's colors: electric blue \`#0060FE\` and purple \`#9C05F8\` in light mode, cyan \`#0BE3EA\` and light purple \`#C97AFD\` in dark mode, on Navy \`#132C47\`; light canvas \`#F3F7F8\`, white surface, blue-tinted chosen items and Navy text. Dark mode uses Navy surfaces with cyan controls under navy text. Values and contrast: \`../docs/brand-guidelines.md\`.
+- **Palette:** the logo's colors: electric blue \`#0060FE\` and purple \`#9C05F8\` in light mode, cyan \`#0BE3EA\` and light purple \`#C97AFD\` in dark mode, on Navy \`#132C47\`; light canvas \`#F3F7F8\`, white surface, blue-tinted chosen items and Navy text. Dark mode uses Navy surfaces with cyan controls under navy text. Values and contrast follow the brand guidelines.
 - **Typography:** locally available system sans for interface copy; locally available monospace for sequence, coordinates, and data values.
 - **Spacing:** 8 px base unit, with primary layout gaps at 8/16/24/32 px.
 - **Radius:** 8 px content surfaces; 6 px controls; compact status pills.

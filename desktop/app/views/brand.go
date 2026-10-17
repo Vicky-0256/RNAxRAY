@@ -1,7 +1,7 @@
 package views
 
 // The RNAxRay wordmark of the web app (web/assets/rnaxray-wordmark*.svg,
-// copied here from docs/brand/RNAxRay-SVG/01-字标; desktop/scripts/make-icon.py
+// copied here from the brand kit's 01-字标 set; desktop/scripts/make-icon.py
 // renders the app icon from the same set).
 
 import (

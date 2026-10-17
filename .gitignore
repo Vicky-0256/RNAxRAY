@@ -13,3 +13,7 @@ desktop/resources/native-*/
 desktop/resources/native-stage-*/
 desktop/resources/*.tar.gz
 desktop/resources/*.zip
+
+# Not part of the source: promotional material and documents are kept locally.
+/promo/
+/docs/

@@ -55,7 +55,7 @@ Drop a `.hyb` file on the start page (up to about 50 MB works comfortably), opti
 | Linux x86-64 (Debian/Ubuntu) | [`RNAxRay-Desktop-Linux-x64.deb`](https://github.com/Vicky-0256/RNAxRAY/releases/latest/download/RNAxRay-Desktop-Linux-x64.deb) |
 | Linux x86-64 (other) | [`RNAxRay-Desktop-Linux-x64.tar.gz`](https://github.com/Vicky-0256/RNAxRAY/releases/latest/download/RNAxRay-Desktop-Linux-x64.tar.gz) |
 
-Check a download against [`SHA256SUMS.txt`](https://github.com/Vicky-0256/RNAxRAY/releases/latest/download/SHA256SUMS.txt). Intel Macs and ARM Linux/Windows have no installer yet; use the [command-line pipeline](docs/command-line-pipeline.md) there.
+Check a download against [`SHA256SUMS.txt`](https://github.com/Vicky-0256/RNAxRAY/releases/latest/download/SHA256SUMS.txt). Intel Macs and ARM Linux/Windows have no installer yet; use the [command-line pipeline](bin/README.md) there.
 
 The app is not code-signed yet. On first launch, macOS asks you to allow it in **System Settings → Privacy & Security → Open Anyway**; Windows SmartScreen asks under **More info → Run anyway**.
 
@@ -74,7 +74,7 @@ Native CPLfold has no capacity test. The page shows how long one fold may be on 
 
 CPLfold builds on LinearFold. Phase 1 enumerates a few nested scaffolds under an objective that adds a bonus to base pairs supported by chimeric reads (weight α); Phase 2 adds crossing pairs under the scaffold constraints; the candidates are then re-scored with a pseudoknot energy model (DP09 by default), with β biasing the choice towards pseudoknots. Decoding is near-linear in length, so a 10,807-nt viral genome folds in one run.
 
-The browser and desktop builds run the same Python sources (`third_party/cplfold`, `web/cplfold`); the desktop build adds Numba-compiled kernels with byte-identical results. See [docs/cplfold-python.md](docs/cplfold-python.md).
+The browser and desktop builds run the same Python sources (`third_party/cplfold`, `web/cplfold`); the desktop build adds Numba-compiled kernels with byte-identical results. See [bin/cplfold-python.md](bin/cplfold-python.md).
 
 ## Repository
 
@@ -84,7 +84,7 @@ The browser and desktop builds run the same Python sources (`third_party/cplfold
 | `desktop/` | RNAxRay Desktop: the Go app (`app/`), its Python runtime bridge (`runtime/`), project schemas (`spec/`) and release scripts ([desktop/README.md](desktop/README.md)) |
 | `pipeline/` | The Python pipeline (`rnaxraypipe`: reads → `.hyb`) and analysis (`rnaxrayanalysis`: indexes, coverage, DESeq2), with golden tests |
 | `third_party/cplfold/` | CPLfold |
-| `bin/` | The original command-line tools ([docs/command-line-pipeline.md](docs/command-line-pipeline.md)) |
+| `bin/` | The original command-line tools ([bin/README.md](bin/README.md)) |
 | `scripts/` | Build scripts for the browser's WebAssembly runtimes and the web checks |
 | `data/` | Small test data |
 
