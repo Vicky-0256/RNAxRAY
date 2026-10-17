@@ -13,6 +13,9 @@
 
   const RED = [214, 69, 65];
   const BLUE = [43, 108, 196];
+  // exports keep the white publication palette; on screen the map takes the
+  // site theme (screenColours), as the arc map does
+  const PRINT = { background: "#ffffff", ink: "#222222", muted: "#6b7280", line: "#c7ced6", selection: "#111111", red: RED, blue: BLUE };
   const BIN = 10;
   const PADJ_FULL = 20; // −log10 padj at which a cell is fully opaque
   const BOTTOM_SPACE = 104;
@@ -311,8 +314,32 @@
     };
   }
 
+  function screenColours() {
+    if (typeof document === "undefined" || typeof getComputedStyle !== "function") {
+      return PRINT;
+    }
+    const style = getComputedStyle(document.documentElement);
+    const token = function (name, fallback) { return style.getPropertyValue(name).trim() || fallback; };
+    const dark = document.documentElement.dataset.theme === "dark";
+    return {
+      background: token("--surface-subtle", PRINT.background), ink: token("--ink", PRINT.ink), muted: token("--muted", PRINT.muted),
+      line: token("--line-strong", PRINT.line), selection: token("--ink", PRINT.selection),
+      red: dark ? [232, 96, 90] : RED, blue: dark ? [76, 143, 232] : BLUE
+    };
+  }
+
+  function rgbOf(colour) {
+    const hex = /^#([0-9a-f]{6})$/i.exec(colour);
+    if (hex) {
+      return [0, 2, 4].map(function (i) { return parseInt(hex[1].slice(i, i + 2), 16); });
+    }
+    const parts = /rgba?\(([^)]+)\)/.exec(colour);
+    return parts ? parts[1].split(",").slice(0, 3).map(Number) : [255, 255, 255];
+  }
+
   // cells to draw, least significant first (as Desktop: strongest on top)
-  function eachCell(result, show, visit) {
+  function eachCell(result, show, visit, colours) {
+    const c = colours || PRINT;
     const s = result.significant;
     for (let i = s.x.length - 1; i >= 0; i -= 1) {
       const lfc = s.log2FoldChange[i];
@@ -324,28 +351,29 @@
       }
       const padj = s.padj[i] > 0 ? Math.max(s.padj[i], 1e-300) : 1e-300;
       const strength = Math.min(1, -Math.log10(padj) / 20);
-      visit(s.x[i], s.y[i], lfc > 0 ? RED : BLUE, 0.2 + 0.8 * strength);
+      visit(s.x[i], s.y[i], lfc > 0 ? c.red : c.blue, 0.2 + 0.8 * strength);
     }
   }
 
-  function drawPanel(context, width, height, comparison, result, show, selectedRow) {
+  function drawPanel(context, width, height, comparison, result, show, selectedRow, colours) {
+    const palette = colours || PRINT;
     const g = geometry(width, height, mapLength(result));
-    context.fillStyle = "#ffffff";
+    context.fillStyle = palette.background;
     context.fillRect(0, 0, width, height);
-    context.fillStyle = "#222222";
+    context.fillStyle = palette.ink;
     context.font = "600 13px Inter, Arial, sans-serif";
     context.textAlign = "left";
     context.fillText("Differential coverage map · " + (comparison.conditionALabel || "Condition A") + " vs " + (comparison.conditionBLabel || "Condition B"), g.left, 20);
-    context.strokeStyle = "#c7ced6";
+    context.strokeStyle = palette.line;
     context.lineWidth = 1;
     context.strokeRect(g.left - 0.5, g.top - 0.5, g.size + 1, g.size + 1);
     eachCell(result, show, function (x, y, colour, alpha) {
       context.fillStyle = "rgba(" + colour[0] + "," + colour[1] + "," + colour[2] + "," + alpha.toFixed(3) + ")";
       context.fillRect(g.x(x), g.y(y + BIN), g.cell, g.cell);
-    });
+    }, palette);
     if (selectedRow) {
       const r = Number(comparison.deseq && comparison.deseq.radius) || 0;
-      context.strokeStyle = "#111111";
+      context.strokeStyle = palette.selection;
       context.lineWidth = 1.5;
       const x0 = g.x(Math.max(0, selectedRow.x - r));
       const y0 = g.y(selectedRow.y + BIN + r);
@@ -353,13 +381,13 @@
     }
     axes(g, function (kind, a, b, c, d, text, anchor) {
       if (kind === "line") {
-        context.strokeStyle = "#c7ced6";
+        context.strokeStyle = palette.line;
         context.beginPath();
         context.moveTo(a, b);
         context.lineTo(c, d);
         context.stroke();
       } else {
-        context.fillStyle = "#6b7280";
+        context.fillStyle = palette.muted;
         context.font = "11px Inter, Arial, sans-serif";
         context.textAlign = anchor;
         if (kind === "vtext") {
@@ -374,7 +402,7 @@
       }
     }, comparison);
     if (legendKit()) {
-      legendKit().legend.drawCanvas(context, legendOptions(g, comparison));
+      legendKit().legend.drawCanvas(context, legendOptions(g, comparison, palette));
     }
   }
 
@@ -401,10 +429,12 @@
   }
 
   // K1 colour bar: signed −log10 padj, the colour giving the direction and
-  // the opacity the strength, as the cells are drawn (over white)
-  function legendOptions(g, comparison) {
+  // the opacity the strength, as the cells are drawn (over the background)
+  function legendOptions(g, comparison, colours) {
+    const c = colours || PRINT;
+    const base = rgbOf(c.background);
     const tint = function (colour, alpha) {
-      return "rgb(" + colour.map(function (c) { return Math.round(255 + (c - 255) * alpha); }).join(",") + ")";
+      return "rgb(" + colour.map(function (v, i) { return Math.round(base[i] + (v - base[i]) * alpha); }).join(",") + ")";
     };
     return {
       kind: "diverging",
@@ -414,7 +444,7 @@
       colorAt: function (t) {
         const signed = 2 * t - 1;
         const strength = Math.abs(signed);
-        return strength < 1e-6 ? "rgb(255,255,255)" : tint(signed > 0 ? RED : BLUE, 0.2 + 0.8 * strength);
+        return strength < 1e-6 ? "rgb(" + base.join(",") + ")" : tint(signed > 0 ? c.red : c.blue, 0.2 + 0.8 * strength);
       },
       format: function (value) { return (Math.abs(value) >= PADJ_FULL ? "≥ " : "") + Math.abs(value); },
       title: "−log10 padj (opacity); colour: direction",
@@ -425,8 +455,8 @@
       y: g.top + g.size + 46,
       width: Math.min(280, g.size),
       height: 10,
-      ink: "#222222",
-      muted: "#6b7280",
+      ink: c.ink,
+      muted: c.muted,
       font: "Inter, Arial, sans-serif"
     };
   }
@@ -446,7 +476,7 @@
     canvas.height = Math.round(height * dpr);
     const context = canvas.getContext("2d");
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
-    drawPanel(context, width, height, comparison, deseq.result, deseq.show || "both", selectedInteraction(deseq));
+    drawPanel(context, width, height, comparison, deseq.result, deseq.show || "both", selectedInteraction(deseq), screenColours());
     canvas.onpointerup = function (event) {
       const box = canvas.getBoundingClientRect();
       const g = geometry(width, height, mapLength(deseq.result));
