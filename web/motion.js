@@ -521,6 +521,9 @@
     // `stem` is the stem a read supports, or -1.
     const READS = 260;
     const SUPPORT_SHARE = 0.68;
+    // Step 1: every read lands (ms after load). Step 2: the structure is
+    // predicted from them. Nothing is added below after step 1.
+    const READS_IN = [400, 2400];
     function jitter(spread) {
       return Math.round((random() + random() + random() - 1.5) * spread);
     }
@@ -539,13 +542,14 @@
     const contacts = [];
     for (let k = 0; k < READS; k += 1) {
       const read = sampleRead();
-      read.arrive = 500 + random() * 2600;
+      read.arrive = READS_IN[0] + random() * (READS_IN[1] - READS_IN[0]);
       contacts.push(read);
     }
     contacts.sort(function (x, y) { return x.arrive - y.arrive; });
 
-    // The predicted structure is drawn stem by stem once the reads are in,
-    // best-supported stem first, as if the fold were being computed from them.
+    // The predicted structure is drawn stem by stem once all reads are in,
+    // densest-supported stem first; while a stem is drawn, the reads that
+    // support it light up, so the density visibly produces the stem.
     const support = stemSpecs.map(function () { return 0; });
     contacts.forEach(function (read) {
       if (read.stem >= 0) {
@@ -553,14 +557,14 @@
       }
     });
     const stemOrder = stemSpecs.map(function (_, k) { return k; }).sort(function (x, y) { return support[y] - support[x]; });
-    const FOLD_START = 2200;
-    const STEM_GAP = 260;
+    const FOLD_START = READS_IN[1] + 500;
+    const STEM_GAP = 320;
     const STEM_DRAW = 420;
+    const STEM_LIGHT = 800;
     const stemStart = {};
     stemOrder.forEach(function (stem, rank) {
       stemStart[stem] = FOLD_START + rank * STEM_GAP;
     });
-    const SETTLED = FOLD_START + stemOrder.length * STEM_GAP + STEM_DRAW;
 
     let host = null;
     let canvas = null;
@@ -573,10 +577,8 @@
     let born = 0;
     let pointer = null;
     let palette = null;
-    let resampled = 0;
     let readsNode = null;
     let probeNode = null;
-    let nextResample = 0;
     let resizeObserver = null;
     let visibilityObserver = null;
 
@@ -797,15 +799,16 @@
         const supports = focusStem >= 0 && read.stem === focusStem;
         const isFocus = focus && focus.below && focus.arc === read;
         const dim = focus && !supports && !isFocus;
-        ctx.globalAlpha = dim ? 0.06 : (supports || isFocus ? 0.75 : (palette.dark ? 0.2 : 0.26) + fresh * 0.5);
+        const lit = read.stem >= 0 && !focus ? Math.max(0, 1 - Math.abs(elapsed - stemStart[read.stem] - STEM_DRAW / 2) / (STEM_LIGHT / 2)) : 0;
+        ctx.globalAlpha = dim ? 0.06 : (supports || isFocus ? 0.75 : (palette.dark ? 0.2 : 0.26) + fresh * 0.5 + lit * 0.5);
         ctx.strokeStyle = palette.violet;
-        ctx.lineWidth = isFocus ? 2 : (supports ? 1.4 : 0.8);
+        ctx.lineWidth = isFocus ? 2 : (supports ? 1.4 : 0.8 + lit * 0.6);
         ctx.beginPath();
         ctx.ellipse(s.cx, g.base, s.rx, s.ry * t, 0, Math.PI, 0, true);
         ctx.stroke();
       });
       ctx.globalAlpha = 1;
-      const shown = arrived + resampled;
+      const shown = arrived;
       if (readsNode && readsNode.textContent !== shown.toLocaleString("en-US")) {
         readsNode.textContent = shown.toLocaleString("en-US");
       }
@@ -854,21 +857,6 @@
         ctx.fillText(String(i + 1), g.x(i), height - 6);
       }
       ctx.globalAlpha = 1;
-
-      // After the fold, reads keep arriving: one read is re-sampled at a time,
-      // so the data below stays messy while the structure above holds.
-      if (!reduced && elapsed > SETTLED) {
-        if (now >= nextResample) {
-          const read = contacts[(random() * contacts.length) | 0];
-          const next = sampleRead();
-          read.i = next.i;
-          read.j = next.j;
-          read.stem = next.stem;
-          read.arrive = elapsed;
-          resampled += 1;
-          nextResample = now + 160 + random() * 340;
-        }
-      }
 
       // Scanner line + probe readout.
       if (pointer && probeIndex >= 0) {
