@@ -3,6 +3,11 @@ RNA structure, on your own computer. Your data is not uploaded anywhere. The
 only network use is the optional RNAcentral lookup, which is off until you
 turn it on in Preferences.
 
+## What's new in 0.1.5
+
+- **New RNAxRay logo**: the new wordmark in the sidebar and on the start
+  page (with its own dark-mode version), and the new app icon.
+
 ## What's new in 0.1.4
 
 - **RNAxRay**: the app, its files and its windows carry the RNAxRay name

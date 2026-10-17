@@ -1,6 +1,6 @@
 {
   "name": "RNAxRay Desktop",
   "identifier": "org.cplfold.rnaxray.desktop",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "out": "build"
 }

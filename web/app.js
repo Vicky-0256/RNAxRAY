@@ -913,8 +913,8 @@
 
   function renderBrand() {
     const logoAsset = state.theme === "dark"
-      ? (window.RNAXRAY_ASSET_BASE || "./") + "assets/rnaxray-logo-dark.png"
-      : (window.RNAXRAY_ASSET_BASE || "./") + "assets/rnaxray-logo.png";
+      ? (window.RNAXRAY_ASSET_BASE || "./") + "assets/rnaxray-wordmark-dark.svg"
+      : (window.RNAXRAY_ASSET_BASE || "./") + "assets/rnaxray-wordmark.svg";
     return [
       '<a class="brand" href="#/" aria-label="RNAxRay Web home">',
       '  <span class="brand-mark"><img src="' + logoAsset + '" alt="RNAxRay"></span>',

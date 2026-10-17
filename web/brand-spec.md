@@ -6,7 +6,7 @@ Name, logo, palette and voice shared with RNAxRay Desktop:
 ## Current asset state
 
 - **Product:** RNAxRay Web, a browser-local workspace for HYB RNA interaction files.
-- **Logo:** \`assets/rnaxray-logo.png\` is the light-theme RNAxRay wordmark; \`assets/rnaxray-logo-dark.png\` is used automatically for the dark theme.
+- **Logo:** \`assets/rnaxray-wordmark.svg\` is the light-theme RNAxRay wordmark; \`assets/rnaxray-wordmark-dark.svg\` is used automatically for the dark theme; \`assets/favicon.svg\` is the tab icon. Sources and placement: \`../docs/brand-guidelines.md\`.
 - **External network assets:** none at runtime. The deployed artifact self-hosts pinned ViennaRNA, Pyodide, NumPy, and CPLfold files; it deliberately loads no remote images, fonts, scripts, analytics, or CDN resources after deployment.
 
 ## Design system

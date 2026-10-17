@@ -1,7 +1,8 @@
 package views
 
-// The RNAxRay logo of the web app (web/assets/rnaxray-logo*.png, copied here;
-// desktop/scripts/make-icon.py draws the app icon from the same mark).
+// The RNAxRay wordmark of the web app (web/assets/rnaxray-wordmark*.svg,
+// copied here from docs/brand/RNAxRay-SVG/01-字标; desktop/scripts/make-icon.py
+// renders the app icon from the same set).
 
 import (
 	_ "embed"
@@ -11,25 +12,17 @@ import (
 )
 
 var (
-	//go:embed assets/rnaxray-logo.png
-	logoPNG []byte
-	//go:embed assets/rnaxray-logo-dark.png
-	logoDarkPNG []byte
+	//go:embed assets/rnaxray-wordmark.svg
+	logoSVG []byte
+	//go:embed assets/rnaxray-wordmark-dark.svg
+	logoDarkSVG []byte
 
-	logoLight = mustBitmap(logoPNG)
-	logoDark  = mustBitmap(logoDarkPNG)
+	logoLight = ui.MustParseSVG(logoSVG)
+	logoDark  = ui.MustParseSVG(logoDarkSVG)
 )
 
-// logoAspect is the logo's width / height (158 x 67).
-const logoAspect = 158.0 / 67.0
-
-func mustBitmap(data []byte) *ui.Bitmap {
-	b, err := ui.DecodeBitmap(data)
-	if err != nil {
-		panic("views: logo: " + err.Error())
-	}
-	return b
-}
+// logoAspect is the wordmark's width / height (its viewBox, 1940 x 389.67).
+const logoAspect = 1940 / 389.67
 
 // The RNAxRay accent of the web app (web/styles.css --teal, --teal-deep,
 // --primary-hover, --primary-foreground and, for text, --primary-ink),

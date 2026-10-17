@@ -181,7 +181,7 @@ state.view = {
 const report = context.window.RNAxRayReport;
 const html = report.render(state);
 assert.match(html, /data-report-page/);
-assert.match(html, /assets\/rnaxray-logo\.png/);
+assert.match(html, /assets\/rnaxray-wordmark\.svg/);
 assert.match(html, /Print \/ Save PDF/);
 ["Executive summary", "Validation", "HYB File Format", "Interactions", "Contact Map", "Viewpoint", "Region Explorer", "Compare", "RNA Structure"].forEach(function (heading) {
   assert.match(html, new RegExp(heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), heading + " must be present in the report");
