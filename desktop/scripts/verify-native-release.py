@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 PINS = {"numpy":"1.24.4", "numba":"0.58.1", "llvmlite":"0.41.1"}
 EXPECTED = "..(((((..[[[[)))))......]]]]"
 LICENSE_FILES = ["third_party/bowtie2/LICENSE",
+                 "third_party/cplfold/LICENSE",
                  "third_party/cplfold/THIRD_PARTY_NOTICES.md",
                  "third_party/cplfold/LICENSES/LinearFold-LICENSE.txt",
                  "third_party/cplfold/LICENSES/GPL-2.0-or-later.txt"]

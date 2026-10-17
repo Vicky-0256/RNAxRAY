@@ -66,6 +66,7 @@ cp "$source_directory/CPLfold_parser.py" "$staging_directory/CPLfold_parser.py"
 cp "$bridge_source" "$staging_directory/cplfold_web.py"
 cp "$source_directory"/Utils/*.py "$staging_directory/Utils/"
 cp "$source_directory"/Utils/energy_params/* "$staging_directory/Utils/energy_params/"
+cp "$source_directory/LICENSE" "$output_directory/CPLfold-LICENSE.txt"
 cp "$source_directory/THIRD_PARTY_NOTICES.md" "$output_directory/CPLfold-THIRD_PARTY_NOTICES.md"
 cp "$source_directory/LICENSES/GPL-2.0-or-later.txt" "$output_directory/CPLfold-GPL-2.0-or-later.txt"
 cp "$source_directory/LICENSES/LinearFold-LICENSE.txt" "$output_directory/CPLfold-LinearFold-LICENSE.txt"
@@ -91,7 +92,7 @@ manifest_path = root / "build-manifest.json"
 manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
 names = ["pyodide.mjs", "pyodide.asm.js", "pyodide.asm.wasm", "python_stdlib.zip",
          "pyodide-lock.json", "numpy-2.2.5-cp313-cp313-pyemscripten_2025_0_wasm32.whl",
-         "Pyodide-LICENSE.txt", "CPLfold-THIRD_PARTY_NOTICES.md",
+         "Pyodide-LICENSE.txt", "CPLfold-LICENSE.txt", "CPLfold-THIRD_PARTY_NOTICES.md",
          "CPLfold-GPL-2.0-or-later.txt", "CPLfold-LinearFold-LICENSE.txt",
          manifest["cplfoldArchiveFile"]]
 manifest["assets"] = {name: hashlib.sha256((root / name).read_bytes()).hexdigest() for name in names}

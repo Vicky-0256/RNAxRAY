@@ -1,17 +1,19 @@
 # Third-party notices and distribution status
 
-This directory is an experimental vendored snapshot. It has two material
-upstream code lineages and does **not** currently claim one resolved license for
-their combined distribution. Do not relabel it, or the RNAxRay repository, as MIT
-or Apache licensed.
+This directory is a vendored snapshot of CPLfold with two upstream code
+lineages besides CPLfold's own. CPLfold's own code is licensed GPL-2.0-or-later
+(`LICENSE`); the combination with the LinearFold-derived parser does **not** yet
+have one resolved license (see "Compatibility review required"). Do not relabel
+it, or the RNAxRay repository, as MIT or Apache licensed.
 
 ## CPLfold-authored code
 
-`CPLfold.py` identifies Ke Wang as its author. The imported upstream snapshot
-contains no `LICENSE`, `COPYING`, or other explicit grant covering CPLfold's
-original orchestration code, tests, examples, and documentation. This vendoring
-does not infer or create such a grant; permission from the relevant rights
-holder is still required for public redistribution.
+`CPLfold.py` identifies Ke Wang as its author. Ke Wang, the author and rights
+holder, licensed CPLfold's original orchestration code, tests, examples and
+documentation under the GNU General Public License, version 2 or (at your
+option) any later version, on 2026-10-17: see `LICENSE`, with the license text
+in `LICENSES/GPL-2.0-or-later.txt`. The upstream repository
+(https://github.com/Vicky-0256/CPLfold) should carry the same `LICENSE`.
 
 ## LinearFold-derived parser
 
@@ -46,6 +48,8 @@ The GPL prohibits adding further downstream restrictions, while the LinearFold
 terms include conditions beyond the GPL text. Because CPLfold imports the
 LinearFold-derived parser and HotKnots-derived evaluator into one Python
 program, publishing the combined snapshot may require an explicit compatible
-license or exception from the relevant copyright holders. Recording both texts
-is necessary attribution, but it is not itself a compatibility determination
-or legal advice.
+license or exception from the LinearFold copyright holders. CPLfold's own code
+and the HotKnots-derived files are both GPL-2.0-or-later, so this question
+concerns the LinearFold terms only. Recording both texts is necessary
+attribution, but it is not itself a compatibility determination or legal
+advice.

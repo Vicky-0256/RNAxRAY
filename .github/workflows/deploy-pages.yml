@@ -115,6 +115,7 @@ jobs:
           test -s web/vendor/pyodide-cplfold/pyodide.mjs
           test -s web/vendor/pyodide-cplfold/pyodide.asm.wasm
           test -s web/vendor/pyodide-cplfold/numpy-2.2.5-cp313-cp313-pyemscripten_2025_0_wasm32.whl
+          test -s web/vendor/pyodide-cplfold/CPLfold-LICENSE.txt
           test -s web/vendor/pyodide-cplfold/CPLfold-THIRD_PARTY_NOTICES.md
           test -s web/vendor/pyodide-cplfold/CPLfold-GPL-2.0-or-later.txt
           test -s web/vendor/pyodide-cplfold/CPLfold-LinearFold-LICENSE.txt

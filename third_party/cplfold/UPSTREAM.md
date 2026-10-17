@@ -25,8 +25,10 @@ other ignored local artifacts.
   Output is byte-identical to the original (kept as `_outside_python`;
   `CPLFOLD_PYTHON_OUTSIDE=1` selects it). 600 nt drops from 270 s to about
   1 s. This change is not upstream yet.
-- `LICENSES/`, `THIRD_PARTY_NOTICES.md`, and this file record provenance and
-  distribution constraints; they do not supply a missing upstream license.
+- `LICENSE` is the author's GPL-2.0-or-later grant for CPLfold's own code
+  (2026-10-17), not in upstream commit `24bab52`. `LICENSES/`,
+  `THIRD_PARTY_NOTICES.md`, and this file record provenance and the
+  distribution constraints of the LinearFold- and HotKnots-derived parts.
 
 Upstream commit `24bab52` does not identify an exact LinearFold source revision
 or the exact HotKnots 2.0 archive/checksum used to create the Python-derived

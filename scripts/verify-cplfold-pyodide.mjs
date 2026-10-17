@@ -17,6 +17,7 @@ const runtimeDirectory = path.join(repository, "web", "vendor", "pyodide-cplfold
   "numpy-2.2.5-cp313-cp313-pyemscripten_2025_0_wasm32.whl",
   "build-manifest.json",
   "Pyodide-LICENSE.txt",
+  "CPLfold-LICENSE.txt",
   "CPLfold-THIRD_PARTY_NOTICES.md",
   "CPLfold-GPL-2.0-or-later.txt",
   "CPLfold-LinearFold-LICENSE.txt"

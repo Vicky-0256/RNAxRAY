@@ -23,6 +23,6 @@ The browser runtime is intentionally conservative:
   `BRIDGE_VERSION` in the bridge, worker and build manifest whenever that
   packaged interface changes. GitHub Actions publishes the same-origin assets.
 
-The CPLfold/LinearFold/HotKnots licensing boundary remains documented in
-`third_party/cplfold/THIRD_PARTY_NOTICES.md`. Resolve the upstream CPLfold
-licence before a public redistribution or GitHub Pages release.
+CPLfold's own code is GPL-2.0-or-later (`third_party/cplfold/LICENSE`); the
+LinearFold terms of its parser and the remaining licensing question are
+documented in `third_party/cplfold/THIRD_PARTY_NOTICES.md`.
