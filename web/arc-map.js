@@ -809,8 +809,10 @@
   function svg(arcMap, model, colours) {
     const c = Object.assign({ ink: "#222222", muted: "#6b7280", line: "#c7ced6", a: "#d64541", b: "#2b6cc4", shared: "#8c8c8c",
       up: "#c62828", down: "#1f4e9e", track: ["#d9d9d9", "#bdbdbd"], background: "#ffffff" }, colours || {});
-    // one-colour structures: the ink in print, the structure colour on screen
+    // default structure colours, A above and B below in two colours: ink and
+    // grey in print, the theme's primary and accent on screen
     c.structure = c.structure || c.ink;
+    c.structureB = c.structureB || "#8c8c8c";
     const s = arcMap;
     const width = 1000;
     const left = 16;
@@ -857,9 +859,9 @@
     const mono = s.mono;
     const layers = [
       { pairs: model.pairsA.filter(function (p) { return !setB.has(p[0] + ":" + p[1]); }), up: true, colour: mono ? c.structure : c.a },
-      { pairs: model.pairsB.filter(function (p) { return !setA.has(p[0] + ":" + p[1]); }), up: false, colour: mono ? c.structure : c.b },
+      { pairs: model.pairsB.filter(function (p) { return !setA.has(p[0] + ":" + p[1]); }), up: false, colour: mono ? c.structureB : c.b },
       { pairs: model.pairsA.filter(function (p) { return setB.has(p[0] + ":" + p[1]); }), up: true, colour: mono ? c.structure : c.shared },
-      { pairs: model.pairsB.filter(function (p) { return setA.has(p[0] + ":" + p[1]); }), up: false, colour: mono ? c.structure : c.shared }
+      { pairs: model.pairsB.filter(function (p) { return setA.has(p[0] + ":" + p[1]); }), up: false, colour: mono ? c.structureB : c.shared }
     ];
     layers.forEach(function (layer) {
       const d = layer.pairs.filter(visible).map(function (p) { return arcPath(p[0], p[1], layer.up, false); }).join("");
@@ -906,7 +908,7 @@
       legend.push([mono ? c.structure : c.a, "A · " + s.a.name + (twoSided && model.pairsB.length ? " (above)" : "")]);
     }
     if (s.b) {
-      legend.push([mono ? c.structure : c.b, "B · " + s.b.name + " (below)"]);
+      legend.push([mono ? c.structureB : c.b, "B · " + s.b.name + " (below)"]);
     }
     if (model.overlay.some(function (o) { return o.up; })) {
       legend.push([c.up, "higher in " + (s.labelOne || "condition one")]);
@@ -963,7 +965,7 @@
     const dark = document.documentElement.dataset.theme === "dark";
     return {
       ink: token("--ink"), muted: token("--muted"), line: token("--line-strong"), background: token("--surface-subtle"),
-      structure: token("--primary"), a: dark ? "#e8605a" : "#d64541", b: dark ? "#4c8fe8" : "#2b6cc4", shared: token("--muted"),
+      structure: token("--primary"), structureB: token("--accent"), a: dark ? "#e8605a" : "#d64541", b: dark ? "#4c8fe8" : "#2b6cc4", shared: token("--muted"),
       up: dark ? "#e8605a" : "#c62828", down: dark ? "#4c8fe8" : "#1f4e9e", track: [token("--line"), token("--line-strong")]
     };
   }
@@ -1018,7 +1020,7 @@
       control("Condition two", "labelTwo", s.labelTwo, "label, e.g. ZASI"),
       select("Condition one cells are on", "oneOn", s.oneOn, [["a", "A's reference"], ["b", "B's reference"]]),
       select("Condition two cells are on", "twoOn", s.twoOn, [["a", "A's reference"], ["b", "B's reference"]]),
-      select("Structures", "mono", s.mono ? "mono" : "colour", [["mono", "One colour"], ["colour", "A red, B blue"]]),
+      select("Structures", "mono", s.mono ? "mono" : "colour", [["mono", "Default colours"], ["colour", "A red, B blue"]]),
       // empty means the whole structure: the placeholder says so in words,
       // so that an empty field does not read as a disabled one
       control("From (nt)", "start", s.start, "Start (1)"),
