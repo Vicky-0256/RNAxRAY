@@ -1,5 +1,8 @@
 # RNAxRay Web — brand notes
 
+Name, logo, palette and voice shared with RNAxRay Desktop:
+`../docs/brand-guidelines.md`. This file adds what is specific to the web app.
+
 ## Current asset state
 
 - **Product:** RNAxRay Web, a browser-local workspace for HYB RNA interaction files.

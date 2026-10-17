@@ -128,7 +128,7 @@ func openError(err error) string {
 func startStep(c *ui.Context, n, title, body string) {
 	t := c.Theme()
 	ui.Row(c).Gap(10).AlignItems(ui.Start).Grow(1).Basis(200).Children(func() {
-		ui.Text(c, n).FontSize(13).Bold().TextColor(t.Accent).Width(18)
+		ui.Text(c, n).FontSize(13).Bold().TextColor(brandInk(t)).Width(18)
 		ui.Column(c).Gap(2).Grow(1).Shrink(1).MinWidth(0).Children(func() {
 			ui.Text(c, title).Bold()
 			ui.Text(c, body).FontSize(12).TextColor(t.TextMuted)
@@ -275,7 +275,7 @@ func (a *App) startView(c *ui.Context) {
 					r := r
 					ui.Row(c.Key(r.Path)).Gap(8).Children(func() {
 						ui.Column(c).Grow(1).Shrink(1).MinWidth(0).Children(func() {
-							if ui.Link(c, nameOr(r.Name, filepath.Base(r.Path)), "").Disabled(s.preparing).Clicked() {
+							if brandLink(c, nameOr(r.Name, filepath.Base(r.Path))).Disabled(s.preparing).Clicked() {
 								a.Open(r.Path)
 							}
 							ui.Text(c, r.Path).FontSize(12).TextColor(t.TextMuted).SingleLine()
@@ -325,7 +325,7 @@ func (a *App) create(path, name string) {
 // card is a titled panel.
 func card(c *ui.Context, title string, body func()) ui.Element {
 	t := c.Theme()
-	return ui.Column(c).Padding(16).Gap(10).Radius(10).Background(t.Background).Border(1, t.Border).Children(func() {
+	return ui.Column(c).Padding(16).Gap(10).Radius(8).Background(t.Background).Border(1, t.Border).Children(func() {
 		if title != "" {
 			ui.Text(c, title).FontSize(16).Bold()
 		}

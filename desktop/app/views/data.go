@@ -416,7 +416,7 @@ func dataStageChip(c *ui.Context, name, status string) {
 	case "failed", "interrupted", "cancelled":
 		b.Background(t.Danger.Alpha(0.15)).TextColor(t.Danger)
 	case "running", "queued":
-		b.Background(t.Accent.Alpha(0.15)).TextColor(t.Accent)
+		b.Background(t.Accent.Alpha(0.15)).TextColor(brandInk(t))
 	case "skipped", "pending", "":
 		b.TextColor(t.TextMuted)
 	}
@@ -739,7 +739,7 @@ func (p *dataPage) sampleRows(c *ui.Context, samples []model.Sample, cols []ui.T
 		case 1:
 			ui.Column(c).Gap(2).MinWidth(0).Children(func() {
 				id := s.ID
-				if ui.Link(c, s.Label(), "").Label("Edit sample " + s.Label()).Tooltip("Edit sample").Clicked() {
+				if brandLink(c, s.Label()).Label("Edit sample " + s.Label()).Tooltip("Edit sample").Clicked() {
 					p.openEdit(id)
 				}
 				if s.GeneID != "" {
@@ -773,7 +773,7 @@ func (p *dataPage) sampleRows(c *ui.Context, samples []model.Sample, cols []ui.T
 					id := s.ID
 					ui.Row(c).Gap(6).Children(func() {
 						ui.Text(c, "No reference").FontSize(11).TextColor(c.Theme().Danger)
-						if ui.Link(c, "Set reference…", "").FontSize(11).
+						if brandLink(c, "Set reference…").FontSize(11).
 							Tooltip("Choose the reference " + s.Label() + "'s reads are mapped to").Clicked() {
 							p.openEdit(id)
 						}

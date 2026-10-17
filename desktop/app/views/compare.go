@@ -1128,13 +1128,14 @@ func cmpSimilarityCells(result *comparisonResult) []widgets.Cell {
 func cmpTitleButton(c *ui.Context, title string) ui.Element {
 	t := c.Theme()
 	b := ui.ButtonBase(c).Cursor(ui.CursorPointer).Justify(ui.Start).Label(title)
-	b.Children(func() { ui.Text(c, title).Bold().TextColor(t.Accent) })
+	b.Children(func() { ui.Text(c, title).Bold().TextColor(brandInk(t)) })
 	return b
 }
 
 func cmpStat(c *ui.Context, label, value string, color ui.Color) ui.Element {
 	t := c.Theme()
-	return ui.Column(c).Gap(2).Padding(8, 12).Radius(8).Background(t.Surface).MinWidth(120).Children(func() {
+	// The web app's stat tile, a bordered card.
+	return ui.Column(c).Gap(4).Padding(8, 12).Radius(8).Background(t.Background).Border(1, t.Border).MinWidth(120).Children(func() {
 		ui.Text(c, label).FontSize(12).TextColor(t.TextMuted)
 		ui.Text(c, value).FontSize(18).Bold().TextColor(color)
 	})

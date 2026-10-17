@@ -281,7 +281,7 @@ func (p *explorePage) View(c *ui.Context) {
 	ui.Column(c).Fill().Padding(20, 24).Gap(14).Children(func() {
 		ui.Row(c).Gap(16).AlignItems(ui.Center).Wrap().Children(func() {
 			ui.Column(c).Grow(1).Gap(2).Children(func() {
-				ui.Text(c, "Explore").FontSize(24).Bold()
+				ui.Text(c, "Explore").FontSize(28).FontWeight(800)
 				note := "Selection: " + a.SelectionLabel(a.Selected.Key) + " · change it in the top bar."
 				if p.summary.records > 0 {
 					note = fmt.Sprintf("Selection: %s · %s hybrids, %s reads · change it in the top bar.",
@@ -352,7 +352,7 @@ func notice(c *ui.Context, text string) {
 func stat(c *ui.Context, label, value string) {
 	ui.Column(c).Gap(2).Children(func() {
 		ui.Text(c, label).FontSize(11).TextColor(c.Theme().TextMuted)
-		ui.Text(c, value).FontSize(16).Bold()
+		ui.Text(c, value).FontSize(16).Bold().Font("monospace")
 	})
 }
 

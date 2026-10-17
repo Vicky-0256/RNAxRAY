@@ -421,7 +421,7 @@ func (p *researchPanel) View(c *ui.Context, target *researchTarget) {
 			ui.Text(c, "External lookups are off. When you turn them on, only the identifier and species you enter are sent to "+
 				"RNAcentral; no sequence, structure or project data leaves this computer.").FontSize(12).TextColor(t.TextMuted)
 			ui.Row(c).Children(func() {
-				if ui.Link(c, "Turn on in Preferences…", "").Clicked() {
+				if brandLink(c, "Turn on in Preferences…").Clicked() {
 					a.openPrefs()
 				}
 			})

@@ -341,7 +341,7 @@ func (p *qcPage) summaryRows(c *ui.Context, cols []ui.TableColumn, rows []qcRow,
 			ui.Column(c).Gap(2).MinWidth(0).Children(func() {
 				if sample != nil {
 					id := sample.ID
-					if ui.Link(c, sample.Label(), "").Label("Explore " + sample.Label()).Tooltip("Select and explore").Clicked() {
+					if brandLink(c, sample.Label()).Label("Explore " + sample.Label()).Tooltip("Select and explore").Clicked() {
 						a.Selected.Key = "s:" + id
 						a.Navigate("explore", nil)
 					}

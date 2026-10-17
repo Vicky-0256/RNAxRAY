@@ -13,6 +13,7 @@ import (
 
 // View builds the window: the start page, or the project shell.
 func (a *App) View(c *ui.Context) {
+	applyBrandTheme(c)
 	for _, m := range a.toasts {
 		c.AddToast(ui.Toast{ID: m.ID, Title: m.Text})
 	}
@@ -26,7 +27,7 @@ func (a *App) View(c *ui.Context) {
 		a.topBar(c)
 		ui.Row(c).Grow(1).AlignItems(ui.Stretch).Children(func() {
 			a.navigation(c)
-			content := ui.Column(c).Grow(1).MinWidth(0).ClipX().Background(t.Surface).Children(func() {
+			content := ui.Column(c).Grow(1).MinWidth(0).ClipX().Background(brandCanvas(t)).Children(func() {
 				if p := a.pages[a.Page]; p != nil {
 					p.View(c.Key("page-" + a.Page))
 				}
@@ -50,11 +51,16 @@ func (a *App) navigation(c *ui.Context) {
 		ui.Sidebar(c, &page, func() {
 			for _, p := range Pages {
 				item := ui.SidebarItem(c, p.ID, nil, p.Number+"  "+p.Title)
+				if p.ID == page {
+					// The web app's chosen page: light teal, a teal bar on the left.
+					item.Background(brandSoft(t)).TextColor(brandInk(t)).FontWeight(600).
+						BorderWidth(0, 0, 0, 3).BorderColor(brandTeal)
+				}
 				if p.ID == "data" && len(a.Project.Samples) > 0 {
 					item.Children(func() { ui.Badge(c, fmt.Sprint(len(a.Project.Samples))) })
 				}
 			}
-		}).Grow(1).FillWidth().OnChange(func() { a.Navigate(page, nil) })
+		}).Grow(1).FillWidth().Background(t.Background).OnChange(func() { a.Navigate(page, nil) })
 		ui.Column(c).Padding(10, 14, 14, 14).Children(func() {
 			if ui.Button(c, "Close project").FillWidth().Tooltip("Back to the start page").Clicked() {
 				a.Close()
@@ -257,7 +263,7 @@ func StatusChip(c *ui.Context, status string) {
 	case "cancelled", "skipped", "pending":
 		b.Background(t.TextMuted.Alpha(0.12)).TextColor(t.TextMuted)
 	case "running", "queued":
-		b.Background(t.Accent.Alpha(0.15)).TextColor(t.Accent)
+		b.Background(t.Accent.Alpha(0.15)).TextColor(brandInk(t))
 	}
 }
 
@@ -345,7 +351,7 @@ func Field(c *ui.Context, label string, control func()) {
 // PageHeader is the title and subtitle every page starts with.
 func PageHeader(c *ui.Context, title, subtitle string) {
 	ui.Column(c).Gap(4).Children(func() {
-		ui.Text(c, title).FontSize(24).Bold()
+		ui.Text(c, title).FontSize(28).FontWeight(800)
 		if subtitle != "" {
 			ui.Text(c, subtitle).TextColor(c.Theme().TextMuted)
 		}
@@ -363,7 +369,7 @@ func (p *placeholder) Show() {}
 
 func (p *placeholder) View(c *ui.Context) {
 	ui.Column(c).Fill().Padding(24).Gap(8).Children(func() {
-		ui.Text(c, p.info.Title).FontSize(24).Bold()
+		ui.Text(c, p.info.Title).FontSize(28).FontWeight(800)
 		ui.Text(c, "This page is being rebuilt in the native interface.").TextColor(c.Theme().TextMuted)
 	})
 }
