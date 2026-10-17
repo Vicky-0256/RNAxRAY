@@ -423,7 +423,9 @@
       return [{
         name: "contact",
         key: queryKey + "|" + stableKey(display),
-        present: function () { return !!state.contact && !!state.contact.matrix; },
+        // A stale map (Generate, or a control change) is refetched even when
+        // the query key is unchanged.
+        present: function () { return !!state.contact && !!state.contact.matrix && !state.contact.matrixStale; },
         fetch: function () {
           const cached = view().contactBins;
           const bins = cached && cached.key === queryKey
