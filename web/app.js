@@ -920,7 +920,6 @@
       '  <span class="brand-mark"><img src="' + logoAsset + '" alt="RNAxRay"></span>',
       "  <span>",
       '    <span class="brand-name">Web</span>',
-      '    <span class="brand-subtitle">Lite</span>',
       "  </span>",
       "</a>"
     ].join("");

@@ -201,8 +201,8 @@ func (p *explorePage) regionView(c *ui.Context) {
 			Card(c, "", func() {
 				ui.Row(c).Gap(24).Wrap().AlignItems(ui.Center).Children(func() {
 					ui.Column(c).Grow(1).Gap(2).Children(func() {
-						ui.Text(c, "Region "+span(d.f.start, d.f.end)+" nt").FontSize(16).Bold()
-						ui.Text(c, d.gene+" · "+regionSubtitle(d.f)).FontSize(12).TextColor(t.TextMuted)
+						ui.Text(c, "Region "+span(d.f.start, d.f.end)+" nt").FontSize(ts(c, 16)).Bold()
+						ui.Text(c, d.gene+" · "+regionSubtitle(d.f)).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 					})
 					stat(c, "Hybrids", FormatNumber(d.records))
 					stat(c, "Reads", FormatNumber(d.reads))
@@ -215,7 +215,7 @@ func (p *explorePage) regionView(c *ui.Context) {
 					start, end, v := s.profile.Bin(i)
 					readout = fmt.Sprintf("%s · %s reads", span(start, end), trimFloat(v))
 				}
-				ui.Text(c, readout).FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, readout).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 				ui.Row(c).Gap(8).Children(func() {
 					if ui.PrimaryButton(c, "Show hybrids").Tooltip("Interactions with arm 1 in this region").Clicked() {
 						p.showRegionHybrids(d)
@@ -257,9 +257,9 @@ func (p *explorePage) regionTable(c *ui.Context, d *regionData) {
 		title = fmt.Sprintf("Strongest interactions (%d of %s distinct)", len(d.rows), FormatNumber(d.distinct))
 	}
 	Card(c, title, func() {
-		ui.Text(c, "Hybrids with the same genes, arm coordinates and type are merged; by reads.").FontSize(12).TextColor(t.TextMuted)
+		ui.Text(c, "Hybrids with the same genes, arm coordinates and type are merged; by reads.").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		if !d.exact {
-			notice(c, "The order over several samples is approximate near the end of this list.")
+			caveat(c, "The order over several samples is approximate near the end of this list.")
 		}
 		rows := d.rows
 		// One RNA in every row: name it once and give its columns to the arms.
@@ -287,7 +287,7 @@ func (p *explorePage) regionTable(c *ui.Context, d *regionData) {
 			cols, index = append(cols, col), append(index, i)
 		}
 		if oneGene {
-			ui.Text(c, "Both arms of every interaction listed are on "+rows[0].Gene1+".").FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, "Both arms of every interaction listed are on "+rows[0].Gene1+".").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		}
 		ui.Table(c.Key("rg-table"), &s.list, cols, len(rows), func(row, col int) {
 			r := rows[row]

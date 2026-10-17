@@ -195,11 +195,13 @@ func (p *qcPage) View(c *ui.Context) {
 			return
 		}
 		if p.err != "" {
-			ui.Row(c).Gap(10).Children(func() {
-				ui.Text(c, "Could not load the counts: "+ShortError(p.err)).TextColor(t.Danger).Grow(1).Shrink(1).MinWidth(0)
-				if ui.Button(c, "Retry").Clicked() {
-					p.refresh()
-				}
+			notice(c, noticeError, func() {
+				ui.Row(c).Gap(10).AlignItems(ui.Center).Children(func() {
+					ui.Text(c, "Could not load the counts: "+ShortError(p.err)).TextColor(t.Danger).Grow(1).Shrink(1).MinWidth(0)
+					if ui.Button(c, "Retry").Clicked() {
+						p.refresh()
+					}
+				})
 			})
 		}
 		if p.loading && len(p.stats) == 0 {
@@ -328,7 +330,7 @@ func (p *qcPage) summaryRows(c *ui.Context, cols []ui.TableColumn, rows []qcRow,
 	ui.Table(c, &p.table, cols, len(rows), func(row, col int) {
 		r := rows[row]
 		if r.header != "" {
-			ui.Text(c, r.header).Bold().FontSize(12).TextColor(t.TextMuted).SingleLine()
+			ui.Text(c, r.header).Bold().FontSize(ts(c, 12)).TextColor(t.TextMuted).SingleLine()
 			return
 		}
 		var sample *model.Sample
@@ -349,10 +351,10 @@ func (p *qcPage) summaryRows(c *ui.Context, cols []ui.TableColumn, rows []qcRow,
 					if sample.Replicate != nil {
 						detail += " · rep " + dataReplicate(sample.Replicate)
 					}
-					ui.Text(c, detail).FontSize(11).TextColor(t.TextMuted).SingleLine()
+					ui.Text(c, detail).FontSize(ts(c, 11)).TextColor(t.TextMuted).SingleLine()
 				} else {
 					ui.Text(c, r.cond).Bold().SingleLine()
-					ui.Text(c, dataPlural(len(a.SelectionIDs("c:"+r.cond)), "replicate", "replicates")).FontSize(11).TextColor(t.TextMuted).SingleLine()
+					ui.Text(c, dataPlural(len(a.SelectionIDs("c:"+r.cond)), "replicate", "replicates")).FontSize(ts(c, 11)).TextColor(t.TextMuted).SingleLine()
 				}
 			})
 		case 1:

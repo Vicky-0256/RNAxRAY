@@ -281,7 +281,7 @@ func (p *explorePage) View(c *ui.Context) {
 	ui.Column(c).Fill().Padding(20, 24).Gap(14).Children(func() {
 		ui.Row(c).Gap(16).AlignItems(ui.Center).Wrap().Children(func() {
 			ui.Column(c).Grow(1).Gap(2).Children(func() {
-				ui.Text(c, "Explore").FontSize(28).FontWeight(800)
+				ui.Text(c, "Explore").FontSize(ts(c, 28)).FontWeight(800)
 				note := "Selection: " + a.SelectionLabel(a.Selected.Key) + " · change it in the top bar."
 				if p.summary.records > 0 {
 					note = fmt.Sprintf("Selection: %s · %s hybrids, %s reads · change it in the top bar.",
@@ -336,23 +336,22 @@ func loadingLine(c *ui.Context, l *loader, what string) {
 	}
 }
 
+// errorLine is a page's failure, in an error notice.
 func errorLine(c *ui.Context, text string) {
-	ui.Text(c, text).TextColor(c.Theme().Danger)
+	noticeText(c, noticeError, text)
 }
 
-// notice is a muted one-line remark, e.g. a truncation or adjusted bin.
-func notice(c *ui.Context, text string) {
-	t := c.Theme()
-	ui.Row(c).Padding(6, 10).Radius(6).Background(t.Warning.Alpha(0.12)).Children(func() {
-		ui.Text(c, text).FontSize(12)
-	})
+// caveat is a one-line remark on what is shown, e.g. a truncation or an
+// adjusted bin, in a warning notice as the web app's.
+func caveat(c *ui.Context, text string) {
+	notice(c, noticeWarning, func() { ui.Text(c, text).FontSize(ts(c, 12)).TextColor(noticeInk(c.Theme(), noticeWarning)) })
 }
 
 // stat is a label over a number.
 func stat(c *ui.Context, label, value string) {
 	ui.Column(c).Gap(2).Children(func() {
-		ui.Text(c, label).FontSize(11).TextColor(c.Theme().TextMuted)
-		ui.Text(c, value).FontSize(16).Bold().Font("monospace")
+		ui.Text(c, label).FontSize(ts(c, 11)).TextColor(c.Theme().TextMuted)
+		ui.Text(c, value).FontSize(ts(c, 16)).Bold().Font("monospace")
 	})
 }
 

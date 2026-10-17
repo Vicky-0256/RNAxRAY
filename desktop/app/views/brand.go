@@ -5,6 +5,7 @@ package views
 
 import (
 	_ "embed"
+	"runtime"
 
 	"github.com/egoist/mygo/ui"
 )
@@ -53,12 +54,14 @@ var (
 		surface: ui.Hex("#f3f7f8"), surfaceHover: ui.Hex("#e9f1f3"), surfacePressed: ui.Hex("#dce7ec"),
 		border: ui.Hex("#dce7ec"), text: ui.Hex("#132c47"), textMuted: ui.Hex("#5b6c80"),
 		danger: ui.Hex("#b42318"), warning: ui.Hex("#9c5e12"), success: ui.Hex("#007b78"),
+		mutedStrong: ui.Hex("#38516a"), dangerSoft: ui.Hex("#fcecea"), warningSoft: ui.Hex("#fff4e3"),
 	}
 	brandDark = brandNeutrals{
 		background: ui.Hex("#132c47"), canvas: ui.Hex("#0c1a29"), soft: ui.Hex("#123f4b"),
 		surface: ui.Hex("#183650"), surfaceHover: ui.Hex("#21405e"), surfacePressed: ui.Hex("#2e4b66"),
 		border: ui.Hex("#2e4b66"), text: ui.Hex("#ecf1f8"), textMuted: ui.Hex("#9eb1c3"),
 		danger: ui.Hex("#f29c96"), warning: ui.Hex("#f5b867"), success: ui.Hex("#43d1b0"),
+		mutedStrong: ui.Hex("#c8d6e2"), dangerSoft: ui.Hex("#4a2524"), warningSoft: ui.Hex("#4a3518"),
 	}
 )
 
@@ -67,6 +70,7 @@ type brandNeutrals struct {
 	surface, surfaceHover, surfacePressed ui.Color
 	border, text, textMuted               ui.Color
 	danger, warning, success              ui.Color
+	mutedStrong, dangerSoft, warningSoft  ui.Color
 }
 
 func brandOf(t *ui.Theme) *brandNeutrals {
@@ -106,6 +110,59 @@ func brandCanvas(t *ui.Theme) ui.Color { return brandOf(t).canvas }
 
 // brandSoft is the light teal of a chosen item (web --primary-soft).
 func brandSoft(t *ui.Theme) ui.Color { return brandOf(t).soft }
+
+// Tones of a notice.
+const (
+	noticeInfo = iota
+	noticeWarning
+	noticeError
+)
+
+// notice is the web app's .notice: a tinted, bordered box for what a page
+// says about itself (neutral), a caveat (warning) or a failure (error). body
+// draws its content; noticeInk is the color for its text.
+func notice(c *ui.Context, tone int, body func()) ui.Element {
+	t := c.Theme()
+	n := brandOf(t)
+	bg, border := t.Surface, t.Border
+	switch tone {
+	case noticeWarning:
+		bg, border = n.warningSoft, t.Warning.Mix(t.Border, 0.72)
+	case noticeError:
+		bg, border = n.dangerSoft, t.Danger.Mix(t.Border, 0.6)
+	}
+	return ui.Column(c).Gap(6).Padding(10, 12).Radius(6).Background(bg).Border(1, border).Children(body)
+}
+
+// noticeInk is the text color of a notice of tone.
+func noticeInk(t *ui.Theme, tone int) ui.Color {
+	switch tone {
+	case noticeWarning:
+		return t.Warning
+	case noticeError:
+		return t.Danger
+	}
+	return brandOf(t).mutedStrong
+}
+
+// noticeText is a notice holding one paragraph.
+func noticeText(c *ui.Context, tone int, text string) ui.Element {
+	return notice(c, tone, func() { ui.Text(c, text).TextColor(noticeInk(c.Theme(), tone)) })
+}
+
+// baseFontSize is MyGo's text size at the system's usual setting.
+var baseFontSize = func() float32 {
+	if runtime.GOOS == "darwin" {
+		return 13
+	}
+	return 14
+}()
+
+// ts is a font size of px at the usual text size, scaled as the theme's
+// text is by the system's text size setting; px itself at the usual size.
+func ts(c *ui.Context, px float32) float32 {
+	return px * c.Theme().FontSize / baseFontSize
+}
 
 // brandInk is the accent for text, which plain teal is too light for on a
 // light background.

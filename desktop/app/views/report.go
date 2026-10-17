@@ -329,7 +329,7 @@ func reportReadTest(b core.Backend, pr *model.Project, e comparisonEntry, label 
 	top := append([]cmpInteraction(nil), result.Interactions...)
 	sort.SliceStable(top, func(i, j int) bool { return cmpPadj(top[i].Padj) < cmpPadj(top[j].Padj) })
 	x.Top = top[:min(len(top), reportTopInteractions)]
-	x.Cells = cmpSignificantCells(&result, 0)
+	x.Cells = cmpSignificantCells(&result, 0, cmpRed, cmpBlue) // the HTML report is light
 	x.CellsTotal = max(result.CellsTotal, int64(len(x.Cells)))
 	x.SimCells = cmpSimilarityCells(&result)
 	// the folding energies, when computed (an older runtime may not know the operation)
@@ -444,13 +444,13 @@ func (p *reportPage) View(c *ui.Context) {
 			Card(c, "Project", func() { reportFacts(c, d.projectFacts()) })
 			Card(c, "Before you report these results", func() {
 				for _, check := range d.reviewChecks() {
-					ui.Text(c, "• "+check).FontSize(12)
+					ui.Text(c, "• "+check).FontSize(ts(c, 12))
 				}
 			})
 			Card(c, "References", func() { reportTable(c, "references", d.referenceTable(), "No reference in this project.") })
 			Card(c, "Samples", func() {
 				reportTable(c, "samples", d.sampleTable(), "No sample in this project.")
-				ui.Text(c, "Hybrids and reads from each analysed sample's index; intra / inter are shares of hybrids.").FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, "Hybrids and reads from each analysed sample's index; intra / inter are shares of hybrids.").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			})
 			Card(c, "Conditions", func() {
 				reportTable(c, "conditions", d.conditionTable(), "No condition: samples have no condition set.")
@@ -460,14 +460,14 @@ func (p *reportPage) View(c *ui.Context) {
 				if len(d.Settings) > 0 {
 					reportTable(c, "settings", d.settingsTable(), "")
 				}
-				ui.Text(c, reportFingerprintNote).FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, reportFingerprintNote).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			})
 			Card(c, "Differential tests", func() { p.testsView(c, d) })
 			Card(c, "Structures", func() {
 				reportTable(c, "structures", d.structureTable(), "No structure has been folded.")
 				for _, s := range d.Structures {
 					if s.Err != "" {
-						ui.Text(c, s.Gene+" ("+s.ID+"): "+s.Err).FontSize(12).TextColor(t.Danger)
+						ui.Text(c, s.Gene+" ("+s.ID+"): "+s.Err).FontSize(ts(c, 12)).TextColor(t.Danger)
 					}
 				}
 			})
@@ -488,15 +488,16 @@ func (p *reportPage) testsView(c *ui.Context, d *reportData) {
 		x := &d.Tests[i]
 		ui.Column(c.Key("test-"+x.ID)).Gap(8).Padding(12, 0, 0, 0).BorderWidth(1, 0, 0, 0).BorderColor(t.Border).Children(func() {
 			ui.Column(c).Gap(2).Children(func() {
-				ui.Text(c, x.LabelA+" vs "+x.LabelB).FontSize(16).Bold()
-				ui.Text(c, strings.Join(x.Genes, ", ")+" · "+x.Params+" · log2 fold change = A / B · "+FormatTime(x.Created)).FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, x.LabelA+" vs "+x.LabelB).FontSize(ts(c, 16)).Bold()
+				ui.Text(c, strings.Join(x.Genes, ", ")+" · "+x.Params+" · log2 fold change = A / B · "+FormatTime(x.Created)).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			})
 			s := x.Summary
 			ui.Row(c).Gap(10).Wrap().Children(func() {
-				cmpStat(c, "Significant cells", FormatNumber(s.Significant), t.Text)
-				cmpStat(c, "Higher in "+x.LabelA, FormatNumber(s.SignificantUp), cmpRed)
-				cmpStat(c, "Higher in "+x.LabelB, FormatNumber(s.SignificantDown), cmpBlue)
-				cmpStat(c, "Interactions A / B", FormatNumber(s.InteractionsUp)+" / "+FormatNumber(s.InteractionsDown), t.Text).
+				cmpStat(c, "Significant cells", FormatNumber(s.Significant), ui.Color{})
+				condA, condB := condColors(t)
+				cmpStat(c, "Higher in "+x.LabelA, FormatNumber(s.SignificantUp), condA)
+				cmpStat(c, "Higher in "+x.LabelB, FormatNumber(s.SignificantDown), condB)
+				cmpStat(c, "Interactions A / B", FormatNumber(s.InteractionsUp)+" / "+FormatNumber(s.InteractionsDown), ui.Color{}).
 					Tooltip("Merged interactions higher in A / higher in B")
 			})
 			if x.Err != "" {
@@ -522,7 +523,7 @@ func reportEvidenceView(c *ui.Context, d *reportData) {
 	for i := range d.Evidence {
 		e := &d.Evidence[i]
 		ui.Column(c.Key(fmt.Sprint("evidence-", i))).Gap(8).Padding(12, 0, 0, 0).BorderWidth(1, 0, 0, 0).BorderColor(t.Border).Children(func() {
-			ui.Text(c, e.Title).FontSize(16).Bold()
+			ui.Text(c, e.Title).FontSize(ts(c, 16)).Bold()
 			ui.Text(c, e.Boundary).Bold().Padding(4, 8).Radius(6).Background(t.Warning.Alpha(0.14))
 			reportFacts(c, e.Facts())
 			if e.Text != "" {
@@ -530,7 +531,7 @@ func reportEvidenceView(c *ui.Context, d *reportData) {
 			}
 		})
 	}
-	ui.Text(c, reportEvidenceNote).FontSize(12).TextColor(t.TextMuted)
+	ui.Text(c, reportEvidenceNote).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 }
 
 // reportFacts shows label / value lines.
@@ -583,9 +584,9 @@ func reportTable(c *ui.Context, key string, table reportTableData, empty string)
 				}
 				switch {
 				case header:
-					el.FontSize(12).Bold().TextColor(t.TextMuted)
+					el.FontSize(ts(c, 12)).Bold().TextColor(t.TextMuted)
 				case i > 0:
-					el.FontSize(11).TextColor(t.TextMuted)
+					el.FontSize(ts(c, 11)).TextColor(t.TextMuted)
 				}
 			}
 		})
@@ -625,7 +626,7 @@ func reportTable(c *ui.Context, key string, table reportTableData, empty string)
 		}
 		// The scroll bar shows only on hover, so say that more columns
 		// are off to the right.
-		ui.Text(c, reportScrollHint).FontSize(11).TextColor(t.TextMuted)
+		ui.Text(c, reportScrollHint).FontSize(ts(c, 11)).TextColor(t.TextMuted)
 		ui.ScrollHorizontal(c).AlignItems(ui.Stretch).Children(func() { rows(minWidth) })
 	})
 }

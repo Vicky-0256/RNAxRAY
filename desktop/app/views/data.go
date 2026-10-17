@@ -495,7 +495,7 @@ func (p *dataPage) View(c *ui.Context) {
 			}
 		})
 		if p.checkSummary != "" {
-			ui.Text(c, p.checkSummary).FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, p.checkSummary).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		}
 		p.foreignLinks(c)
 		p.referencesCard(c)
@@ -518,7 +518,7 @@ func (p *dataPage) referencesCard(c *ui.Context) {
 	t := c.Theme()
 	Card(c, "", func() {
 		ui.Row(c).Gap(8).Children(func() {
-			ui.Text(c, "References").FontSize(16).Bold().Grow(1)
+			ui.Text(c, "References").FontSize(ts(c, 16)).Bold().Grow(1)
 			if ui.Button(c, "Add reference…").Clicked() {
 				p.addReference()
 			}
@@ -594,7 +594,7 @@ func (p *dataPage) renameDialog(c *ui.Context) {
 	d := &p.rename
 	ui.Modal(c, &d.open, func() {
 		ui.Column(c).Width(380).Gap(12).Children(func() {
-			ui.Text(c, "Rename reference").FontSize(18).Bold()
+			ui.Text(c, "Rename reference").FontSize(ts(c, 18)).Bold()
 			Field(c, "Label", func() {
 				ui.TextInput(c.Key("ref-label"), &d.label).Label("Label")
 			})
@@ -644,7 +644,7 @@ func (p *dataPage) samplesCard(c *ui.Context) {
 	}
 	Card(c, "", func() {
 		ui.Row(c).Gap(8).Children(func() {
-			ui.Text(c, fmt.Sprintf("Samples (%d)", len(samples))).FontSize(16).Bold()
+			ui.Text(c, fmt.Sprintf("Samples (%d)", len(samples))).FontSize(ts(c, 16)).Bold()
 			if len(samples) > 0 {
 				all := len(selected) == len(samples)
 				p.allChecked = all
@@ -743,7 +743,7 @@ func (p *dataPage) sampleRows(c *ui.Context, samples []model.Sample, cols []ui.T
 					p.openEdit(id)
 				}
 				if s.GeneID != "" {
-					ui.Text(c, s.GeneID).Tooltip(s.GeneID).FontSize(11).TextColor(t.TextMuted).SingleLine()
+					ui.Text(c, s.GeneID).Tooltip(s.GeneID).FontSize(ts(c, 11)).TextColor(t.TextMuted).SingleLine()
 				}
 			})
 		case 2:
@@ -772,14 +772,14 @@ func (p *dataPage) sampleRows(c *ui.Context, samples []model.Sample, cols []ui.T
 				if p.needsReference(s) {
 					id := s.ID
 					ui.Row(c).Gap(6).Children(func() {
-						ui.Text(c, "No reference").FontSize(11).TextColor(c.Theme().Danger)
-						if brandLink(c, "Set reference…").FontSize(11).
+						ui.Text(c, "No reference").FontSize(ts(c, 11)).TextColor(c.Theme().Danger)
+						if brandLink(c, "Set reference…").FontSize(ts(c, 11)).
 							Tooltip("Choose the reference " + s.Label() + "'s reads are mapped to").Clicked() {
 							p.openEdit(id)
 						}
 					})
 				} else if reason != "" {
-					ui.Text(c, reason).FontSize(11).TextColor(c.Theme().Danger).SingleLine().
+					ui.Text(c, reason).FontSize(ts(c, 11)).TextColor(c.Theme().Danger).SingleLine().
 						Tooltip(reason + " — the full log is in the task drawer")
 				}
 			})
@@ -823,7 +823,7 @@ func (p *dataPage) fileCell(c *ui.Context, s model.Sample) {
 				meta = append(meta, part)
 			}
 		}
-		ui.Text(c, strings.Join(meta, " · ")).FontSize(11).TextColor(t.TextMuted).SingleLine()
+		ui.Text(c, strings.Join(meta, " · ")).FontSize(ts(c, 11)).TextColor(t.TextMuted).SingleLine()
 		if checked && check.Status != "ok" {
 			ui.Row(c).Gap(4).Children(func() {
 				dataInputChip(c, check)
@@ -925,7 +925,7 @@ func (p *dataPage) runDialog(c *ui.Context) {
 	}
 	ui.Modal(c, &d.open, func() {
 		ui.Column(c).Width(520).Gap(12).Children(func() {
-			ui.Text(c, "Run "+dataPlural(len(d.ids), "sample", "samples")).FontSize(18).Bold()
+			ui.Text(c, "Run "+dataPlural(len(d.ids), "sample", "samples")).FontSize(ts(c, 18)).Bold()
 			var names []string
 			for _, id := range d.ids {
 				if s := a.Project.Sample(id); s != nil {
@@ -934,7 +934,7 @@ func (p *dataPage) runDialog(c *ui.Context) {
 			}
 			ui.Text(c, strings.Join(names, ", "))
 			if len(d.leftOut) > 0 {
-				ui.Text(c, noReferenceText(d.leftOut, true)).FontSize(12).TextColor(t.Warning)
+				ui.Text(c, noReferenceText(d.leftOut, true)).FontSize(ts(c, 12)).TextColor(t.Warning)
 			}
 			switch {
 			case d.loading:
@@ -962,9 +962,9 @@ func (p *dataPage) runDialog(c *ui.Context) {
 				for _, v := range e.Volumes {
 					text := fmt.Sprintf("%s needed for %s on %s, %s free.", dataFormatBytes(v.Required), v.Role, v.Path, dataFormatBytes(v.Free))
 					if v.OK {
-						ui.Text(c, text).FontSize(12).TextColor(t.TextMuted)
+						ui.Text(c, text).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 					} else {
-						ui.Text(c, "Not enough space: "+text).FontSize(12).TextColor(t.Danger)
+						ui.Text(c, "Not enough space: "+text).FontSize(ts(c, 12)).TextColor(t.Danger)
 					}
 				}
 			}
@@ -980,7 +980,7 @@ func (p *dataPage) runDialog(c *ui.Context) {
 				case e.Measured < e.Samples:
 					basis = fmt.Sprintf("Partly measured on this computer (%d of %d samples' formats; %d CPUs).", e.Measured, e.Samples, e.CPU)
 				}
-				ui.Text(c, basis).FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, basis).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			}
 			ui.Text(c, "Each sample runs mapping → .hyb → analysis index as one task; tasks wait in the queue when the CPU / memory budget (Preferences) is used up. "+
 				"While one sample maps, the next one already prepares its reads.").
@@ -1179,7 +1179,7 @@ func (p *dataPage) editDialog(c *ui.Context) {
 	}
 	ui.Modal(c, &d.open, func() {
 		ui.Column(c).Width(460).Gap(12).Children(func() {
-			ui.Text(c, "Sample "+s.Label()).FontSize(18).Bold()
+			ui.Text(c, "Sample "+s.Label()).FontSize(ts(c, 18)).Bold()
 			Field(c, "Name", func() { ui.TextInput(c.Key("edit-name"), &d.name).Label("Name") })
 			ui.Row(c).Gap(12).Children(func() {
 				ui.Column(c).Grow(1).Children(func() {
@@ -1206,7 +1206,7 @@ func (p *dataPage) editDialog(c *ui.Context) {
 			Field(c, "Gene", func() {
 				ui.Select(c.Key("edit-gene"), &d.gene, p.geneOptions(d.reference, d.gene, "—")).Label("Gene")
 			})
-			ui.Text(c, s.Reads.Path).FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, s.Reads.Path).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			if d.status != "" {
 				ui.Text(c, d.status).TextColor(t.Danger)
 			}
@@ -1285,15 +1285,15 @@ func (p *dataPage) setRefDialog(c *ui.Context) {
 	refs := p.refLabels()
 	ui.Modal(c, &d.open, func() {
 		ui.Column(c).Width(460).Gap(12).Children(func() {
-			ui.Text(c, "Set the reference of "+dataPlural(len(names), "sample", "samples")).FontSize(18).Bold()
-			ui.Text(c, strings.Join(names, ", ")).FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, "Set the reference of "+dataPlural(len(names), "sample", "samples")).FontSize(ts(c, 18)).Bold()
+			ui.Text(c, strings.Join(names, ", ")).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			if len(refs) == 0 {
 				ui.Text(c, "The project has no reference yet. Add one under References first.").TextColor(t.Warning)
 			} else {
 				Field(c, "Reference", func() {
 					ui.Select(c.Key("setref-reference"), &d.reference, refs).Label("Reference")
 				})
-				ui.Text(c, "Their reads are mapped to it when they run.").FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, "Their reads are mapped to it when they run.").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			}
 			if d.status != "" {
 				ui.Text(c, d.status).TextColor(t.Danger)
@@ -1395,7 +1395,7 @@ func (p *dataPage) addDialog(c *ui.Context) {
 	}
 	ui.Modal(c, &d.open, func() {
 		ui.Column(c).Width(620).Gap(12).Children(func() {
-			ui.Text(c, "Import "+dataPlural(len(d.paths), "file", "files")).FontSize(18).Bold()
+			ui.Text(c, "Import "+dataPlural(len(d.paths), "file", "files")).FontSize(ts(c, 18)).Bold()
 			ui.Text(c, "Each file becomes one sample. Replicates are numbered in the order below, after any existing replicates of the condition unless you give the first one.").
 				FontSize(12).TextColor(t.TextMuted)
 			ui.Row(c).Gap(12).AlignItems(ui.End).Children(func() {
@@ -1445,7 +1445,7 @@ func (p *dataPage) addDialog(c *ui.Context) {
 					ui.Row(c.Key(fmt.Sprintf("add-file-%d", i))).Gap(8).AlignItems(ui.Center).Children(func() {
 						ui.Text(c, fmt.Sprint(i+1)).Width(20).TextColor(t.TextMuted)
 						ui.TextInput(c.Key("name"), &d.names[i]).Width(180).Label("Sample name for " + filepath.Base(path))
-						ui.Text(c, path).Tooltip(path).FontSize(12).TextColor(t.TextMuted).Grow(1).Shrink(1).MinWidth(0).SingleLine()
+						ui.Text(c, path).Tooltip(path).FontSize(ts(c, 12)).TextColor(t.TextMuted).Grow(1).Shrink(1).MinWidth(0).SingleLine()
 					})
 				}
 			})
@@ -1565,11 +1565,11 @@ func (p *dataPage) sheetDialog(c *ui.Context) {
 	if d.problemsOpen {
 		ui.Modal(c, &d.problemsOpen, func() {
 			ui.Column(c).Width(560).Gap(12).Children(func() {
-				ui.Text(c, "Sample sheet problems").FontSize(18).Bold()
+				ui.Text(c, "Sample sheet problems").FontSize(ts(c, 18)).Bold()
 				ui.Text(c, dataBasename(d.sheet)+" cannot be imported:")
 				ui.Scroll(c).MaxHeight(260).Padding(8).Radius(6).Background(t.Surface).Children(func() {
 					for _, line := range strings.Split(d.problems, "; ") {
-						ui.Text(c, line).FontSize(12).TextColor(t.Danger)
+						ui.Text(c, line).FontSize(ts(c, 12)).TextColor(t.Danger)
 					}
 				})
 				ui.Text(c, "Expected columns: name, condition (or dataset/group), replicate, files (several files separated by ';' become replicates), reference, optional gene_id. Relative paths are resolved from the sheet's folder.").
@@ -1587,7 +1587,7 @@ func (p *dataPage) sheetDialog(c *ui.Context) {
 	}
 	ui.Modal(c, &d.open, func() {
 		ui.Column(c).Width(720).Gap(12).Children(func() {
-			ui.Text(c, "Import "+dataBasename(d.sheet)).FontSize(18).Bold()
+			ui.Text(c, "Import "+dataBasename(d.sheet)).FontSize(ts(c, 18)).Bold()
 			ui.Text(c, fmt.Sprintf("%s, %d reference(s). Nothing has been imported yet.", dataPlural(len(d.rows), "sample", "samples"), d.references)).
 				TextColor(t.TextMuted)
 			cols := []ui.TableColumn{{Title: "Name", MinWidth: 100}, {Title: "Condition", Width: 86}, {Title: "Rep", Width: 52, Align: ui.End},
@@ -1688,13 +1688,13 @@ func (p *dataPage) foreignLinks(c *ui.Context) {
 	ui.Column(c.Key("data-foreign")).Gap(6).Padding(12, 14).Radius(8).Border(1, t.Warning).Background(t.Warning.Alpha(0.08)).Children(func() {
 		ui.Text(c, title).Bold()
 		ui.Text(c, "The project may come from another computer. RNAxRay does not open these files until you allow them; "+
-			"allow them only if you trust where the project came from, or use Relink to point to your own copies.").FontSize(12)
+			"allow them only if you trust where the project came from, or use Relink to point to your own copies.").FontSize(ts(c, 12))
 		for i, link := range links {
 			if i == dataForeignShown {
-				ui.Text(c, fmt.Sprintf("and %d more", len(links)-dataForeignShown)).FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, fmt.Sprintf("and %d more", len(links)-dataForeignShown)).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 				break
 			}
-			ui.Text(c, link.Path).FontSize(12).Font("monospace").SingleLine().Tooltip(strings.Join(link.UsedBy, ", "))
+			ui.Text(c, link.Path).FontSize(ts(c, 12)).Font("monospace").SingleLine().Tooltip(strings.Join(link.UsedBy, ", "))
 		}
 		ui.Row(c).Justify(ui.End).Children(func() {
 			if ui.Button(c, "Allow these files").Disabled(p.allowing).Clicked() {

@@ -60,10 +60,29 @@ func init() {
 	})
 }
 
+// The colors of condition A and B: cmpRed and cmpBlue on white (the
+// light theme and exported files, as web/arc-map.js), lighter steps of the
+// same hues on the dark theme's navy (3:1 against its cards and plots).
 var (
-	cmpRed  = ui.RGB(214, 69, 65)
-	cmpBlue = ui.RGB(43, 108, 196)
+	cmpRed      = ui.RGB(214, 69, 65)
+	cmpBlue     = ui.RGB(43, 108, 196)
+	cmpRedDark  = ui.Hex("#e8605a")
+	cmpBlueDark = ui.Hex("#4c8fe8")
 )
+
+// condColors are the colors of condition A and B on the theme.
+func condColors(t *ui.Theme) (a, b ui.Color) {
+	if t.Dark {
+		return cmpRedDark, cmpBlueDark
+	}
+	return cmpRed, cmpBlue
+}
+
+// condDot marks text with a condition's color, which the text itself does
+// not take.
+func condDot(c *ui.Context, color ui.Color) ui.Element {
+	return ui.Box(c).Size(8, 8).Radius(4).Background(color).Shrink(0)
+}
 
 // ---- data
 
@@ -750,9 +769,10 @@ func (p *comparePage) controls(c *ui.Context) {
 			return
 		}
 		ui.Row(c).Gap(12).AlignItems(ui.End).Wrap().Children(func() {
-			p.groupPicker(c.Key("cmp-a"), "A (condition one)", &p.keyA, cmpRed, options)
+			condA, condB := condColors(t)
+			p.groupPicker(c.Key("cmp-a"), "A (condition one)", &p.keyA, condA, options)
 			ui.Text(c, "vs").TextColor(t.TextMuted).Margin(0, 0, 8, 0)
-			p.groupPicker(c.Key("cmp-b"), "B (condition two)", &p.keyB, cmpBlue, options)
+			p.groupPicker(c.Key("cmp-b"), "B (condition two)", &p.keyB, condB, options)
 			ui.Spacer(c)
 			ui.Column(c).Gap(4).Children(func() {
 				ui.Text(c, fmt.Sprintf("%d + %d replicates", len(a.SelectionIDs(p.keyA)), len(a.SelectionIDs(p.keyB)))).
@@ -772,10 +792,10 @@ func (p *comparePage) controls(c *ui.Context) {
 			})
 		})
 		if p.runMsg != "" {
-			ui.Text(c, p.runMsg).TextColor(t.Danger)
+			errorLine(c, p.runMsg)
 		}
 		if notice := p.referenceNotice(); notice != "" {
-			ui.Text(c, notice).FontSize(12).TextColor(t.Warning)
+			ui.Text(c, notice).FontSize(ts(c, 12)).TextColor(t.Warning)
 		}
 		ui.Collapsible(c.Key("cmp-settings"), "Settings", &p.settings, func() {
 			ui.Column(c).Gap(8).Padding(8, 0, 0, 0).Children(func() {
@@ -818,7 +838,10 @@ func (p *comparePage) groupPicker(c *ui.Context, label string, key *string, colo
 		}
 	}
 	ui.Column(c).Gap(4).Children(func() {
-		ui.Text(c, label).FontSize(12).Bold().TextColor(color)
+		ui.Row(c).Gap(6).AlignItems(ui.Center).Children(func() {
+			condDot(c, color)
+			ui.Text(c, label).FontSize(ts(c, 12)).Bold()
+		})
 		ui.Select(c.Key("select"), &current, labels).Width(240).Label(label).OnChange(func() {
 			*key = keys[current]
 			p.runMsg = ""
@@ -833,7 +856,7 @@ func (p *comparePage) list(c *ui.Context) {
 	t := c.Theme()
 	Card(c, "", func() {
 		ui.Row(c).Children(func() {
-			ui.Text(c, "Differential tests").FontSize(16).Bold().Grow(1)
+			ui.Text(c, "Differential tests").FontSize(ts(c, 16)).Bold().Grow(1)
 			if ui.Button(c, "Refresh").Clicked() {
 				p.cache = map[string]*comparisonResult{}
 				p.readErr = map[string]string{}
@@ -843,11 +866,13 @@ func (p *comparePage) list(c *ui.Context) {
 		running := cmpTaskRows(c, a, "compare")
 		if p.listErr != "" {
 			// Not "no tests yet": the list is unknown.
-			ui.Row(c).Gap(10).AlignItems(ui.Center).Children(func() {
-				ui.Text(c, "Could not list comparisons: "+ShortError(p.listErr)).TextColor(t.Danger).Grow(1).Shrink(1).MinWidth(0)
-				if ui.Button(c, "Retry").Clicked() {
-					p.loadList()
-				}
+			notice(c, noticeError, func() {
+				ui.Row(c).Gap(10).AlignItems(ui.Center).Children(func() {
+					ui.Text(c, "Could not list comparisons: "+ShortError(p.listErr)).TextColor(t.Danger).Grow(1).Shrink(1).MinWidth(0)
+					if ui.Button(c, "Retry").Clicked() {
+						p.loadList()
+					}
+				})
 			})
 			if len(p.comparisons) == 0 && running == 0 {
 				return
@@ -880,7 +905,7 @@ func (p *comparePage) list(c *ui.Context) {
 				if e.Available != nil && !*e.Available {
 					meta += " · files missing"
 				}
-				ui.Text(c, meta).FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, meta).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			})
 		}
 	})
@@ -919,7 +944,7 @@ func cmpTaskRows(c *ui.Context, a *App, kind string) int {
 					}
 				})
 				if e := task.ErrorText(); e != "" {
-					ui.Text(c, truncate(e, 300)).FontSize(12).TextColor(t.Danger)
+					ui.Text(c, truncate(e, 300)).FontSize(ts(c, 12)).TextColor(t.Danger)
 				}
 			})
 		}
@@ -949,7 +974,7 @@ func (p *comparePage) results(c *ui.Context) {
 	if result == nil {
 		Card(c, "", func() {
 			if err := p.readErr[id]; err != "" {
-				ui.Text(c, "Could not read the comparison: "+err).TextColor(t.Danger)
+				errorLine(c, "Could not read the comparison: "+err)
 			} else {
 				ui.Text(c, "Loading results…").TextColor(t.TextMuted)
 			}
@@ -958,7 +983,7 @@ func (p *comparePage) results(c *ui.Context) {
 	}
 	ctx := p.context(e)
 	shown := p.shownInteractions(result)
-	p.syncHeatmap(e, result)
+	p.syncHeatmap(e, result, t)
 	if p.row >= len(shown) {
 		p.row = -1
 	}
@@ -969,32 +994,33 @@ func (p *comparePage) results(c *ui.Context) {
 			cutoff = *e.Parameters.PadjCutoff
 		}
 		ui.Column(c).Gap(2).Children(func() {
-			ui.Text(c, ctx.LabelA+" vs "+ctx.LabelB).FontSize(18).Bold()
+			ui.Text(c, ctx.LabelA+" vs "+ctx.LabelB).FontSize(ts(c, 18)).Bold()
 			ui.Text(c, fmt.Sprintf("%s · DESeq2 on %s cells (10 nt) · padj < %g · log2FC = A / B",
-				strings.Join(e.Genes, ", "), FormatNumber(s.CellsTested), cutoff)).FontSize(12).TextColor(t.TextMuted)
+				strings.Join(e.Genes, ", "), FormatNumber(s.CellsTested), cutoff)).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		})
 		sizeFactors := make([]string, len(s.SizeFactors))
 		for i, v := range s.SizeFactors {
 			sizeFactors[i] = fmt.Sprintf("%.2f", v)
 		}
 		ui.Row(c).Gap(10).Wrap().Children(func() {
-			cmpStat(c, "Significant cells", FormatNumber(s.Significant), t.Text)
-			cmpStat(c, "Higher in "+ctx.LabelA, FormatNumber(s.SignificantUp), cmpRed)
-			cmpStat(c, "Higher in "+ctx.LabelB, FormatNumber(s.SignificantDown), cmpBlue)
-			cmpStat(c, "Interactions A / B", FormatNumber(s.InteractionsUp)+" / "+FormatNumber(s.InteractionsDown), t.Text).
+			cmpStat(c, "Significant cells", FormatNumber(s.Significant), ui.Color{})
+			condA, condB := condColors(t)
+			cmpStat(c, "Higher in "+ctx.LabelA, FormatNumber(s.SignificantUp), condA)
+			cmpStat(c, "Higher in "+ctx.LabelB, FormatNumber(s.SignificantDown), condB)
+			cmpStat(c, "Interactions A / B", FormatNumber(s.InteractionsUp)+" / "+FormatNumber(s.InteractionsDown), ui.Color{}).
 				Tooltip("Merged interactions higher in A / higher in B")
 			if n := len(e.SamplesOne); n > 0 && n < len(sizeFactors) {
-				cmpStat(c, "Size factors A · B", strings.Join(sizeFactors[:n], " ")+" · "+strings.Join(sizeFactors[n:], " "), t.Text).
+				cmpStat(c, "Size factors A · B", strings.Join(sizeFactors[:n], " ")+" · "+strings.Join(sizeFactors[n:], " "), ui.Color{}).
 					Tooltip("DESeq2 size factors, in sample order: " + strings.Join(append(append([]string{}, e.SamplesOne...), e.SamplesTwo...), ", "))
 			} else {
-				cmpStat(c, "Size factors", strings.Join(sizeFactors, " "), t.Text)
+				cmpStat(c, "Size factors", strings.Join(sizeFactors, " "), ui.Color{})
 			}
 		})
 		ui.Text(c, "padj is corrected over every tested cell. Before reporting an interaction, check that each replicate supports it (open the region in Explore for each sample): a small padj with a low mean count can still come from one replicate.").
 			FontSize(12).TextColor(t.TextMuted)
 		if result.Truncated {
 			ui.Text(c, fmt.Sprintf("The map shows the %s strongest of %s significant cells.",
-				FormatNumber(int64(len(result.Cells.X))), FormatNumber(result.CellsTotal))).FontSize(12).TextColor(t.TextMuted)
+				FormatNumber(int64(len(result.Cells.X))), FormatNumber(result.CellsTotal))).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		}
 		ui.Row(c).Gap(16).AlignItems(ui.Start).Children(func() {
 			ui.Column(c).Gap(6).Children(func() {
@@ -1043,7 +1069,7 @@ func (p *comparePage) results(c *ui.Context) {
 					}
 				}
 				if len(files) > 0 {
-					ui.Text(c, "Files: "+strings.Join(files, ", ")).FontSize(11).TextColor(t.TextMuted)
+					ui.Text(c, "Files: "+strings.Join(files, ", ")).FontSize(ts(c, 11)).TextColor(t.TextMuted)
 				}
 			})
 		})
@@ -1057,7 +1083,7 @@ func (p *comparePage) results(c *ui.Context) {
 func (p *comparePage) similarityCard(c *ui.Context, e *comparisonEntry, result *comparisonResult, ctx cmpContext) {
 	t := c.Theme()
 	Card(c, "", func() {
-		ui.Text(c, "Similarity heatmap").FontSize(16).Bold()
+		ui.Text(c, "Similarity heatmap").FontSize(ts(c, 16)).Bold()
 		if result.Similarity == nil {
 			ui.Text(c, "This test was run before the similarity heatmap existed; run it again to get one.").TextColor(t.TextMuted)
 			return
@@ -1077,14 +1103,14 @@ func (p *comparePage) similarityCard(c *ui.Context, e *comparisonEntry, result *
 			note += fmt.Sprintf(" (count ≥ %g in each)", minimum)
 		}
 		note += fmt.Sprintf("; green = the smaller of the two summed counts, capped at the 95%% quantile (%g). As rnaxray's plot_similarity_map.", result.Summary.SimilarityCap)
-		ui.Text(c, note).FontSize(12).TextColor(t.TextMuted)
+		ui.Text(c, note).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		ui.Row(c).Gap(10).Wrap().Children(func() {
 			cmpStat(c, "Similar cells", FormatNumber(result.Summary.SimilarityCells), cmpGreen)
-			cmpStat(c, "Colour cap", fmt.Sprintf("%g", result.Summary.SimilarityCap), t.Text)
+			cmpStat(c, "Colour cap", fmt.Sprintf("%g", result.Summary.SimilarityCap), ui.Color{})
 		})
 		if n := int64(len(result.Similarity.X)); n < result.Summary.SimilarityCells {
 			ui.Text(c, fmt.Sprintf("The map shows the %s strongest of %s cells.", FormatNumber(n),
-				FormatNumber(result.Summary.SimilarityCells))).FontSize(12).TextColor(t.TextMuted)
+				FormatNumber(result.Summary.SimilarityCells))).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		}
 		// similarity_heatmap.R draws on white; keep the theme surface in dark mode
 		p.simHeat.Background = ui.Color{}
@@ -1132,25 +1158,32 @@ func cmpTitleButton(c *ui.Context, title string) ui.Element {
 	return b
 }
 
+// cmpStat is the web app's stat tile, a bordered card; a condition's
+// color (zero for none) marks its label with a dot.
 func cmpStat(c *ui.Context, label, value string, color ui.Color) ui.Element {
 	t := c.Theme()
-	// The web app's stat tile, a bordered card.
 	return ui.Column(c).Gap(4).Padding(8, 12).Radius(8).Background(t.Background).Border(1, t.Border).MinWidth(120).Children(func() {
-		ui.Text(c, label).FontSize(12).TextColor(t.TextMuted)
-		ui.Text(c, value).FontSize(18).Bold().TextColor(color)
+		ui.Row(c).Gap(6).AlignItems(ui.Center).Children(func() {
+			if color.A > 0 {
+				condDot(c, color)
+			}
+			ui.Text(c, label).FontSize(ts(c, 12)).TextColor(t.TextMuted)
+		})
+		ui.Text(c, value).FontSize(ts(c, 18)).Bold()
 	})
 }
 
 func cmpLegend(c *ui.Context, labelA, labelB string) {
 	t := c.Theme()
+	condA, condB := condColors(t)
 	ui.Row(c).Gap(14).Children(func() {
 		for _, item := range []struct {
 			color ui.Color
 			label string
-		}{{cmpRed, "higher in " + labelA}, {cmpBlue, "higher in " + labelB}} {
+		}{{condA, "higher in " + labelA}, {condB, "higher in " + labelB}} {
 			ui.Row(c).Gap(6).AlignItems(ui.Center).Children(func() {
 				ui.Box(c).Size(12, 12).Radius(3).Background(item.color)
-				ui.Text(c, item.label).FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, item.label).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			})
 		}
 	})
@@ -1184,13 +1217,14 @@ func cmpPadj(v *float64) float64 {
 }
 
 // syncHeatmap rebuilds the map's cells when the result or direction changes.
-func (p *comparePage) syncHeatmap(e *comparisonEntry, result *comparisonResult) {
-	key := fmt.Sprintf("%s/%d", e.ID, p.direction)
+func (p *comparePage) syncHeatmap(e *comparisonEntry, result *comparisonResult, t *ui.Theme) {
+	key := fmt.Sprintf("%s/%d/%v", e.ID, p.direction, t.Dark)
 	if key == p.heatKey {
 		return
 	}
 	p.heatKey = key
-	p.heat.SetCells(cmpSignificantCells(result, p.direction), float64(p.mapLength(e, result)), float64(p.mapLength(e, result)))
+	condA, condB := condColors(t)
+	p.heat.SetCells(cmpSignificantCells(result, p.direction, condA, condB), float64(p.mapLength(e, result)), float64(p.mapLength(e, result)))
 }
 
 func (p *comparePage) mapLength(e *comparisonEntry, result *comparisonResult) int {
@@ -1207,7 +1241,7 @@ func (p *comparePage) mapLength(e *comparisonEntry, result *comparisonResult) in
 // cmpSignificantCells colours the significant 10-nt cells: red higher in A,
 // blue higher in B, alpha by -log10 padj; weakest first so strong cells
 // stay on top.
-func cmpSignificantCells(result *comparisonResult, direction int) []widgets.Cell {
+func cmpSignificantCells(result *comparisonResult, direction int, colorA, colorB ui.Color) []widgets.Cell {
 	cells := result.Cells
 	out := make([]widgets.Cell, 0, len(cells.X))
 	for i := len(cells.X) - 1; i >= 0; i-- {
@@ -1223,9 +1257,9 @@ func cmpSignificantCells(result *comparisonResult, direction int) []widgets.Cell
 			padj = math.Max(*cells.Padj[i], 1e-300)
 		}
 		strength := math.Min(1, -math.Log10(padj)/20)
-		color := cmpBlue
+		color := colorB
 		if lfc > 0 {
-			color = cmpRed
+			color = colorA
 		}
 		out = append(out, widgets.Cell{X: float64(cells.X[i]), Y: float64(cells.Y[i]), W: 10, H: 10,
 			Color: color.Alpha(float32(0.2 + 0.8*strength))})
@@ -1273,14 +1307,15 @@ func (p *comparePage) interactionTable(c *ui.Context, shown []cmpInteraction) {
 		case 1:
 			ui.Text(c, fmt.Sprintf("%d–%d", row.Y, row.Y+9)).SingleLine()
 		case 2:
-			color := cmpBlue
+			condA, condB := condColors(t)
+			color := condB
 			if row.LFC != nil && *row.LFC > 0 {
-				color = cmpRed
+				color = condA
 			}
-			text := ui.Text(c, cmpFloat(row.LFC, "%.2f"))
-			if i != p.row { // the chosen row's text takes the accent's text color
-				text.TextColor(color)
-			}
+			ui.Row(c).Gap(6).AlignItems(ui.Center).Children(func() {
+				condDot(c, color)
+				ui.Text(c, cmpFloat(row.LFC, "%.2f"))
+			})
 		case 3:
 			ui.Text(c, cmpFloat(row.Padj, "%.1e"))
 		case 4:
@@ -1315,9 +1350,9 @@ func (p *comparePage) actionRow(c *ui.Context, target *cmpTarget, ctx cmpContext
 			p.planFold(*target, ctx)
 		}
 		if none {
-			ui.Text(c, "Choose a row or a cell on the map.").FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, "Choose a row or a cell on the map.").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		} else {
-			ui.Text(c, fmt.Sprintf("%d–%d × %d–%d", target.X, target.X+ctx.Bin-1, target.Y, target.Y+ctx.Bin-1)).FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, fmt.Sprintf("%d–%d × %d–%d", target.X, target.X+ctx.Bin-1, target.Y, target.Y+ctx.Bin-1)).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		}
 	})
 }
@@ -1330,7 +1365,7 @@ func (p *comparePage) foldDialog(c *ui.Context) {
 	plan := p.fold
 	ui.Modal(c.Key("cmp-fold"), &p.foldOpen, func() {
 		ui.Column(c).Gap(12).Width(420).Children(func() {
-			ui.Text(c, fmt.Sprintf("Fold %s:%d–%d", plan.ctx.GeneA, plan.start, plan.end)).FontSize(16).Bold()
+			ui.Text(c, fmt.Sprintf("Fold %s:%d–%d", plan.ctx.GeneA, plan.start, plan.end)).FontSize(ts(c, 16)).Bold()
 			ui.Text(c, fmt.Sprintf("Two window folds (pseudoknots allowed) of %d nt: one with %s evidence, one with %s evidence. They appear on the Structure page.",
 				plan.end-plan.start+1, plan.ctx.LabelA, plan.ctx.LabelB)).TextColor(t.TextMuted)
 			ui.Row(c).Gap(8).Justify(ui.End).Children(func() {
@@ -1420,7 +1455,7 @@ func (p *comparePage) quickView(c *ui.Context) {
 			return
 		}
 		if q.err != "" {
-			ui.Text(c, "The quick comparison is unavailable: "+q.err).TextColor(t.Danger)
+			errorLine(c, "The quick comparison is unavailable: "+q.err)
 			if ui.Button(c, "Back to tests").Clicked() {
 				p.mode = cmpModeTest
 			}
@@ -1434,12 +1469,12 @@ func (p *comparePage) quickView(c *ui.Context) {
 		rows := p.quickRows()
 		ui.Row(c).Gap(8).Children(func() {
 			ui.Column(c).Gap(2).Grow(1).Children(func() {
-				ui.Text(c, "Quick view · "+ctx.LabelA+" vs "+ctx.LabelB).FontSize(18).Bold()
+				ui.Text(c, "Quick view · "+ctx.LabelA+" vs "+ctx.LabelB).FontSize(ts(c, 18)).Bold()
 				meta := fmt.Sprintf("%s · %d-nt bins · %s cells", q.gene, d.BinSize, FormatNumber(int64(len(d.X))))
 				if d.LibraryA != nil && d.LibraryB != nil {
 					meta += " · libraries " + FormatNumber(int64(*d.LibraryA)) + " / " + FormatNumber(int64(*d.LibraryB))
 				}
-				ui.Text(c, meta+" · no statistics; use the differential test for padj").FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, meta+" · no statistics; use the differential test for padj").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			})
 			if ui.Button(c, "Back to tests").Clicked() {
 				p.mode = cmpModeTest
@@ -1454,7 +1489,8 @@ func (p *comparePage) quickView(c *ui.Context) {
 				}
 				length += d.BinSize
 			}
-			q.heat.SetCells(cmpQuickCells(rows, d.BinSize), float64(length), float64(length))
+			condA, condB := condColors(t)
+			q.heat.SetCells(cmpQuickCells(rows, d.BinSize, condA, condB), float64(length), float64(length))
 		}
 		if q.row >= 0 && q.row < len(rows) {
 			r := rows[q.row]
@@ -1497,14 +1533,15 @@ func (p *comparePage) quickView(c *ui.Context) {
 						case 3:
 							ui.Text(c, FormatNumber(int64(r.B)))
 						case 4:
-							color := cmpBlue
+							condA, condB := condColors(t)
+							color := condB
 							if r.Ratio != nil && *r.Ratio > 0 {
-								color = cmpRed
+								color = condA
 							}
-							text := ui.Text(c, cmpFloat(r.Ratio, "%.2f"))
-							if i != q.row {
-								text.TextColor(color)
-							}
+							ui.Row(c).Gap(6).AlignItems(ui.Center).Children(func() {
+								condDot(c, color)
+								ui.Text(c, cmpFloat(r.Ratio, "%.2f"))
+							})
 						}
 					}).Height(p.mapSide() - 40).Label("Quick view bins")
 				}
@@ -1519,7 +1556,7 @@ func (p *comparePage) quickView(c *ui.Context) {
 }
 
 // cmpQuickCells colours bins by log2 A/B: red higher in A, blue higher in B.
-func cmpQuickCells(rows []cmpQuickRow, bin int) []widgets.Cell {
+func cmpQuickCells(rows []cmpQuickRow, bin int, colorA, colorB ui.Color) []widgets.Cell {
 	out := make([]widgets.Cell, 0, len(rows))
 	for i := len(rows) - 1; i >= 0; i-- {
 		r := rows[i]
@@ -1527,9 +1564,9 @@ func cmpQuickCells(rows []cmpQuickRow, bin int) []widgets.Cell {
 			continue
 		}
 		strength := math.Min(1, math.Abs(*r.Ratio)/3)
-		color := cmpBlue
+		color := colorB
 		if *r.Ratio > 0 {
-			color = cmpRed
+			color = colorA
 		}
 		out = append(out, widgets.Cell{X: float64(r.X), Y: float64(r.Y), W: float64(bin), H: float64(bin),
 			Color: color.Alpha(float32(0.15 + 0.85*strength))})

@@ -109,13 +109,9 @@ func (r *regionResult) chosen() *regionCandidate {
 // regionName is "Region A" for the first direction, "Region B" for the second.
 func regionName(k int) string { return "Region " + string(rune('A'+k)) }
 
-// regionColor is the colour of the lineage the region is enriched in.
-func regionColor(enriched int) ui.Color {
-	if enriched == 1 {
-		return cmpBlue
-	}
-	return cmpRed
-}
+// regionColor is the colour of the lineage the region is enriched in, in
+// exported files.
+func regionColor(enriched int) ui.Color { return figLight.condition(enriched) }
 
 func candidateText(c *regionCandidate) string {
 	lfc := "NA"
@@ -621,7 +617,7 @@ func energyFigure(stats [2]violinStats, labels [2]string, title, subtitle string
 	f.text(left-40, top-9, "Folding energy (kcal/mol)", 9.5, pal.Muted, -1, false)
 	slot := (w - left - right) / 2
 	half := slot * 0.42
-	colors := [2]ui.Color{cmpRed, cmpBlue}
+	colors := [2]ui.Color{pal.A, pal.B}
 	for k, s := range stats {
 		if s.N == 0 {
 			continue

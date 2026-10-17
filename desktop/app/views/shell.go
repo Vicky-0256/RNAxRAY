@@ -77,6 +77,7 @@ func (a *App) topBar(c *ui.Context) {
 		a.genePicker(c)
 		a.selectionPicker(c)
 		ui.Spacer(c)
+		a.privacyChip(c)
 		active := len(a.ActiveTasks())
 		label := "Tasks idle"
 		if active > 0 {
@@ -89,6 +90,41 @@ func (a *App) topBar(c *ui.Context) {
 			a.openPrefs()
 		}
 	})
+}
+
+// privacyChip is the web app's "Local only" chip: what leaves this
+// computer. A click opens Preferences, where external lookups are set.
+func (a *App) privacyChip(c *ui.Context) {
+	if !a.lookup.known {
+		return
+	}
+	t := c.Theme()
+	label, tip := "Local only", "Your data stays on this computer: external lookups are off."
+	ink, bg, border := t.Success, brandSoft(t), t.Success.Mix(t.Border, 0.73)
+	if a.lookup.on {
+		label, tip = "RNAcentral lookups on", "Only the identifier and species you enter are sent to RNAcentral; no sequence, structure or project data."
+		ink, bg, border = brandOf(t).mutedStrong, t.Surface, t.Border
+	}
+	// In a narrow window, as with large text, the dot alone keeps the
+	// pickers and buttons of the bar in view; the name and tooltip stay.
+	width, _ := c.Size()
+	compact := width < t.Rem(90)
+	if compact {
+		tip = label + ". " + tip
+	}
+	b := ui.ButtonBase(c.Key("privacy-chip")).Cursor(ui.CursorPointer).Label(label).Tooltip(tip).
+		Padding(4, 10).Radius(999).Background(bg).Border(1, border)
+	b.Children(func() {
+		ui.Row(c).Gap(6).AlignItems(ui.Center).Children(func() {
+			ui.Box(c).Size(7, 7).Radius(4).Background(ink)
+			if !compact {
+				ui.Text(c, label).FontSize(ts(c, 12)).FontWeight(700).TextColor(ink)
+			}
+		})
+	})
+	if b.Clicked() {
+		a.openPrefs()
+	}
 }
 
 func (a *App) referencePicker(c *ui.Context) {
@@ -171,7 +207,7 @@ func (a *App) tasksDrawer(c *ui.Context) {
 				Role(ui.RoleDialog).Label("Tasks")
 			panel.Children(func() {
 				ui.Row(c).Children(func() {
-					ui.Text(c, "Tasks").FontSize(18).Bold().Grow(1)
+					ui.Text(c, "Tasks").FontSize(ts(c, 18)).Bold().Grow(1)
 					if ui.Button(c, "Close").Clicked() {
 						a.drawerOpen = false
 					}
@@ -207,9 +243,9 @@ func (a *App) taskItem(c *ui.Context, task model.Task) {
 		if task.FinishedAt != "" {
 			meta = append(meta, "finished "+FormatTime(task.FinishedAt))
 		}
-		ui.Text(c, strings.Join(meta, " · ")).FontSize(12).TextColor(t.TextMuted)
+		ui.Text(c, strings.Join(meta, " · ")).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		if e := task.ErrorText(); e != "" {
-			ui.Text(c, truncate(e, 400)).FontSize(12).TextColor(t.Danger)
+			ui.Text(c, truncate(e, 400)).FontSize(ts(c, 12)).TextColor(t.Danger)
 		}
 		ui.Row(c).Gap(6).Children(func() {
 			if task.Active() {
@@ -247,8 +283,13 @@ func (a *App) taskItem(c *ui.Context, task model.Task) {
 // ---- shared small widgets
 
 // barLabel names the top bar control after it.
+// barLabel names a picker of the top bar; a window too narrow for the bar
+// (as with large text) leaves it out, the picker keeping its own label.
 func barLabel(c *ui.Context, text string) {
-	ui.Text(c, text).FontSize(12).TextColor(c.Theme().TextMuted)
+	if width, _ := c.Size(); width < c.Theme().Rem(80) {
+		return
+	}
+	ui.Text(c, text).FontSize(ts(c, 12)).TextColor(c.Theme().TextMuted)
 }
 
 // StatusChip shows a task or stage status.
@@ -283,9 +324,9 @@ func ProgressBar(c *ui.Context, task model.Task) {
 		if task.SecondsLeft != nil {
 			detail += " · about " + FormatDuration(*task.SecondsLeft) + " left"
 		}
-		ui.Text(c, detail).FontSize(12).TextColor(t.TextMuted).SingleLine()
+		ui.Text(c, detail).FontSize(ts(c, 12)).TextColor(t.TextMuted).SingleLine()
 	} else if task.Status == "queued" {
-		ui.Text(c, "Waiting for CPU or memory budget").FontSize(12).TextColor(t.TextMuted)
+		ui.Text(c, "Waiting for CPU or memory budget").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 	}
 }
 
@@ -343,7 +384,7 @@ func truncate(s string, n int) string {
 // Element.Label are for assistive technology only).
 func Field(c *ui.Context, label string, control func()) {
 	ui.Column(c).Gap(4).Children(func() {
-		ui.Text(c, label).FontSize(12).Bold().TextColor(c.Theme().TextMuted)
+		ui.Text(c, label).FontSize(ts(c, 12)).Bold().TextColor(c.Theme().TextMuted)
 		control()
 	})
 }
@@ -351,7 +392,7 @@ func Field(c *ui.Context, label string, control func()) {
 // PageHeader is the title and subtitle every page starts with.
 func PageHeader(c *ui.Context, title, subtitle string) {
 	ui.Column(c).Gap(4).Children(func() {
-		ui.Text(c, title).FontSize(28).FontWeight(800)
+		ui.Text(c, title).FontSize(ts(c, 28)).FontWeight(800)
 		if subtitle != "" {
 			ui.Text(c, subtitle).TextColor(c.Theme().TextMuted)
 		}
@@ -369,7 +410,7 @@ func (p *placeholder) Show() {}
 
 func (p *placeholder) View(c *ui.Context) {
 	ui.Column(c).Fill().Padding(24).Gap(8).Children(func() {
-		ui.Text(c, p.info.Title).FontSize(28).FontWeight(800)
+		ui.Text(c, p.info.Title).FontSize(ts(c, 28)).FontWeight(800)
 		ui.Text(c, "This page is being rebuilt in the native interface.").TextColor(c.Theme().TextMuted)
 	})
 }

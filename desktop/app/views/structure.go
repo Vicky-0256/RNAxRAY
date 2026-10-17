@@ -716,7 +716,7 @@ func (p *structurePage) viewer(c *ui.Context) {
 			}
 		}
 		ui.Row(c).Gap(8).AlignItems(ui.Center).Wrap().Children(func() {
-			heading := ui.Text(c.Key("st-viewer-title"), "Viewer").FontSize(16).Bold().Grow(1)
+			heading := ui.Text(c.Key("st-viewer-title"), "Viewer").FontSize(ts(c, 16)).Bold().Grow(1)
 			if e := p.entry(p.viewA); a != nil && e != nil {
 				heading.Focusable().Label("Viewer: " + stResultLabel(e))
 				// A fold started here has just arrived: the keyboard focus
@@ -762,7 +762,7 @@ func (p *structurePage) viewer(c *ui.Context) {
 			if len(p.pairLabels) == 2 {
 				labels = p.pairLabels[0] + " (A) and " + p.pairLabels[1] + " (B)"
 			}
-			ui.Text(c, "Folding "+labels+"; they show here as the folds finish.").FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, "Folding "+labels+"; they show here as the folds finish.").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		}
 		if p.viewA == "" {
 			msg := "Run a fold to see its arc diagram here."
@@ -774,7 +774,7 @@ func (p *structurePage) viewer(c *ui.Context) {
 		}
 		for _, id := range []string{p.viewA, p.viewB} {
 			if err := p.readErr[id]; id != "" && err != "" {
-				ui.Text(c, "Could not read the structure: "+err).TextColor(t.Danger)
+				errorLine(c, "Could not read the structure: "+err)
 				return
 			}
 		}
@@ -798,7 +798,7 @@ func (p *structurePage) viewer(c *ui.Context) {
 			}
 		}
 		ui.Row(c).Gap(14).Wrap().Children(func() {
-			colorA, colorB := cmpRed, cmpBlue
+			colorA, colorB := condColors(t)
 			if p.layers.mono {
 				colorA, colorB = t.Text, t.Text
 			}
@@ -824,20 +824,21 @@ func (p *structurePage) viewer(c *ui.Context) {
 		if len(p.arcs.Features) > 0 {
 			height += 20
 		}
-		ev := p.arcs.Show(c.Key("st-arcs"), height, cmpRed, cmpBlue, t.TextMuted, "Arc diagram of base pairs")
+		condA, condB := condColors(t)
+		ev := p.arcs.Show(c.Key("st-arcs"), height, condA, condB, t.TextMuted, "Arc diagram of base pairs")
 		info := fmt.Sprintf("%s–%s · wheel zooms, drag pans, double click resets", FormatNumber(int64(p.arcs.Start)), FormatNumber(int64(p.arcs.End)))
 		if ev.Hover {
 			info = "Position " + FormatNumber(int64(ev.Position)) + " · " + info
 		}
-		ui.Text(c, info).FontSize(11).TextColor(t.TextMuted)
+		ui.Text(c, info).FontSize(ts(c, 11)).TextColor(t.TextMuted)
 		for _, note := range p.layers.notes {
-			ui.Text(c, note).FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, note).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		}
 		if p.stats.DifferentCover {
-			ui.Text(c, "Pair statistics count pairs inside the regions both structures cover.").FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, "Pair statistics count pairs inside the regions both structures cover.").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		}
 		p.statsTable(c, b != nil)
-		ui.Text(c, p.metaLine(a)).FontSize(12).TextColor(t.TextMuted)
+		ui.Text(c, p.metaLine(a)).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
 			ui.Text(c, "Dot-bracket (A)").Bold().Grow(1)
 			if ui.Button(c, "Copy").Clicked() {
@@ -845,14 +846,14 @@ func (p *structurePage) viewer(c *ui.Context) {
 				p.a.Toast("Dot-bracket copied")
 			}
 		})
-		ui.TextArea(c.Key("st-dbn"), &p.dbnText).ReadOnly(true).Font("monospace").FontSize(11).Height(130).Label("Dot-bracket")
+		ui.TextArea(c.Key("st-dbn"), &p.dbnText).ReadOnly(true).Font("monospace").FontSize(ts(c, 11)).Height(130).Label("Dot-bracket")
 	})
 }
 
 func stLegend(c *ui.Context, color ui.Color, label string) {
 	ui.Row(c).Gap(6).AlignItems(ui.Center).Children(func() {
 		ui.Box(c).Size(14, 3).Background(color)
-		ui.Text(c, label).FontSize(12).TextColor(c.Theme().TextMuted)
+		ui.Text(c, label).FontSize(ts(c, 12)).TextColor(c.Theme().TextMuted)
 	})
 }
 
@@ -1010,12 +1011,12 @@ func (p *structurePage) statsTable(c *ui.Context, compare bool) {
 				ui.Text(c, label).Grow(1)
 				ta := ui.Text(c, a).Width(130).TextAlign(ui.End)
 				if header {
-					ta.Bold().TextColor(cmpRed)
+					ta.Bold()
 				}
 				if compare {
 					tb := ui.Text(c, b).Width(130).TextAlign(ui.End)
 					if header {
-						tb.Bold().TextColor(cmpBlue)
+						tb.Bold()
 					}
 				}
 			})

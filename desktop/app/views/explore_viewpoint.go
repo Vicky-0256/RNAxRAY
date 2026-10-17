@@ -135,12 +135,12 @@ func (p *explorePage) viewpointView(c *ui.Context) {
 				return
 			}
 			if d.adjusted {
-				notice(c, fmt.Sprintf("The resolution was increased to %d nt so the plot has at most 30,000 bins.", d.bin))
+				caveat(c, fmt.Sprintf("The resolution was increased to %d nt so the plot has at most 30,000 bins.", d.bin))
 			}
 			Card(c, "", func() {
 				ui.Row(c).Gap(24).Wrap().Children(func() {
 					ui.Column(c).Grow(1).Gap(2).Children(func() {
-						ui.Text(c, "Interaction coverage").FontSize(16).Bold()
+						ui.Text(c, "Interaction coverage").FontSize(ts(c, 16)).Bold()
 						what := "records"
 						if d.measure == measureReads {
 							what = "reads"
@@ -160,7 +160,7 @@ func (p *explorePage) viewpointView(c *ui.Context) {
 					start, end, v := s.profile.Bin(i)
 					readout = fmt.Sprintf("%s · mean %s", span(start, end), trimFloat(v))
 				}
-				ui.Text(c, readout).FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, readout).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			})
 			ui.Row(c).Gap(16).AlignItems(ui.Start).Wrap().Children(func() {
 				Card(c, "Selected interval", func() {
@@ -212,7 +212,7 @@ func partnerCard(c *ui.Context, title string, partners []partnerTotal, byReads b
 		}
 		for i, pt := range partners {
 			if i == 8 {
-				ui.Text(c, fmt.Sprintf("and %d more", len(partners)-8)).FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, fmt.Sprintf("and %d more", len(partners)-8)).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 				break
 			}
 			ui.Row(c.Key(pt.Name)).Gap(8).AlignItems(ui.Center).Children(func() {
@@ -224,7 +224,7 @@ func partnerCard(c *ui.Context, title string, partners []partnerTotal, byReads b
 				ui.Box(c).Grow(1).Height(8).Radius(4).Background(t.Border).Children(func() {
 					ui.Box(c).WidthPercent(fraction * 100).FillHeight().Radius(4).Background(t.Accent)
 				})
-				ui.Text(c, FormatNumber(pt.Records)+" hybrids · "+FormatNumber(pt.Reads)+" reads").FontSize(12).
+				ui.Text(c, FormatNumber(pt.Records)+" hybrids · "+FormatNumber(pt.Reads)+" reads").FontSize(ts(c, 12)).
 					TextColor(t.TextMuted).Width(170).TextAlign(ui.End)
 			})
 		}

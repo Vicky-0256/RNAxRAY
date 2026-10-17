@@ -247,9 +247,9 @@ func (p *explorePage) contactView(c *ui.Context) {
 				return
 			}
 			if d.adjusted && s.bin == binAuto {
-				notice(c, fmt.Sprintf("Auto bin: %d nt, so the map stays within %s cells.", d.bin, FormatNumber(autoMaxCells)))
+				caveat(c, fmt.Sprintf("Auto bin: %d nt, so the map stays within %s cells.", d.bin, FormatNumber(autoMaxCells)))
 			} else if d.adjusted {
-				notice(c, fmt.Sprintf("The bin size was increased from %d to %d nt so the map stays within %s cells.",
+				caveat(c, fmt.Sprintf("The bin size was increased from %d to %d nt so the map stays within %s cells.",
 					d.requested, d.bin, FormatNumber(fixedMaxCells)))
 			}
 			if len(d.count) == 0 {
@@ -271,7 +271,7 @@ func (p *explorePage) contactView(c *ui.Context) {
 						if s.hover != "" {
 							hint = s.hover
 						}
-						ui.Text(c, hint).FontSize(12).TextColor(t.TextMuted).Grow(1).SingleLine().MaxWidth(mapSizeTarget - 40)
+						ui.Text(c, hint).FontSize(ts(c, 12)).TextColor(t.TextMuted).Grow(1).SingleLine().MaxWidth(mapSizeTarget - 40)
 						if s.heat.Zoomed() && ui.Button(c, "Reset zoom").Clicked() {
 							s.heat.ResetZoom()
 						}
@@ -336,7 +336,7 @@ func (p *explorePage) contactLegend(c *ui.Context, d *contactData) {
 				}
 			})
 			ui.Row(c).Children(func() {
-				ui.Text(c, "1").FontSize(11).TextColor(t.TextMuted).Grow(1)
+				ui.Text(c, "1").FontSize(ts(c, 11)).TextColor(t.TextMuted).Grow(1)
 				ui.Text(c, fmt.Sprintf("≥ %s %s (max %s)", formatCount(limit), strings.ToLower(d.measure), FormatNumber(int64(d.max)))).
 					FontSize(11).TextColor(t.TextMuted)
 			})
@@ -373,7 +373,7 @@ func (p *explorePage) contactDetails(c *ui.Context, d *contactData) {
 		if d.gene2 != d.gene {
 			genes += " × " + shortGene(d.gene2)
 		}
-		ui.Text(c, genes).FontSize(12).TextColor(t.TextMuted)
+		ui.Text(c, genes).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		for _, line := range [][2]string{{"Arm 1 (X)", span(x0, x1)}, {"Arm 2 (Y)", span(y0, y1)},
 			{d.measure, FormatNumber(int64(d.count[s.picked]))}} {
 			ui.Row(c.Key(line[0])).Gap(8).Children(func() {

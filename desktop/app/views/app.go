@@ -268,6 +268,20 @@ func (a *App) setProject(p *model.Project) {
 	a.remember(p.Path, p.Name)
 	a.RefreshTasks()
 	a.showPage()
+	a.loadLookup()
+}
+
+// loadLookup reads whether external lookups are on, for the top bar's
+// privacy chip.
+func (a *App) loadLookup() {
+	a.Go(func() func() {
+		got, err := a.B.Preferences()
+		return func() {
+			if err == nil {
+				a.setLookup(got)
+			}
+		}
+	})
 }
 
 // Close returns to the start page.

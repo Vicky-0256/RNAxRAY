@@ -135,7 +135,7 @@ func (p *structurePage) form(c *ui.Context) {
 	pl := p.plan()
 	card := Card(c, "New fold", func() {
 		if p.prefillNote != "" {
-			ui.Text(c, p.prefillNote).FontSize(12).Padding(8).Radius(6).Background(t.Accent.Alpha(0.10))
+			ui.Text(c, p.prefillNote).FontSize(ts(c, 12)).Padding(8).Radius(6).Background(t.Accent.Alpha(0.10))
 		}
 		p.inputs(c, pl)
 		p.advanced(c)
@@ -190,7 +190,7 @@ func (p *structurePage) inputs(c *ui.Context, pl foldPlan) {
 			OnChange(func() { p.gene = names[current] })
 		if pl.length > 0 {
 			// The full name, which the select may cut.
-			ui.Text(c, p.gene+" · "+FormatNumber(int64(pl.length))+" nt").FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, p.gene+" · "+FormatNumber(int64(pl.length))+" nt").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		}
 	})
 	options := a.SelectionOptions()
@@ -213,7 +213,7 @@ func (p *structurePage) inputs(c *ui.Context, pl foldPlan) {
 		ui.Select(c.Key("st-evidence"), &currentEv, evLabels).FillWidth().Label("Evidence").
 			OnChange(func() { p.evidence = keys[currentEv] })
 		if len(pl.ids) > 0 {
-			ui.Text(c, "Samples: "+p.sampleNames(pl.ids)).FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, "Samples: "+p.sampleNames(pl.ids)).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		}
 	})
 	Field(c, "3  What to fold", func() {
@@ -221,7 +221,7 @@ func (p *structurePage) inputs(c *ui.Context, pl foldPlan) {
 			ui.Radio(c, &p.mode, "genome", "The whole RNA (no pseudoknots)")
 			ui.Radio(c, &p.mode, "windows", "Regions (windows), pseudoknots possible")
 		}).Label("What to fold")
-		ui.Text(c, stLimitText(pl)).FontSize(12).TextColor(t.TextMuted)
+		ui.Text(c, stLimitText(pl)).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		if p.mode != "windows" {
 			p.overLimit(c, pl)
 		}
@@ -231,7 +231,7 @@ func (p *structurePage) inputs(c *ui.Context, pl foldPlan) {
 			ui.TextArea(c.Key("st-windows"), &p.windows).Lines(3, 8).Font("monospace").
 				Placeholder("e.g.\n1-400\n2300-2700").Label("Windows")
 			if len(pl.lengths) > 0 {
-				ui.Text(c, pl.what+": "+pl.span()).FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, pl.what+": "+pl.span()).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			}
 			p.overLimit(c, pl)
 		})
@@ -269,7 +269,7 @@ func (p *structurePage) overLimit(c *ui.Context, pl foldPlan) {
 	if pl.parallel > 1 {
 		next = FormatNumber(int64(pl.maxNT)) + " nt, fewer windows at once (Advanced), or raise Memory in Preferences."
 	}
-	ui.Text(c, what+next).FontSize(12).TextColor(c.Theme().Danger)
+	ui.Text(c, what+next).FontSize(ts(c, 12)).TextColor(c.Theme().Danger)
 }
 
 // advanced: alpha, beam and parallel windows, folded away. Their values
@@ -291,10 +291,10 @@ func (p *structurePage) advanced(c *ui.Context) {
 			row := func(key, label string, value *float64, lo, hi, step float64, help string) {
 				ui.Column(c).Gap(2).Children(func() {
 					ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
-						ui.Text(c, label).FontSize(12).Bold().Width(150)
+						ui.Text(c, label).FontSize(ts(c, 12)).Bold().Width(150)
 						ui.NumberInput(c.Key(key), value, lo, hi, step).Grow(1).Label(label)
 					})
-					ui.Text(c, help).FontSize(12).TextColor(t.TextMuted)
+					ui.Text(c, help).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 				})
 			}
 			row("st-alpha", "Evidence weight (alpha)", &p.alpha, 0, 1, 0.05,
@@ -315,7 +315,7 @@ func (p *structurePage) advanced(c *ui.Context) {
 	if changed {
 		color = t.Warning
 	}
-	ui.Text(c, summary).FontSize(12).TextColor(color)
+	ui.Text(c, summary).FontSize(ts(c, 12)).TextColor(color)
 }
 
 // check: the fold to run, its cost and limits, and Run fold — disabled,
@@ -327,8 +327,8 @@ func (p *structurePage) check(c *ui.Context, pl foldPlan) {
 		ui.Text(c, "Check before running").Bold()
 		line := func(label, value string) {
 			ui.Row(c).Gap(8).Children(func() {
-				ui.Text(c, label).FontSize(12).TextColor(t.TextMuted).Width(70)
-				ui.Text(c, value).FontSize(12).Grow(1).Shrink(1).MinWidth(0)
+				ui.Text(c, label).FontSize(ts(c, 12)).TextColor(t.TextMuted).Width(70)
+				ui.Text(c, value).FontSize(ts(c, 12)).Grow(1).Shrink(1).MinWidth(0)
 			})
 		}
 		if pl.length > 0 {
@@ -359,16 +359,16 @@ func (p *structurePage) check(c *ui.Context, pl foldPlan) {
 			line("Memory", mem)
 		}
 		for _, l := range pl.limits {
-			ui.Text(c, "• "+l).FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, "• "+l).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		}
 		if len(pl.problems) > 0 {
-			ui.Text(c, "Cannot run yet:").FontSize(12).Bold().TextColor(t.Danger)
+			ui.Text(c, "Cannot run yet:").FontSize(ts(c, 12)).Bold().TextColor(t.Danger)
 			for _, msg := range pl.problems {
-				ui.Text(c, "• "+msg).FontSize(12).TextColor(t.Danger)
+				ui.Text(c, "• "+msg).FontSize(ts(c, 12)).TextColor(t.Danger)
 			}
 		}
 		ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
-			ui.Text(c, "Shortcut: "+cmdName()+"+Enter").FontSize(12).TextColor(t.TextMuted).Grow(1)
+			ui.Text(c, "Shortcut: "+cmdName()+"+Enter").FontSize(ts(c, 12)).TextColor(t.TextMuted).Grow(1)
 			busy := p.running()
 			label := "Run fold"
 			if busy {
@@ -459,7 +459,7 @@ func (p *structurePage) status(c *ui.Context) {
 	case p.startErr != "":
 		box(t.Danger, func() {
 			ui.Text(c, "The fold did not start").Bold().TextColor(t.Danger)
-			ui.Text(c, p.startErr).FontSize(12)
+			ui.Text(c, p.startErr).FontSize(ts(c, 12))
 		})
 		return
 	case p.lastTask == "":
@@ -490,7 +490,7 @@ func (p *structurePage) status(c *ui.Context) {
 				}
 			})
 			ui.Progress(c, task.Progress.Fraction()).Label("Fold progress")
-			ui.Text(c, stTimeLine(task)).FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, stTimeLine(task)).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		})
 	case "succeeded":
 		box(t.Success, func() {
@@ -501,16 +501,16 @@ func (p *structurePage) status(c *ui.Context) {
 					done = s + ". " + done
 				}
 			}
-			ui.Text(c, done).FontSize(12)
+			ui.Text(c, done).FontSize(ts(c, 12))
 		})
 	case "failed":
 		what, next := stExplain(task.ErrorText())
 		box(t.Danger, func() {
 			ui.Text(c, "The fold failed").Bold().TextColor(t.Danger)
-			ui.Text(c, what).FontSize(12)
-			ui.Text(c, "Next: "+next).FontSize(12)
+			ui.Text(c, what).FontSize(ts(c, 12))
+			ui.Text(c, "Next: "+next).FontSize(ts(c, 12))
 			ui.Collapsible(c.Key("st-error"), "Technical details", &p.errorOpen, func() {
-				ui.Text(c, truncate(task.ErrorText(), 600)+" (log: runs/"+task.TaskID+"/stderr.log)").FontSize(12).
+				ui.Text(c, truncate(task.ErrorText(), 600)+" (log: runs/"+task.TaskID+"/stderr.log)").FontSize(ts(c, 12)).
 					TextColor(t.TextMuted).Selectable()
 			})
 		})
@@ -671,7 +671,7 @@ func (p *structurePage) list(c *ui.Context) {
 			if n := len(p.structures); n > 0 {
 				title = fmt.Sprintf("Results (%d)", n)
 			}
-			ui.Text(c, title).FontSize(16).Bold().Grow(1)
+			ui.Text(c, title).FontSize(ts(c, 16)).Bold().Grow(1)
 			if ui.Button(c, "Refresh").Tooltip("Read the project's structures again").Clicked() {
 				p.loadList()
 			}
@@ -689,7 +689,7 @@ func (p *structurePage) list(c *ui.Context) {
 				ui.Spinner(c).Label("Loading results…")
 			case others == 0 && p.listErr == "":
 				ui.Text(c, "No structures yet. Choose an RNA and its evidence above and press Run fold; "+
-					"results appear here and in the Report.").FontSize(12).TextColor(t.TextMuted)
+					"results appear here and in the Report.").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			}
 			return
 		}
@@ -703,12 +703,12 @@ func (p *structurePage) list(c *ui.Context) {
 			item.Children(func() {
 				// The whole RNA name, on up to two lines.
 				ui.Text(c, e.GeneID).Bold().MaxLines(2).Tooltip(e.GeneID)
-				ui.Text(c, stWhat(e)).FontSize(12)
+				ui.Text(c, stWhat(e)).FontSize(ts(c, 12))
 				if s := stSummaryText(e); s != "" {
-					ui.Text(c, s).FontSize(12)
+					ui.Text(c, s).FontSize(ts(c, 12))
 				}
 				meta := "Evidence: " + nameOr(p.evidenceNames(e), "—") + " · " + FormatTime(e.CreatedAt)
-				ui.Text(c, meta).FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, meta).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 				if e.Available != nil && !*e.Available {
 					ui.Text(c, "Its files are missing from the project folder; it cannot be shown. Run the fold again to recreate it.").
 						FontSize(12).TextColor(t.Danger)
@@ -716,12 +716,12 @@ func (p *structurePage) list(c *ui.Context) {
 				}
 				ui.Row(c).Gap(6).Children(func() {
 					if isA {
-						ui.Badge(c, "A · shown").Background(cmpRed.Alpha(0.15)).TextColor(cmpRed)
+						ui.Badge(c, "A · shown").Background(cmpRed.Alpha(0.15)).TextColor(t.Text)
 					} else if ui.Button(c, "Show").Clicked() {
 						p.show(e.ID)
 					}
 					if isB {
-						ui.Badge(c, "B · compared").Background(cmpBlue.Alpha(0.15)).TextColor(cmpBlue)
+						ui.Badge(c, "B · compared").Background(cmpBlue.Alpha(0.15)).TextColor(t.Text)
 					} else if p.viewA != "" && !isA {
 						if ui.Button(c, "Compare as B").Clicked() {
 							p.viewB = e.ID
@@ -756,9 +756,9 @@ func (p *structurePage) otherTasks(c *ui.Context) int {
 					}
 				})
 				if task.Status == "queued" {
-					ui.Text(c, "Waiting to start").FontSize(12).TextColor(t.TextMuted)
+					ui.Text(c, "Waiting to start").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 				} else {
-					ui.Text(c, stStageText(task)).FontSize(12)
+					ui.Text(c, stStageText(task)).FontSize(ts(c, 12))
 					ui.Progress(c, task.Progress.Fraction()).Label("Fold progress")
 				}
 			})
@@ -774,10 +774,10 @@ func (p *structurePage) otherTasks(c *ui.Context) int {
 					}
 				})
 				if task.Status == "interrupted" {
-					ui.Text(c, "Stopped when RNAxRay Desktop closed; nothing was saved.").FontSize(12).TextColor(t.TextMuted)
+					ui.Text(c, "Stopped when RNAxRay Desktop closed; nothing was saved.").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 				} else {
 					what, next := stExplain(task.ErrorText())
-					ui.Text(c, what+" Next: "+next).FontSize(12).TextColor(t.Danger)
+					ui.Text(c, what+" Next: "+next).FontSize(ts(c, 12)).TextColor(t.Danger)
 				}
 			})
 		}

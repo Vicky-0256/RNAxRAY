@@ -49,15 +49,25 @@ type figure struct {
 // screen, figLight in exported files.
 type figPalette struct {
 	Text, Muted, Faint, Border, Background ui.Color
+	A, B                                   ui.Color // conditions A and B
 }
 
 func figPaletteOf(t *ui.Theme) figPalette {
-	return figPalette{Text: t.Text, Muted: t.TextMuted, Faint: t.TextMuted.Alpha(0.35), Border: t.Border, Background: t.Background}
+	a, b := condColors(t)
+	return figPalette{Text: t.Text, Muted: t.TextMuted, Faint: t.TextMuted.Alpha(0.35), Border: t.Border, Background: t.Background, A: a, B: b}
+}
+
+// condition is the color of condition A (0) or B (1).
+func (p figPalette) condition(k int) ui.Color {
+	if k == 1 {
+		return p.B
+	}
+	return p.A
 }
 
 // figLight is the palette of exported SVG files (white paper).
 var figLight = figPalette{Text: ui.RGB(51, 51, 51), Muted: ui.RGB(107, 114, 128), Faint: ui.RGB(200, 204, 211),
-	Border: ui.RGB(201, 206, 214), Background: ui.RGB(255, 255, 255)}
+	Border: ui.RGB(201, 206, 214), Background: ui.RGB(255, 255, 255), A: cmpRed, B: cmpBlue}
 
 func (f *figure) line(stroke ui.Color, width float32, pts ...figPt) {
 	f.Shapes = append(f.Shapes, figShape{Kind: figLine, Pts: pts, Stroke: stroke, Width: width})

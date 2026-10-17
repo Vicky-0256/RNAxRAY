@@ -274,7 +274,10 @@ func (p *comparePage) foldPicker(c *ui.Context, label string, color ui.Color, va
 		}
 	}
 	ui.Column(c).Gap(4).Children(func() {
-		ui.Text(c, label).FontSize(12).Bold().TextColor(color)
+		ui.Row(c).Gap(6).AlignItems(ui.Center).Children(func() {
+			condDot(c, color)
+			ui.Text(c, label).FontSize(ts(c, 12)).Bold()
+		})
 		ui.Select(c.Key("fold"), &current, options).Width(300).Label(label).OnChange(func() {
 			for i, o := range options {
 				if o == current {
@@ -297,7 +300,7 @@ func (p *comparePage) regionsCard(c *ui.Context, e *comparisonEntry, ctx cmpCont
 	}
 	Card(c, "", func() {
 		ui.Row(c).Gap(8).Children(func() {
-			ui.Text(c, "Enriched regions").FontSize(16).Bold().Grow(1)
+			ui.Text(c, "Enriched regions").FontSize(ts(c, 16)).Bold().Grow(1)
 			if s.regions != nil && s.regionsFor == e.ID {
 				if ui.Button(c, "Export SVG…").Tooltip("Save both regions' diagrams").Clicked() {
 					p.exportRegionsSVG(ctx)
@@ -314,8 +317,9 @@ func (p *comparePage) regionsCard(c *ui.Context, e *comparisonEntry, ctx cmpCont
 			return
 		}
 		ui.Row(c).Gap(12).AlignItems(ui.End).Wrap().Children(func() {
-			p.foldPicker(c.Key("cmp-fold-a"), "Fold of "+labels[0], cmpRed, &s.foldA)
-			p.foldPicker(c.Key("cmp-fold-b"), "Fold of "+labels[1], cmpBlue, &s.foldB)
+			condA, condB := condColors(t)
+			p.foldPicker(c.Key("cmp-fold-a"), "Fold of "+labels[0], condA, &s.foldA)
+			p.foldPicker(c.Key("cmp-fold-b"), "Fold of "+labels[1], condB, &s.foldB)
 			Field(c, "padj <", func() {
 				ui.NumberInput(c.Key("cmp-reg-padj"), &s.padj, 1e-12, 1, 0.001).Label("Regions padj cutoff")
 			})
@@ -335,7 +339,7 @@ func (p *comparePage) regionsCard(c *ui.Context, e *comparisonEntry, ctx cmpCont
 			}
 		})
 		if s.regionsErr != "" {
-			ui.Text(c, ShortError(s.regionsErr)).TextColor(t.Danger)
+			errorLine(c, ShortError(s.regionsErr))
 		}
 		res := s.regions
 		if res == nil || s.regionsFor != e.ID {
@@ -363,10 +367,10 @@ func (p *comparePage) regionsCard(c *ui.Context, e *comparisonEntry, ctx cmpCont
 func (p *comparePage) regionBlock(c *ui.Context, e *comparisonEntry, k int, r *regionResult, labels [2]string) {
 	t := c.Theme()
 	s := &p.panels
-	color := regionColor(r.Enriched)
+	color := figPaletteOf(t).condition(r.Enriched)
 	ui.Column(c).Gap(8).Padding(10, 0, 0, 0).Children(func() {
 		ui.Row(c).Gap(10).AlignItems(ui.Center).Wrap().Children(func() {
-			ui.Text(c, regionName(k)+" · higher in "+labels[r.Enriched]).FontSize(15).Bold().TextColor(color)
+			ui.Text(c, regionName(k)+" · higher in "+labels[r.Enriched]).FontSize(ts(c, 15)).Bold().TextColor(color)
 			if len(r.Candidates) == 0 {
 				ui.Text(c, fmt.Sprintf("none of the %s interactions with padj < %g is formed by %s's fold", FormatNumber(int64(r.Tested)), s.padj, labels[r.Enriched])).
 					TextColor(t.TextMuted)
@@ -388,7 +392,7 @@ func (p *comparePage) regionBlock(c *ui.Context, e *comparisonEntry, k int, r *r
 					}
 				}
 			})
-			ui.Text(c, fmt.Sprintf("of %s with padj < %g", FormatNumber(int64(r.Tested)), s.padj)).FontSize(12).TextColor(t.TextMuted)
+			ui.Text(c, fmt.Sprintf("of %s with padj < %g", FormatNumber(int64(r.Tested)), s.padj)).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		})
 		chosen := r.chosen()
 		if chosen == nil || len(r.Panels) == 0 {
@@ -406,11 +410,11 @@ func (p *comparePage) regionBlock(c *ui.Context, e *comparisonEntry, k int, r *r
 					ui.Box(c).Size(340, 340).Radius(8).Border(1, t.Border).Role(ui.RoleImage).
 						Label(fmt.Sprintf("%s, %s: %s, %s", regionName(k), title, panelPairsText(pn), panelOutsideText(pn))).
 						Draw(func(pt *ui.Painter, rect ui.Rect) { fig.paint(pt, rect) })
-					ui.Text(c, title+" · "+windowsText(pn.Windows)).Bold().FontSize(12.5)
-					ui.Text(c, panelPairsText(pn)).FontSize(12).TextColor(t.TextMuted)
-					ui.Text(c, panelOutsideText(pn)).FontSize(12).TextColor(t.TextMuted)
+					ui.Text(c, title+" · "+windowsText(pn.Windows)).Bold().FontSize(ts(c, 12.5))
+					ui.Text(c, panelPairsText(pn)).FontSize(ts(c, 12)).TextColor(t.TextMuted)
+					ui.Text(c, panelOutsideText(pn)).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 					if pn.NotDrawn > 0 {
-						ui.Text(c, fmt.Sprintf("%d crossing pairs left out of the layout", pn.NotDrawn)).FontSize(11).TextColor(t.Warning)
+						ui.Text(c, fmt.Sprintf("%d crossing pairs left out of the layout", pn.NotDrawn)).FontSize(ts(c, 11)).TextColor(t.Warning)
 					}
 				})
 			}
@@ -426,7 +430,7 @@ func (p *comparePage) energyCard(c *ui.Context, e *comparisonEntry, ctx cmpConte
 	res := s.energy[e.ID]
 	Card(c, "", func() {
 		ui.Row(c).Gap(8).Children(func() {
-			ui.Text(c, "Folding energy").FontSize(16).Bold().Grow(1)
+			ui.Text(c, "Folding energy").FontSize(ts(c, 16)).Bold().Grow(1)
 			if res != nil && res.Summary != nil {
 				if ui.Button(c, "Export SVG…").Tooltip("Save both violin plots").Clicked() {
 					p.exportEnergySVG(ctx)
@@ -437,7 +441,7 @@ func (p *comparePage) energyCard(c *ui.Context, e *comparisonEntry, ctx cmpConte
 			}
 		})
 		ui.Text(c, fmt.Sprintf("Each merged interaction with padj below the cutoff: a fragment centred on each arm (bin start + 5, %s's reference), the two joined with & and folded with RNAcofold (ViennaRNA defaults, 37 °C), once with %s's sequence and once with %s's at the aligned positions. Paired t-test per direction.",
-			labels[0], labels[0], labels[1])).FontSize(12).TextColor(t.TextMuted)
+			labels[0], labels[0], labels[1])).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 		running := cmpTaskRows(c, p.a, "energy")
 		ui.Row(c).Gap(12).AlignItems(ui.End).Wrap().Children(func() {
 			Field(c, "Fragment (nt)", func() {
@@ -469,10 +473,10 @@ func (p *comparePage) energyCard(c *ui.Context, e *comparisonEntry, ctx cmpConte
 			}
 		})
 		if s.energyMsg != "" {
-			ui.Text(c, s.energyMsg).TextColor(t.Danger)
+			errorLine(c, s.energyMsg)
 		}
 		if err := s.energyErr[e.ID]; err != "" {
-			ui.Text(c, "Could not read the energies: "+ShortError(err)).TextColor(t.Danger)
+			errorLine(c, "Could not read the energies: "+ShortError(err))
 			return
 		}
 		if res == nil {
@@ -496,7 +500,7 @@ func (p *comparePage) energyCard(c *ui.Context, e *comparisonEntry, ctx cmpConte
 					ui.Box(c).Size(400, 340).Radius(8).Border(1, t.Border).Role(ui.RoleImage).Label(title + "; " + subtitle).
 						Draw(func(pt *ui.Painter, rect ui.Rect) { fig.paint(pt, rect) })
 					ui.Text(c, fmt.Sprintf("mean dG %s %s · %s %s kcal/mol · t = %s", labels[0], formatFloat(st.MeanOne, "%.2f"),
-						labels[1], formatFloat(st.MeanTwo, "%.2f"), formatFloat(st.T, "%.2f"))).FontSize(12).TextColor(t.TextMuted)
+						labels[1], formatFloat(st.MeanTwo, "%.2f"), formatFloat(st.T, "%.2f"))).FontSize(ts(c, 12)).TextColor(t.TextMuted)
 				})
 			}
 		})
@@ -508,7 +512,7 @@ func (p *comparePage) energyCard(c *ui.Context, e *comparisonEntry, ctx cmpConte
 		if f := sum.Files["tsv"]; f != "" {
 			note += " · " + f
 		}
-		ui.Text(c, note).FontSize(11).TextColor(t.TextMuted)
+		ui.Text(c, note).FontSize(ts(c, 11)).TextColor(t.TextMuted)
 	})
 }
 

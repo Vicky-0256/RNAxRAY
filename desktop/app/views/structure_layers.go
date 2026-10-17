@@ -525,7 +525,7 @@ func (p *structurePage) layerControls(c *ui.Context, gene string) {
 		if an != nil && an.file != "" {
 			label = "Genes: " + an.file
 		}
-		ui.Text(c, label).FontSize(12).TextColor(t.TextMuted).Margin(0, 0, 8, 0)
+		ui.Text(c, label).FontSize(ts(c, 12)).TextColor(t.TextMuted).Margin(0, 0, 8, 0)
 		if ui.Button(c, "Gene annotation…").Tooltip("Attach a GenBank, GFF/GTF, BED or TSV file to this reference").Clicked() {
 			p.loadAnnotation(gene, false)
 		}

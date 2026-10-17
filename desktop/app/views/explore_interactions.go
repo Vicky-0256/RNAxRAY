@@ -268,7 +268,7 @@ func (p *explorePage) interactionsView(c *ui.Context) {
 				coordInput(c, "ix-x1", "Arm 1 to", &s.x1, "end").OnSubmit(submit)
 				coordInput(c, "ix-y0", "Arm 2 from", &s.y0, "start").OnSubmit(submit)
 				coordInput(c, "ix-y1", "Arm 2 to", &s.y1, "end").OnSubmit(submit)
-				ui.Text(c, "1-based; Enter or Apply filters.").FontSize(12).TextColor(t.TextMuted)
+				ui.Text(c, "1-based; Enter or Apply filters.").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 			})
 		})
 		if s.inputErr != "" {
@@ -365,7 +365,7 @@ func (p *explorePage) hybridTable(c *ui.Context) {
 		cols, index = append(cols, col), append(index, i)
 	}
 	if oneGene {
-		ui.Text(c, "Both arms of every hybrid shown are on "+rows[0].Gene1+".").FontSize(12).TextColor(t.TextMuted)
+		ui.Text(c, "Both arms of every hybrid shown are on "+rows[0].Gene1+".").FontSize(ts(c, 12)).TextColor(t.TextMuted)
 	}
 	ids := p.ids
 	s.list.Selected = &s.chosen
