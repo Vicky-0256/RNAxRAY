@@ -16,7 +16,7 @@ const (
 )
 
 // AppVersion is reported to Python as RNAXRAY_APP_VERSION.
-var AppVersion = "0.1.6"
+var AppVersion = "0.1.7"
 
 // Bridge locates the Python runtime: the repository root holding
 // desktop/runtime/bridge.py and the interpreter that runs it.

@@ -3,6 +3,12 @@ RNA structure, on your own computer. Your data is not uploaded anywhere. The
 only network use is the optional RNAcentral lookup, which is off until you
 turn it on in Preferences.
 
+## What's new in 0.1.7
+
+- **CPLfold licence**: CPLfold's own code is now licensed GPL-2.0-or-later
+  by its author, and the app includes the licence
+  (`third_party/cplfold/LICENSE`) with CPLfold's third-party notices.
+
 ## What's new in 0.1.6
 
 - **The logo's colors**: buttons, selections and links take the new
