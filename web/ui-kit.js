@@ -323,12 +323,10 @@
       "its limit grows with memory: " + DESKTOP_LIMITS.cplfoldText + ".",
     overview: "The full pipeline on your computer, from raw reads to structures."
   };
-  // The GitHub repository is private, so its release downloads 404 for
-  // visitors: until they are public, no page offers a download (downloadUrl
-  // and checksumsUrl return "") and cta() links to the Desktop drawer only.
-  // Set to true once https://github.com/Vicky-0256/RNAxRAY/releases opens
-  // without signing in.
-  const DESKTOP_DOWNLOADS_PUBLIC = false;
+  // The installers are the GitHub releases' files, public since the
+  // repository is (2026-10-17). False hides every download (downloadUrl and
+  // checksumsUrl return "", cta() opens the Desktop drawer only).
+  const DESKTOP_DOWNLOADS_PUBLIC = true;
   const desktop = {
     name: "RNAxRay Desktop",
     downloadsAvailable: DESKTOP_DOWNLOADS_PUBLIC,
@@ -375,6 +373,21 @@
     },
     checksumsUrl: function () {
       return desktop.downloadUrl(desktop.checksumsFile);
+    },
+    // The published releases, newest first, as web/releases.js lists them
+    // when the site is deployed (scripts/write-releases.mjs): [{ tag,
+    // published: "YYYY-MM-DD", files: [names] }]. Empty when it is missing.
+    releases: function () {
+      const list = root.RNAXRAY_RELEASES;
+      return Array.isArray(list) ? list.filter(function (release) {
+        return release && typeof release.tag === "string" && Array.isArray(release.files);
+      }) : [];
+    },
+    // A file of one release (tag), as downloadUrl gives the latest's.
+    releaseDownloadUrl: function (tag, platform) {
+      const file = typeof platform === "string" ? platform : platform && platform.file;
+      return desktop.downloadsAvailable && tag && file
+        ? desktop.releasesUrl + "/download/" + encodeURIComponent(tag) + "/" + file : "";
     },
     // <a class="desktop-cta" data-action="open-desktop">: the app opens the
     // Desktop drawer on click (and calls preventDefault). Without that handler

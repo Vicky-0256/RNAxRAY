@@ -896,8 +896,10 @@
           }).join("") + "</div>";
       }).join("") + "</div>";
     }
+    const versions = desktopVersions(kit);
     return [
       '<div class="desktop-downloads">',
+      versions.latest,
       choices,
       '<p class="desktop-download-unavailable">' + escapeHtml(kit.unavailable) + "</p>",
       '<details class="desktop-first-launch" data-open-key="desktop-first-launch"' + (window.RNAxRayOpenSections && window.RNAxRayOpenSections["desktop-first-launch"] ? " open" : "") + ">",
@@ -906,9 +908,44 @@
       "<p><strong>Windows:</strong> SmartScreen may warn about an unrecognised app. Choose More info → Run anyway.</p>",
       "</details>",
       '<p class="desktop-download-meta"><a href="' + escapeAttribute(kit.checksumsUrl()) + '">Checksums (' + escapeHtml(kit.checksumsFile) + ")</a>" +
-        '<span aria-hidden="true"> · </span><a href="' + escapeAttribute(kit.releasesUrl + "/latest") + '">Release notes</a></p>',
+        '<span aria-hidden="true"> · </span><a href="' + escapeAttribute(kit.releasesUrl + "/latest") + '">Release notes</a>' +
+        '<span aria-hidden="true"> · </span><a href="' + escapeAttribute(kit.releasesUrl) + '">All releases</a></p>',
+      versions.earlier,
       "</div>"
     ].join("");
+  }
+
+  // The latest version, over the downloads, and the earlier versions
+  // (web/releases.js, written when the site is deployed), each with the
+  // installers it has, in a closed <details> under them.
+  function desktopVersions(kit) {
+    const releases = kit.releases();
+    if (!releases.length) {
+      return { latest: "", earlier: "" };
+    }
+    const date = function (release) {
+      const parsed = release.published ? new Date(release.published + "T00:00:00Z") : null;
+      return parsed && !isNaN(parsed) ? parsed.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" }) : "";
+    };
+    const versionLine = function (release) {
+      const files = kit.platforms.filter(function (item) { return release.files.indexOf(item.file) !== -1; });
+      const links = files.map(function (item) {
+        return '<a class="desktop-download-link" href="' + escapeAttribute(kit.releaseDownloadUrl(release.tag, item)) + '" data-platform="' + escapeAttribute(item.id) +
+          '" aria-label="Download ' + escapeAttribute(release.tag) + " for " + escapeAttribute(item.label) + '">' + escapeHtml(item.label) + "</a>";
+      });
+      links.push('<a class="desktop-download-link" href="' + escapeAttribute(kit.releasesUrl + "/tag/" + encodeURIComponent(release.tag)) + '">Release notes</a>');
+      return '<li><span class="desktop-version-name">' + escapeHtml(release.tag) + "</span>" +
+        (date(release) ? ' <span class="desktop-version-date">' + escapeHtml(date(release)) + "</span>" : "") +
+        '<span class="desktop-version-links">' + links.join('<span aria-hidden="true"> · </span>') + "</span></li>";
+    };
+    const latest = releases[0];
+    const earlier = releases.slice(1);
+    return {
+      latest: '<p class="desktop-download-version">Latest version <strong>' + escapeHtml(latest.tag) + "</strong>" + (date(latest) ? ", " + escapeHtml(date(latest)) : "") + "</p>",
+      earlier: earlier.length ? '<details class="desktop-versions" data-open-key="desktop-versions"' + (window.RNAxRayOpenSections && window.RNAxRayOpenSections["desktop-versions"] ? " open" : "") + ">" +
+        "<summary>Earlier versions (" + earlier.length + ")</summary>" +
+        '<ul class="desktop-version-list">' + earlier.map(versionLine).join("") + "</ul></details>" : ""
+    };
   }
 
   function renderBrand() {

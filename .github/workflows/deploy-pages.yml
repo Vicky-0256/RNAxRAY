@@ -8,6 +8,7 @@ on:
       - "web/**"
       - "scripts/build-vienna-wasm.sh"
       - "scripts/build-cplfold-web.sh"
+      - "scripts/write-releases.mjs"
       - "scripts/verify-vienna-wasm.cjs"
       - "scripts/verify-comrades-analysis.cjs"
       - "scripts/verify-webr-feasibility.cjs"
@@ -55,6 +56,13 @@ jobs:
         run: |
           printf 'window.RNAXRAY_BUILD = { commit: "%s" };\n' "$GITHUB_SHA" > web/build-info.js
 
+      # The Desktop drawer's version list; desktop-release.yml redeploys the
+      # site after each release so that it stays current.
+      - name: List the desktop releases
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/write-releases.mjs "$GITHUB_REPOSITORY"
+
       - name: Build pinned ViennaRNA WebAssembly engine
         env:
           EMSDK_VERSION: 3.1.57
@@ -72,6 +80,7 @@ jobs:
         run: |
           test -f web/index.html
           test -s web/build-info.js
+          test -s web/releases.js
           test -s web/vendor/viennarna/vienna-rna.js
           test -s web/vendor/viennarna/vienna-rna.wasm
           test -s web/vendor/viennarna/COPYING-ViennaRNA.txt

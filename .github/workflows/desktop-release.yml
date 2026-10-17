@@ -160,6 +160,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write # to redeploy the website below
     steps:
       - uses: actions/checkout@v6
       - uses: actions/download-artifact@v4
@@ -176,3 +177,9 @@ jobs:
           cat SHA256SUMS.txt
           gh release create "$GITHUB_REF_NAME" --verify-tag --title "RNAxRay Desktop $GITHUB_REF_NAME" \
             --notes-file ../desktop/RELEASE_NOTES.md -- *
+      # A release made with the workflow token starts no other workflow, but a
+      # dispatch does: the website lists the new version and links it.
+      - name: Redeploy the website with the new version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main --repo "$GITHUB_REPOSITORY"

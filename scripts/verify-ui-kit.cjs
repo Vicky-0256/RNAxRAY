@@ -122,21 +122,38 @@ assert.equal(desk.detectPlatform("Linux; Android 14; Pixel 8"), null, "Android i
 assert.equal(desk.detectPlatform("iPhone; CPU iPhone OS 17_0"), null);
 assert.equal(desk.detectPlatform("Macintosh; Intel Mac OS X 10_15_7", 5), null, "iPadOS Safari reports a Mac with touch points");
 assert.equal(desk.detectPlatform("Macintosh; Intel Mac OS X 10_15_7", 0).id, "mac-arm64");
-// downloads are private for now: nothing may link to an installer
-assert.equal(desk.downloadsAvailable, false);
+// downloads are public: the latest release's files, and each release's
+assert.equal(desk.downloadsAvailable, true);
+assert.equal(desk.downloadUrl(desk.platforms[0]), "https://github.com/Vicky-0256/RNAxRAY/releases/latest/download/RNAxRay-Desktop-macOS-arm64.dmg");
+assert.equal(desk.checksumsUrl(), "https://github.com/Vicky-0256/RNAxRAY/releases/latest/download/SHA256SUMS.txt");
+assert.match(desk.cta("raw-reads"), /^<a class="desktop-cta" href="https:\/\/github\.com\/Vicky-0256\/RNAxRAY\/releases\/latest" data-action="open-desktop".*<strong>Get RNAxRay Desktop<\/strong><\/a>$/);
+assert.equal(desk.releaseDownloadUrl("v0.1.4", desk.platforms[1]), "https://github.com/Vicky-0256/RNAxRAY/releases/download/v0.1.4/RNAxRay-Desktop-Windows-x64-Setup.exe");
+assert.equal(desk.releases().length, 0, "no web/releases.js loaded: no versions");
+context.window.RNAXRAY_RELEASES = [{ tag: "v0.2.0", published: "2026-11-01", files: ["RNAxRay-Desktop-macOS-arm64.dmg"] }, { tag: "broken" }, null];
+assert.equal(desk.releases().map(function (release) { return release.tag; }).join(","), "v0.2.0", "malformed entries are left out");
+delete context.window.RNAXRAY_RELEASES;
+// the generated list, as committed, names only installers the release workflow builds
+const releasesSource = fs.readFileSync(web("releases.js"), "utf8");
+const releasesContext = { window: {} };
+vm.runInNewContext(releasesSource, releasesContext);
+assert.ok(releasesContext.window.RNAXRAY_RELEASES.length > 0, "web/releases.js lists the releases");
+releasesContext.window.RNAXRAY_RELEASES.forEach(function (release) {
+  assert.match(release.tag, /^v\d/);
+  release.files.forEach(function (file) {
+    assert.ok(file === desk.checksumsFile || desk.platforms.some(function (item) { return item.file === file; }), file + " is a known installer");
+  });
+});
+// with downloads hidden, nothing may link to an installer
+desk.downloadsAvailable = false;
 assert.equal(desk.downloadUrl(desk.platforms[0]), "");
 assert.equal(desk.checksumsUrl(), "");
+assert.equal(desk.releaseDownloadUrl("v0.1.4", desk.platforms[0]), "");
 ["raw-reads", "long-fold", "overview"].forEach(function (name) {
   const cta = desk.cta(name);
   assert.match(cta, /^<a class="desktop-cta" href="#rnaxray-desktop" data-action="open-desktop"/, name);
   assert.match(cta, /<strong>About RNAxRay Desktop<\/strong><\/a>$/, name);
   assert.doesNotMatch(cta, /github\.com/, name);
 });
-desk.downloadsAvailable = true;
-assert.equal(desk.downloadUrl(desk.platforms[0]), "https://github.com/Vicky-0256/RNAxRAY/releases/latest/download/RNAxRay-Desktop-macOS-arm64.dmg");
-assert.equal(desk.checksumsUrl(), "https://github.com/Vicky-0256/RNAxRAY/releases/latest/download/SHA256SUMS.txt");
-assert.match(desk.cta("raw-reads"), /^<a class="desktop-cta" href="https:\/\/github\.com\/Vicky-0256\/RNAxRAY\/releases\/latest" data-action="open-desktop".*<strong>Get RNAxRay Desktop<\/strong><\/a>$/);
-desk.downloadsAvailable = false;
 assert.match(desk.cta("long-fold"), /Longer than 500 nt\? RNAxRay Desktop runs CPLfold natively with no capacity test; its limit grows with memory: about 6,500 nt with 8 GB of memory\./);
 assert.equal(desk.cta("no-such-context"), "");
 context.window.RNAxRayDesktop = { enabled: true };
