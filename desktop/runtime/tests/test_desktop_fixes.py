@@ -13,7 +13,7 @@ from unittest import mock
 from desktop.runtime import bridge
 from desktop.runtime.bridge import handle, serve
 from desktop.runtime.detector import detect_runtime
-from desktop.runtime.project import new_project, register_task_run, save_analysis_run, update_ui_state, validate_project_directory
+from desktop.runtime.project import new_project, register_task_run, save_analysis_run, update_ui_state, validate_manifest, validate_project_directory
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -102,7 +102,16 @@ class UiStateAndVersionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(os.environ, {}, clear=False):
             os.environ.pop("RNAXRAY_APP_VERSION", None)
             manifest = json.loads(new_project(Path(tmp) / "p", "P").read_text())
-            self.assertEqual(manifest["application"]["version"], "0.1.3")
+            self.assertEqual(manifest["application"]["version"], "0.1.4")
+
+    def test_project_made_by_hyb2_desktop_still_validates(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = new_project(Path(tmp) / "old.hyb2proj", "Old")
+            manifest = json.loads(path.read_text())
+            manifest["application"] = {"name": "HYB2 Desktop", "version": "0.1.3"}
+            self.assertEqual(validate_manifest(manifest), [])
+            manifest["application"]["name"] = "Something else"
+            self.assertTrue(validate_manifest(manifest))
 
 
 class RegisterTaskRunTests(unittest.TestCase):

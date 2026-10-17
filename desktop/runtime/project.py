@@ -29,7 +29,7 @@ _SCHEMA = re.compile(r"^[0-9]+\.[0-9]+$")
 _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}T")
 
 
-DEFAULT_APP_VERSION = "0.1.3"
+DEFAULT_APP_VERSION = "0.1.4"
 SCHEMA_VERSION = "2.0"
 SUPPORTED_MAJOR = 2
 READ_FORMATS = ("fastq", "fastq.gz", "fasta", "fasta.gz", "sam", "hyb")
@@ -173,10 +173,10 @@ def validate_manifest(manifest: Any) -> List[str]:
         if not isinstance(manifest.get(key), str) or not _DATE.match(manifest.get(key, "")): errors.append("manifest.%s must be an ISO timestamp" % key)
     if not isinstance(manifest.get("name"), str) or not manifest.get("name"): errors.append("manifest.name must be non-empty")
     app = manifest.get("application")
-    # Accept the legacy application label so existing .rnaxrayproj directories
+    # Accept the legacy application label so existing .hyb2proj directories
     # remain readable after the RNAxRay brand migration. New projects use the
     # RNAxRay label below.
-    if not isinstance(app, dict) or app.get("name") not in {"RNAxRay Desktop", "RNAxRay Desktop"} or not isinstance(app.get("version"), str): errors.append("manifest.application must contain RNAxRay Desktop (or legacy RNAxRay Desktop) and version")
+    if not isinstance(app, dict) or app.get("name") not in {"HYB2 Desktop", "RNAxRay Desktop"} or not isinstance(app.get("version"), str): errors.append("manifest.application must contain RNAxRay Desktop (or legacy HYB2 Desktop) and version")
     for key, required in (("inputs", ("id", "role", "path", "format", "sha256", "size_bytes")), ("runs", ("id", "kind", "status", "input_ids", "parameters", "output_paths")), ("artifacts", ("path", "kind", "sha256", "size_bytes"))):
         value = manifest.get(key)
         if not isinstance(value, list):

@@ -888,7 +888,7 @@ def _walk_folder(folder: Path):
             if entry.name.startswith("."):
                 continue
             if entry.is_dir(follow_symlinks=False):
-                if depth + 1 < _FOLDER_MAX_DEPTH and not entry.name.lower().endswith(".rnaxrayproj"):
+                if depth + 1 < _FOLDER_MAX_DEPTH and not entry.name.lower().endswith((".rnaxrayproj", ".hyb2proj")):
                     stack.append((Path(entry.path), depth + 1))
                 continue
             if entry.is_file():

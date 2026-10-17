@@ -3,6 +3,19 @@ RNA structure, on your own computer. Your data is not uploaded anywhere. The
 only network use is the optional RNAcentral lookup, which is off until you
 turn it on in Preferences.
 
+## What's new in 0.1.4
+
+- **RNAxRay**: the app, its files and its windows carry the RNAxRay name
+  (formerly HYB2); projects made with earlier versions still open.
+- **One look with RNAxRay Web**: the web app's teal and navy colors, in
+  light and dark mode; cards on a light canvas, the chosen page in light
+  teal, larger page titles.
+- **Clearer messages**: failures and caveats appear in colored notices; the
+  top bar shows "Local only" while external lookups are off.
+- **Comparison colors** stay legible in dark mode, and values are marked
+  with a condition dot instead of colored text.
+- **Larger text**: the interface follows the system's text size setting.
+
 ## Download
 
 | Computer | File |
