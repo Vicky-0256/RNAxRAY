@@ -1,0 +1,5 @@
+type1:type2	collapsed	all
+virusRNA:virusRNA	8492	9380
+virusRNA:rRNA	947	1143
+rRNA:virusRNA	607	701
+rRNA:rRNA	365	380

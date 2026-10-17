@@ -1,0 +1,15 @@
+__pycache__/
+.DS_Store
+node_modules/
+*.py[cod]
+*.nbc
+*.nbi
+.venv-cplfold/
+.build-tools/
+
+# Platform-specific native runtimes are release inputs, not source files.
+desktop/resources/native/
+desktop/resources/native-*/
+desktop/resources/native-stage-*/
+desktop/resources/*.tar.gz
+desktop/resources/*.zip

@@ -1,0 +1,92 @@
+#!/bin/bash -e
+
+# rnaxray_app -i Livefire.hyb -a ENSG_ENST_ZIKV-PE243-2015_virusRNA -d all_Zika.fasta -j ~/bin/VARNA-master/build/jar/VARNAcmd.jar
+
+VARNA="$(VARNAcmd.sh)"
+
+# parsing command line options
+while getopts "i:a:b:d:j:" OPTION
+do
+     case $OPTION in
+         i) HYB=$OPTARG ;;
+         a) GENE_1=$OPTARG ;;
+         b) GENE_2=$OPTARG ;;
+         d) FASTA=$OPTARG ;;
+         j) VARNA=$OPTARG ;;
+         ?)
+             echo "incorrect option"
+             exit 0
+             ;;
+     esac
+done
+
+r_dir="renv/"
+if [ ! -d "${r_dir}" ]
+then
+    cp -r ~/renv .
+fi
+if [ ! -f .Rprofile ]
+then 
+    echo 'source("renv/activate.R")' > .Rprofile
+fi
+
+cp ~/rnaxray_shiny.R .
+
+# Plot contact density map and start GUI
+if uname -a | grep WSL;
+then
+        if [ -z $GENE_2 ]
+        then
+                rnaxray_coverage -i $HYB -a $GENE_1
+                INPUT=${HYB/.hyb/.$GENE_1".contact.txt"}
+                Rscript -e 'shiny::runApp("rnaxray_shiny.R", launch.browser=FALSE)' $INPUT $HYB $GENE_1 $FASTA $VARNA $GENE_1 > App.log.txt 2>&1 &
+                # Give time to receive link
+                sleep 5
+                # Extract the URL from the shiny_log.txt
+                app_url=$(grep -oP 'Listening on \Khttp://\S+' App.log.txt)
+                if [ -z "$app_url" ]
+                then
+                        echo "Error: Could not find the URL in App.log.txt."
+                        exit 1
+                else
+                        # Use wslview to open the URL in the default Windows browser
+                        echo "Starting GUI at: $app_url"
+                        wslview "$app_url"
+                fi
+        elif [ ! -z $GENE_2 ]
+        then
+                rnaxray_coverage -i $HYB -a $GENE_1 -b $GENE_2
+                INPUT=${HYB/.hyb/.$GENE_1"-"$GENE_2".contact.txt"}
+                Rscript -e 'shiny::runApp("rnaxray_shiny.R", launch.browser=FALSE)' $INPUT $HYB $GENE_1 $FASTA $VARNA $GENE_2 > App.log.txt 2>&1 &
+                # Give time to receive link
+                sleep 5
+                # Extract the URL from the shiny_log.txt
+                app_url=$(grep -oP 'Listening on \Khttp://\S+' App.log.txt)
+                if [ -z "$app_url" ]
+                then
+                        echo "Error: Could not find the URL in App.log.txt."
+                        exit 1
+                else
+                        # Use wslview to open the URL in the default Windows browser
+                        echo "Starting GUI at: $app_url"
+                        wslview "$app_url"
+                fi
+        else
+                echo "Something went wrong! Check input arguments."
+        fi
+else
+       if [ -z $GENE_2 ]
+        then
+                rnaxray_coverage -i $HYB -a $GENE_1
+                INPUT=${HYB/.hyb/.$GENE_1".contact.txt"}
+                Rscript -e 'shiny::runApp("rnaxray_shiny.R", launch.browser=TRUE)' $INPUT $HYB $GENE_1 $FASTA $VARNA $GENE_1
+        elif [ ! -z $GENE_2 ]
+        then
+                rnaxray_coverage -i $HYB -a $GENE_1 -b $GENE_2
+                INPUT=${HYB/.hyb/.$GENE_1"-"$GENE_2".contact.txt"}
+                Rscript -e 'shiny::runApp("rnaxray_shiny.R", launch.browser=TRUE)' $INPUT $HYB $GENE_1 $FASTA $VARNA $GENE_2
+        else
+                echo "Something went wrong! Check input arguments."
+        fi
+fi
+rm .Rprofile

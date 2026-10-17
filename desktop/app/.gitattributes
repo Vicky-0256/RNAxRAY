@@ -1,0 +1,4 @@
+# Go sources stay LF on every checkout (gofmt rejects CRLF; Windows runners convert by default).
+*.go text eol=lf
+go.mod text eol=lf
+go.sum text eol=lf

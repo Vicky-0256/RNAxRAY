@@ -1,0 +1,1226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rnaxray.org/schemas/rnaxray-project-2.0.json",
+  "title": "RNAxRay Desktop project manifest",
+  "description": "Portable manifest for a RNAxRay analysis project (schema 2.0). Project members use paths relative to the project root; linked raw data (references[], samples[].reads with mode=linked) is recorded by absolute path. Readers migrate 1.x manifests by adding empty references/samples arrays and keeping inputs.",
+  "type": "object",
+  "required": [
+    "format",
+    "schema_version",
+    "project_id",
+    "name",
+    "created_at",
+    "updated_at",
+    "inputs",
+    "runs",
+    "artifacts",
+    "application",
+    "runtime"
+  ],
+  "properties": {
+    "format": {
+      "const": "rnaxray-project"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "description": "Manifest format version, independent of the application version. 2.0 adds references[] and samples[]; 1.x is migrated on open."
+    },
+    "project_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 10000
+    },
+    "created_at": {
+      "$ref": "#/$defs/dateTime"
+    },
+    "updated_at": {
+      "$ref": "#/$defs/dateTime"
+    },
+    "application": {
+      "$ref": "#/$defs/application"
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/input"
+      }
+    },
+    "references": {
+      "type": "array",
+      "description": "Reference FASTA files (schema >= 2.0).",
+      "items": {
+        "$ref": "#/$defs/reference"
+      }
+    },
+    "samples": {
+      "type": "array",
+      "description": "Samples: one reads file each, with condition, replicate, reference and per-stage status (schema >= 2.0).",
+      "items": {
+        "$ref": "#/$defs/sample"
+      }
+    },
+    "structures": {
+      "type": "array",
+      "description": "Registered CPLfold structure results (schema >= 2.0; optional, migrated as empty). Upserted by register_task_run when a structure task succeeds.",
+      "items": {
+        "$ref": "#/$defs/structure"
+      }
+    },
+    "comparisons": {
+      "type": "array",
+      "description": "Registered two-condition DESeq2 comparisons (schema >= 2.0; optional, migrated as empty). Upserted by register_task_run when a compare task succeeds.",
+      "items": {
+        "$ref": "#/$defs/comparison"
+      }
+    },
+    "runs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/run"
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "runtime": {
+      "$ref": "#/$defs/runtimeSnapshot"
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "ui_state": {
+      "type": "object",
+      "description": "Optional serializable UI state. It must not contain local absolute paths. Desktop shell state lives under `desktop` and the web analysis session snapshot under `analysis`; legacy flat objects are still accepted.",
+      "properties": {
+        "desktop": {
+          "type": "object",
+          "properties": {
+            "route": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": true
+        },
+        "analysis": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*(?:^|/)\\.\\.(?:$))[^\\u0000]+$",
+      "description": "A slash separated path relative to the project root. Absolute and parent traversal paths are rejected."
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{64}$"
+    },
+    "application": {
+      "type": "object",
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "enum": ["RNAxRay Desktop", "RNAxRay Desktop"]
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commit": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "input": {
+      "type": "object",
+      "required": [
+        "id",
+        "role",
+        "path",
+        "format",
+        "sha256",
+        "size_bytes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,63}$"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "hyb",
+            "fasta",
+            "fastq",
+            "sam",
+            "reference",
+            "constraints",
+            "other"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "hyb",
+            "fasta",
+            "fasta.gz",
+            "fastq",
+            "fastq.gz",
+            "sam",
+            "ct",
+            "dbn",
+            "json",
+            "tsv",
+            "csv",
+            "other"
+          ]
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "imported_at": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "run": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "status",
+        "input_ids",
+        "parameters",
+        "output_paths"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,63}$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "mapping",
+            "sam_to_hyb",
+            "hyb_filter",
+            "contact_map",
+            "viewpoint",
+            "compare",
+            "structure",
+            "cplfold",
+            "varna",
+            "report",
+            "validate_project",
+            "custom",
+            "pipeline",
+            "sample_pipeline",
+            "analysis_index",
+            "hash_inputs",
+            "energy"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "running",
+            "succeeded",
+            "failed",
+            "cancelled",
+            "interrupted",
+            "paused"
+          ]
+        },
+        "input_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output_paths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relativePath"
+          },
+          "uniqueItems": true
+        },
+        "started_at": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "finished_at": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "exit_code": {
+          "type": "integer"
+        },
+        "engine": {
+          "type": "string"
+        },
+        "runtime_capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "log_paths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relativePath"
+          },
+          "uniqueItems": true
+        },
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "artifact": {
+      "type": "object",
+      "required": [
+        "path",
+        "kind",
+        "sha256",
+        "size_bytes"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "input",
+            "output",
+            "log",
+            "report",
+            "export",
+            "other"
+          ]
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "produced_by_run": {
+          "type": "string"
+        },
+        "media_type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "runtimeSnapshot": {
+      "type": "object",
+      "required": [
+        "detected_at",
+        "platform",
+        "capabilities"
+      ],
+      "properties": {
+        "protocol_version": {
+          "const": "1.0",
+          "description": "Shared RNAxRay capability protocol version."
+        },
+        "detected_at": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "detector_version": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "object",
+          "required": [
+            "os",
+            "architecture"
+          ],
+          "properties": {
+            "os": {
+              "enum": [
+                "windows",
+                "macos",
+                "linux",
+                "unknown"
+              ]
+            },
+            "architecture": {
+              "type": "string"
+            },
+            "release": {
+              "type": "string"
+            },
+            "machine": {
+              "type": "string"
+            },
+            "python": {
+              "type": "string"
+            },
+            "wsl": {
+              "type": "boolean"
+            },
+            "wsl_distributions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "probes": {
+          "type": "array",
+          "description": "Optional raw probe details retained for diagnostics.",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "status",
+              "kind"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "available",
+                  "degraded",
+                  "unavailable",
+                  "unknown"
+                ]
+              },
+              "kind": {
+                "type": "string"
+              },
+              "executable": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "version": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "summary": {
+                "type": "string"
+              },
+              "error": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/capability"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "capability": {
+      "type": "object",
+      "required": [
+        "id",
+        "status",
+        "execution",
+        "summary"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "available",
+            "degraded",
+            "unavailable",
+            "unknown"
+          ]
+        },
+        "execution": {
+          "enum": [
+            "browser",
+            "native",
+            "wsl",
+            "hybrid"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "executable": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "requires": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "remediation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "reference": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "path",
+        "mode",
+        "size_bytes",
+        "mtime",
+        "quick_hash",
+        "sequences"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,63}$"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Absolute path when mode=linked; project-relative (traversal-free) when mode=copied."
+        },
+        "mode": {
+          "enum": [
+            "linked",
+            "copied"
+          ]
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mtime": {
+          "type": "number",
+          "description": "File modification time, seconds since the epoch (st_mtime, 6 decimals)."
+        },
+        "quick_hash": {
+          "$ref": "#/$defs/sha256",
+          "description": "sha256(decimal size + '\\n' + first 1 MiB + last 1 MiB)."
+        },
+        "sha256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Full SHA-256, null until computed by hash_inputs (copies are hashed while copying)."
+        },
+        "sequences": {
+          "type": "array",
+          "description": "Sequence names (as they appear in .hyb gene IDs) and lengths.",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "length"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "length": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "annotation": {
+          "type": "object",
+          "description": "Gene annotation copied into the project (annotations/<reference_id>.<ext>); see runtime/annotation.py.",
+          "required": [
+            "path",
+            "format"
+          ],
+          "properties": {
+            "path": {
+              "$ref": "#/$defs/relativePath"
+            },
+            "format": {
+              "enum": [
+                "genbank",
+                "gff",
+                "bed",
+                "tsv"
+              ]
+            },
+            "file_name": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "features": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "copied"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "$ref": "#/$defs/relativePath"
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "sampleStage": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "pending",
+            "queued",
+            "running",
+            "succeeded",
+            "failed",
+            "skipped",
+            "interrupted",
+            "cancelled"
+          ]
+        },
+        "task_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "updated_at": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "sample": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "condition",
+        "replicate",
+        "reference_id",
+        "gene_id",
+        "reads",
+        "settings",
+        "outputs",
+        "stages"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,63}$",
+          "description": "Also the output directory samples/<id>/."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "condition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "replicate": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "reference_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gene_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Target gene (rnaxray -a); defaults to the reference's only sequence."
+        },
+        "reads": {
+          "type": "object",
+          "required": [
+            "path",
+            "mode",
+            "format",
+            "size_bytes",
+            "mtime",
+            "quick_hash"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Absolute path when mode=linked; project-relative (traversal-free) when mode=copied."
+            },
+            "mode": {
+              "enum": [
+                "linked",
+                "copied"
+              ]
+            },
+            "size_bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "mtime": {
+              "type": "number",
+              "description": "File modification time, seconds since the epoch (st_mtime, 6 decimals)."
+            },
+            "quick_hash": {
+              "$ref": "#/$defs/sha256",
+              "description": "sha256(decimal size + '\\n' + first 1 MiB + last 1 MiB)."
+            },
+            "sha256": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/sha256"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Full SHA-256, null until computed by hash_inputs (copies are hashed while copying)."
+            },
+            "format": {
+              "enum": [
+                "fastq",
+                "fastq.gz",
+                "fasta",
+                "fasta.gz",
+                "sam",
+                "hyb"
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "mode": {
+                    "const": "copied"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "path": {
+                    "$ref": "#/$defs/relativePath"
+                  }
+                }
+              }
+            }
+          ],
+          "additionalProperties": false
+        },
+        "settings": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Pipeline options (blast_threshold, max_overlap, max_hits, threads, energy, keep_sam, memory_mb, tmp_dir, resume)."
+        },
+        "outputs": {
+          "type": "object",
+          "properties": {
+            "hyb": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "homodimers": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "stats": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "contact": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "index": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/relativePath"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "stages": {
+          "type": "object",
+          "properties": {
+            "map": {
+              "$ref": "#/$defs/sampleStage"
+            },
+            "hyb": {
+              "$ref": "#/$defs/sampleStage"
+            },
+            "index": {
+              "$ref": "#/$defs/sampleStage"
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/sampleStage"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          },
+          "description": "Extra sample sheet columns."
+        },
+        "created_at": {
+          "$ref": "#/$defs/dateTime"
+        }
+      },
+      "additionalProperties": false
+    },
+    "structure": {
+      "type": "object",
+      "required": [
+        "id",
+        "task_id",
+        "sample_ids",
+        "gene_id",
+        "mode",
+        "windows",
+        "parameters",
+        "created_at",
+        "paths",
+        "summary"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,63}$",
+          "description": "Equal to task_id."
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,63}$"
+        },
+        "sample_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gene_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "genome",
+            "windows"
+          ]
+        },
+        "windows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "start",
+              "end"
+            ],
+            "properties": {
+              "start": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "end": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "1-based inclusive gene coordinates."
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "created_at": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "paths": {
+          "type": "object",
+          "properties": {
+            "dbn": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "pairs": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ct": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "meta": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Project-relative files under structures/<task_id>/."
+        },
+        "summary": {
+          "type": "object",
+          "description": "{records, pairs, pairs_with_bonus, pseudoknot_pairs, energy, energies, length, workers, timings}.",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "comparison": {
+      "type": "object",
+      "required": [
+        "id",
+        "task_id",
+        "samples_one",
+        "samples_two",
+        "parameters",
+        "created_at",
+        "paths",
+        "summary"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,63}$",
+          "description": "Equal to task_id."
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,63}$"
+        },
+        "samples_one": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Condition one (numerator of log2FoldChange)."
+        },
+        "samples_two": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "label_one": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label_two": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "genes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Target genes whose contact maps were compared."
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "{min_count, range, padj_cutoff, gene_id}."
+        },
+        "created_at": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "paths": {
+          "type": "object",
+          "properties": {
+            "results": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "significant": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "interactions": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "similarity": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "summary": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/relativePath"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Project-relative files under comparisons/<task_id>/."
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "{cells_tested, significant, significant_up, significant_down, interactions, interactions_up, interactions_down, max_coordinate, similarity_cells, similarity_cap, timings}."
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "pattern": "^2\\."
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "references",
+          "samples"
+        ]
+      }
+    }
+  ]
+}

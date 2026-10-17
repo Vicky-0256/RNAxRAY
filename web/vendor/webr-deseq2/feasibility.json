@@ -1,0 +1,41 @@
+{
+  "checkedAt": "2026-09-04",
+  "target": {
+    "hosting": "GitHub Pages",
+    "webR": "0.6.0",
+    "r": "4.6.0",
+    "bioconductor": "3.23",
+    "deseq2": "1.52.0",
+    "channel": "PostMessage"
+  },
+  "observations": {
+    "baseRuntimeSmoke": {
+      "status": "recorded-manual-pass",
+      "evidence": "runtime-smoke-result.json",
+      "deploymentCiRerunsSmoke": false,
+      "runtimeVendoredInSite": false
+    },
+    "stableRepository": {
+      "url": "https://repo.r-wasm.org/",
+      "containsDESeq2": false
+    },
+    "exploratoryDependencyProbe": {
+      "status": "blocked",
+      "deseq2": "1.53.2",
+      "track": "R-universe development snapshot",
+      "resolvedPackages": 42,
+      "requiredPackages": 43,
+      "missingPackages": ["locfit"],
+      "evidence": "dependency-probe-1.53.2.json",
+      "applicableToPinnedReleaseTarget": false
+    }
+  },
+  "releaseChecks": {
+    "pinnedTargetDependencyClosure": "not-run",
+    "pinnedTargetLibraryLoad": "not-run",
+    "nativeRNumericalParity": "not-run"
+  },
+  "decision": "blocked",
+  "reason": "Do not enable in-browser DESeq2 until the pinned DESeq2 1.52.0 closure is built as WebAssembly, loaded from static assets, and passes native-R numerical parity. The separate 1.53.2 development probe was blocked by locfit and is not evidence for the pinned target.",
+  "fallback": "Export the raw integer feature-by-sample table plus the two-column headerless RNAxRay names table for bin/DESeq_run.R; export extended sample metadata separately for a future WebR or modern native-R adapter."
+}

@@ -1,0 +1,24 @@
+{
+  "evidenceLevel": "recorded-manual-browser-smoke",
+  "checkedAt": "2026-09-04",
+  "origin": "http://127.0.0.1:4180/",
+  "releaseAsset": {
+    "tag": "v0.6.0",
+    "publishedAt": "2026-05-19T13:03:18Z",
+    "url": "https://github.com/r-wasm/webr/releases/download/v0.6.0/webr-0.6.0.tar.gz",
+    "sha256": "04c56d16c3ad29265a2c4ffcb800ee0b72ab6dd64dd678c9c8fec81a832cb8cc"
+  },
+  "harness": "scripts/webr-smoke/spike.mjs",
+  "harnessSha256": "28d1d7ecf2340cdf23d385f102cfef1f885e7675964d715bd7e12de46fe3c476",
+  "deploymentCiRerunsSmoke": false,
+  "runtimeVendoredInSite": false,
+  "result": {
+    "ready": true,
+    "channel": "PostMessage",
+    "rVersion": "R version 4.6.0 (2026-04-24)",
+    "baseExpression": "sum(dpois(0:12, lambda = 4))",
+    "baseComputation": 0.9997262831771446,
+    "stableRepositoryContainsDESeq2": false,
+    "error": ""
+  }
+}

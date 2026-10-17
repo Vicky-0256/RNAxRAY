@@ -1,0 +1,129 @@
+#!/usr/bin/env python3
+"""Run the vendored CPLfold command in an isolated Python process."""
+
+from __future__ import annotations
+
+import argparse
+import os
+from pathlib import Path
+import sys
+
+
+DEFAULT_MAX_SEQUENCE_LENGTH = 1000
+
+
+def _read_sequence_file(path: Path) -> str:
+    try:
+        contents = path.expanduser().read_text(encoding="utf-8")
+    except FileNotFoundError as error:
+        raise SystemExit(f"CPLfold sequence file was not found: {path}") from error
+    except UnicodeError as error:
+        raise SystemExit(f"CPLfold sequence file is not valid UTF-8: {path}") from error
+    except OSError as error:
+        raise SystemExit(f"Could not read CPLfold sequence file {path}: {error}") from error
+
+    header_count = 0
+    sequence_parts = []
+    for line in contents.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith(">"):
+            header_count += 1
+            if header_count > 1:
+                raise SystemExit(
+                    "CPLfold sequence files must contain exactly one FASTA record"
+                )
+            continue
+        sequence_parts.append("".join(stripped.split()))
+
+    sequence = "".join(sequence_parts)
+    if not sequence:
+        raise SystemExit(f"CPLfold sequence file contains no sequence: {path}")
+    return sequence
+
+
+def _sequence_arguments(arguments: list[str]) -> tuple[str | None, list[str]]:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("-s", "--sequence")
+    parser.add_argument("--sequence-file", type=Path)
+    parsed, _ = parser.parse_known_args(arguments)
+    if parsed.sequence is not None and parsed.sequence_file is not None:
+        raise SystemExit("Use either --sequence or --sequence-file, not both")
+    if parsed.sequence_file is None:
+        return parsed.sequence, list(arguments)
+
+    sequence = _read_sequence_file(parsed.sequence_file)
+    forwarded = []
+    skip_next = False
+    for argument in arguments:
+        if skip_next:
+            skip_next = False
+            continue
+        if argument == "--sequence-file":
+            skip_next = True
+            continue
+        if argument.startswith("--sequence-file="):
+            continue
+        forwarded.append(argument)
+    forwarded.extend(["--sequence", sequence])
+    return sequence, forwarded
+
+
+def _maximum_sequence_length() -> int:
+    raw_value = os.environ.get(
+        "RNAXRAY_CPLFOLD_MAX_NT", str(DEFAULT_MAX_SEQUENCE_LENGTH)
+    )
+    try:
+        value = int(raw_value)
+    except ValueError as error:
+        raise SystemExit("RNAXRAY_CPLFOLD_MAX_NT must be a positive integer") from error
+    if value < 1:
+        raise SystemExit("RNAXRAY_CPLFOLD_MAX_NT must be a positive integer")
+    return value
+
+
+def _default_numba_cache_directory() -> Path:
+    configured_root = os.environ.get("XDG_CACHE_HOME")
+    cache_root = (
+        Path(configured_root).expanduser()
+        if configured_root
+        else Path.home() / ".cache"
+    )
+    cache_directory = cache_root / "rnaxray" / "cplfold-numba"
+    if cache_directory.is_symlink():
+        raise SystemExit(f"Refusing symlinked Numba cache: {cache_directory}")
+    cache_directory.mkdir(mode=0o700, parents=True, exist_ok=True)
+
+    status = cache_directory.stat()
+    if hasattr(os, "getuid") and status.st_uid != os.getuid():
+        raise SystemExit(f"Numba cache is not owned by the current user: {cache_directory}")
+    cache_directory.chmod(0o700)
+    return cache_directory
+
+
+def main() -> None:
+    repository = Path(__file__).resolve().parents[1]
+    entrypoint = repository / "third_party" / "cplfold" / "CPLfold.py"
+    if not entrypoint.is_file():
+        raise SystemExit(f"Vendored CPLfold entry point is missing: {entrypoint}")
+
+    sequence, forwarded_arguments = _sequence_arguments(sys.argv[1:])
+    maximum = _maximum_sequence_length()
+    if sequence is not None and len(sequence.strip()) > maximum:
+        raise SystemExit(
+            f"CPLfold input is {len(sequence.strip())} nt; the RNAxRay safety limit is "
+            f"{maximum} nt. Set RNAXRAY_CPLFOLD_MAX_NT explicitly to override it."
+        )
+
+    if "NUMBA_CACHE_DIR" not in os.environ:
+        os.environ["NUMBA_CACHE_DIR"] = str(_default_numba_cache_directory())
+
+    os.execv(
+        sys.executable,
+        [sys.executable, str(entrypoint), *forwarded_arguments],
+    )
+
+
+if __name__ == "__main__":
+    main()

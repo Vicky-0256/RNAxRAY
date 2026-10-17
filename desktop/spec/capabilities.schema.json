@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rnaxray.org/schemas/rnaxray-capabilities-1.0.json",
+  "title": "RNAxRay runtime capability snapshot",
+  "type": "object",
+  "required": ["protocol_version", "detected_at", "platform", "capabilities"],
+  "properties": {
+    "protocol_version": { "const": "1.0" },
+    "detected_at": { "type": "string", "format": "date-time" },
+    "platform": { "type": "object", "required": ["os", "architecture"], "properties": { "os": { "type": "string" }, "architecture": { "type": "string" }, "python": { "type": "string" } }, "additionalProperties": true },
+    "capabilities": { "type": "array", "items": { "$ref": "#/$defs/capability" }, "uniqueItems": true },
+    "probes": { "type": "array", "items": { "type": "object", "required": ["id", "status"], "properties": { "id": { "type": "string" }, "status": { "$ref": "#/$defs/status" }, "version": { "type": ["string", "null"] }, "summary": { "type": "string" } }, "additionalProperties": true } }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "status": { "enum": ["available", "degraded", "unavailable", "unknown"] },
+    "capability": { "type": "object", "required": ["id", "status", "execution"], "properties": { "id": { "type": "string" }, "status": { "$ref": "#/$defs/status" }, "execution": { "enum": ["browser", "native", "wsl", "hybrid"] }, "version": { "type": ["string", "null"] }, "requires": { "type": "array", "items": { "type": "string" } }, "summary": { "type": "string" }, "details": { "type": "object", "properties": { "max_sequence_length": { "type": "integer", "minimum": 1 } }, "additionalProperties": true } }, "additionalProperties": true }
+  }
+}

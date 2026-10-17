@@ -1,0 +1,237 @@
+/* RNAxRay Web shared UI kit (WEB_UI_FIX_PLAN.md K1, K2, K3).
+   Owned by Phase 0; agents override in their own fix-*.css. */
+
+/* ---- K1 colour bar */
+
+.chart-legend {
+  display: inline-grid;
+  gap: 4px;
+  min-width: 0;
+  color: var(--ink);
+  font-size: var(--text-label);
+}
+
+.chart-legend-title {
+  color: var(--muted-strong);
+  font-weight: 650;
+}
+
+.chart-legend--horizontal .chart-legend-scale {
+  position: relative;
+  width: 220px;
+  max-width: 100%;
+  padding-bottom: 16px;
+}
+
+.chart-legend--horizontal .chart-legend-bar {
+  display: block;
+  height: 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 2px;
+}
+
+.chart-legend--horizontal .chart-legend-tick {
+  position: absolute;
+  top: 13px;
+  transform: translateX(-50%);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chart-legend--horizontal .chart-legend-tick:first-child {
+  transform: none;
+}
+
+.chart-legend--horizontal .chart-legend-tick:last-child {
+  transform: translateX(-100%);
+}
+
+.chart-legend--vertical .chart-legend-scale {
+  position: relative;
+  height: 160px;
+  padding-left: 0;
+}
+
+.chart-legend--vertical .chart-legend-bar {
+  display: block;
+  width: 10px;
+  height: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: 2px;
+}
+
+.chart-legend--vertical .chart-legend-tick {
+  position: absolute;
+  left: 16px;
+  transform: translateY(50%);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chart-legend-ends {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+}
+
+/* ---- K2 export menu */
+
+.export-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.export-menu > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.export-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.export-menu > summary::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 8px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.export-menu[open] > summary::after {
+  transform: translateY(1px) rotate(-135deg);
+}
+
+.export-menu-list {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 6px);
+  right: 0;
+  display: grid;
+  min-width: 220px;
+  max-width: min(320px, calc(100vw - 32px));
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+/* set by ui-kit.js when the list would leave the viewport on the left
+   (a heading that has stacked puts the menu at the left edge) */
+.export-menu.export-menu--start .export-menu-list {
+  right: auto;
+  left: 0;
+}
+
+.export-menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.export-menu-item:hover,
+.export-menu-item:focus-visible {
+  background: var(--surface-subtle);
+  outline: none;
+}
+
+.export-menu-item:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--primary-ink);
+}
+
+.export-menu-item small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: var(--text-label);
+}
+
+@media print {
+  .export-menu {
+    display: none !important;
+  }
+}
+
+/* ---- K3 table conventions (D documents them; pages apply the classes) */
+
+table .num,
+td.num,
+th.num,
+[role="row"] > .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* in a table cell the max-width: 0 trick lets the column's width decide;
+   anywhere else the element truncates within the space it has */
+td.cell-truncate,
+th.cell-truncate {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-truncate:not(td):not(th) {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+th .unit {
+  margin-left: 4px;
+  color: var(--muted);
+  font-size: max(.9em, var(--text-caps));
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* single-line headers: add class="nowrap" to a <th> (or to the table's thead) */
+th.nowrap,
+thead.nowrap th {
+  white-space: nowrap;
+}
+
+/* K9: RNAxRayUiKit.desktop.cta(context), a sentence that links to RNAxRay Desktop */
+.desktop-cta {
+  color: inherit;
+  text-decoration: none;
+}
+
+.desktop-cta strong {
+  color: var(--primary-ink);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+
+.desktop-cta:hover strong,
+.desktop-cta:focus-visible strong {
+  text-decoration-thickness: 2px;
+}
+
+.desktop-cta:focus-visible {
+  outline: 2px solid var(--primary-ink);
+  outline-offset: 2px;
+  border-radius: 3px;
+}

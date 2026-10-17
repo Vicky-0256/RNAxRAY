@@ -1,0 +1,32 @@
+{
+  "id": "rnaxray-cplfold-native",
+  "manifest_version": "1.0",
+  "execution": "native-sidecar",
+  "python": "3.11.x",
+  "numpy": "1.24.4",
+  "numba": "0.58.1",
+  "cplfold_revision": "24bab52",
+  "capacity_measurement": "not-required",
+  "capability_flag": "cplfoldNative",
+  "acceleration_flag": "numbaJit",
+  "platforms": [
+    "windows-x86_64",
+    "macos-aarch64",
+    "macos-x86_64",
+    "linux-x86_64"
+  ],
+  "startup_checks": [
+    "python-import",
+    "numpy-import",
+    "numba-import",
+    "cplfold-import",
+    "revision-match"
+  ],
+  "llvmlite": "0.41.1",
+  "resource_root": "native",
+  "python_executable": {
+    "unix": "python/bin/python3",
+    "windows": "python/python.exe"
+  },
+  "requirements": "requirements-native.txt"
+}

@@ -1,0 +1,23 @@
+{
+  "description": "First 2,000,000 reads (8,000,000 lines) of zika_files/ZAFR_REP1.fastq mapped to zika_files/ZAFR.fasta. Produced with rnaxraypipe at f041ec0 (in-memory implementation) before the streaming rewrite.",
+  "source": "ZAFR_REP1.fastq",
+  "source_gz": "ZAFR_REP1.fastq.gz",
+  "lines": 8000000,
+  "subset_sha256": "642d7e7dd1423b0575f073c6ff8bfedb2d93984a4a515c3742850b84014c2f79",
+  "reference": "ZAFR.fasta",
+  "reference_sha256": "6a9c6f4701ad8da40fa6d33e5d2f13a4587c07f30ef8da5dc1a0b4451a2f3a89",
+  "runs": {
+    "fastq_e0": {
+      "note": "FASTQ -> collapse -> Bowtie2 -> .hyb; the SAM input path on the resulting SAM gives the same bytes",
+      "hyb": {"sha256": "265d4a108d7babb0ea32739cd0a8dfb4c3a8204a14ef8f541895e8c92a72146a", "lines": 14500},
+      "homodimers": {"sha256": "78c39e5d46d92ec1e4a72a319ee73a526278a1ac0aa18f07311f3d422e4ac4c4", "lines": 64},
+      "stats": {"sha256": "ac1f8c32a1c6bd54423aaf8411728d5a1f6dd5f45d3697ad80b7e31d846a7cdb", "lines": 2}
+    },
+    "sam_e1": {
+      "note": "the SAM written by fastq_e0, as SAM input, with -e 1 (ViennaRNA 2.7.2)",
+      "hyb": {"sha256": "c2014d84f7479f0baa666467e01473940c6c7ab4922dce84d57e212bcd2416ac", "lines": 14500},
+      "homodimers": {"sha256": "81326a5366bdfef91d0358e91a5603c8a63c134ed3adfa813bed351f224a0dca", "lines": 64},
+      "stats": {"sha256": "ac1f8c32a1c6bd54423aaf8411728d5a1f6dd5f45d3697ad80b7e31d846a7cdb", "lines": 2}
+    }
+  }
+}

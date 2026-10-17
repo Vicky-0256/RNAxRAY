@@ -1,0 +1,54 @@
+{
+ "ok": true,
+ "path": "/projects/zikv.rnaxrayproj",
+ "samples": [
+  {
+   "id": "SUB_REP1",
+   "format": "fastq",
+   "input_bytes": 30519358,
+   "uncompressed_bytes": 30519358,
+   "temp_bytes": 36623229,
+   "output_bytes": 885061
+  },
+  {
+   "id": "SUB_REP2",
+   "format": "fastq",
+   "input_bytes": 29352692,
+   "uncompressed_bytes": 29352692,
+   "temp_bytes": 35223230,
+   "output_bytes": 851226
+  }
+ ],
+ "completed": [],
+ "totals": {
+  "input_bytes": 59872050,
+  "uncompressed_bytes": 59872050,
+  "temp_peak_bytes": 36623229,
+  "temp_total_bytes": 71846459,
+  "output_bytes": 1736287,
+  "required_bytes": 38359516
+ },
+ "volumes": [
+  {
+   "path": "/projects/zikv.rnaxrayproj",
+   "role": "outputs+temp",
+   "required_bytes": 38359516,
+   "free_bytes": 235819716608,
+   "ok": true
+  }
+ ],
+ "fits": true,
+ "assumptions": {
+  "gz_expansion": 6.5,
+  "temp_factor": 1.2,
+  "hyb_factor": 0.02,
+  "index_factor": 0.25,
+  "contact_factor": 0.2,
+  "sam_factors": {
+   "none": 0.0,
+   "gz": 0.25,
+   "plain": 1.0
+  },
+  "concurrency": 1
+ }
+}

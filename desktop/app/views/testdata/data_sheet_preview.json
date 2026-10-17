@@ -1,0 +1,62 @@
+{
+ "ok": true,
+ "path": "/projects/zikv.rnaxrayproj",
+ "dry_run": true,
+ "samples": [
+  {
+   "format": "fastq",
+   "name": "SUB_REP1",
+   "condition": "SUB",
+   "replicate": 1,
+   "gene_id": null,
+   "metadata": {
+    "condition": "SUB",
+    "sheet_row": 2
+   },
+   "path": "/data/zikv/ZAFR_REP1_sub.fastq",
+   "reference": "/data/zikv/ZAFR.fasta"
+  },
+  {
+   "format": "fastq",
+   "name": "SUB_REP2",
+   "condition": "SUB",
+   "replicate": 2,
+   "gene_id": null,
+   "metadata": {
+    "condition": "SUB",
+    "sheet_row": 3
+   },
+   "path": "/data/zikv/ZAFR_REP2_sub.fastq",
+   "reference": "/data/zikv/ZAFR.fasta"
+  },
+  {
+   "format": "hyb",
+   "name": "AFR_REP1",
+   "condition": "AFR",
+   "replicate": 1,
+   "gene_id": null,
+   "metadata": {
+    "condition": "AFR",
+    "sheet_row": 4
+   },
+   "path": "/data/zikv/ZAFR_REP1.hyb",
+   "reference": "/data/zikv/ZAFR.fasta"
+  },
+  {
+   "format": "hyb",
+   "name": "AFR_REP2",
+   "condition": "AFR",
+   "replicate": 2,
+   "gene_id": null,
+   "metadata": {
+    "condition": "AFR",
+    "sheet_row": 5
+   },
+   "path": "/data/zikv/ZAFR_REP2.hyb",
+   "reference": "/data/zikv/ZAFR.fasta"
+  }
+ ],
+ "references": [
+  "/data/zikv/ZAFR.fasta"
+ ]
+}

@@ -1,0 +1,147 @@
+name: Deploy RNAxRay Web
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "web/**"
+      - "scripts/build-vienna-wasm.sh"
+      - "scripts/build-cplfold-web.sh"
+      - "scripts/verify-vienna-wasm.cjs"
+      - "scripts/verify-comrades-analysis.cjs"
+      - "scripts/verify-webr-feasibility.cjs"
+      - "scripts/verify-parser.cjs"
+      - "scripts/verify-structure-worker.cjs"
+      - "scripts/verify-structure-render.cjs"
+      - "scripts/verify-cplfold-pyodide.mjs"
+      - "scripts/verify-cplfold-worker.mjs"
+      - "scripts/verify-analysis-data.cjs"
+      - "scripts/verify-ui-contract.cjs"
+      - "scripts/verify-motion-contract.cjs"
+      - "scripts/verify-evidence.cjs"
+      - "scripts/verify-report-render.cjs"
+      - "scripts/verify-deseq.cjs"
+      - "scripts/verify-arc-map.cjs"
+      - "scripts/verify-region-panels.cjs"
+      - "scripts/verify-folding-energy.cjs"
+      - "scripts/verify-example.cjs"
+      - "scripts/verify-results.cjs"
+      - "scripts/verify-ui-kit.cjs"
+      - "scripts/verify-desktop-entry.cjs"
+      - "scripts/json-schema-lite.cjs"
+      - "scripts/webr-smoke/**"
+      - "third_party/cplfold/**"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "github-pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Record build provenance
+        run: |
+          printf 'window.RNAXRAY_BUILD = { commit: "%s" };\n' "$GITHUB_SHA" > web/build-info.js
+
+      - name: Build pinned ViennaRNA WebAssembly engine
+        env:
+          EMSDK_VERSION: 3.1.57
+        run: |
+          rnaxray_emsdk_directory="$RUNNER_TEMP/rnaxray-emsdk"
+          git clone --depth 1 --branch "$EMSDK_VERSION" https://github.com/emscripten-core/emsdk.git "$rnaxray_emsdk_directory"
+          "$rnaxray_emsdk_directory/emsdk" install "$EMSDK_VERSION"
+          "$rnaxray_emsdk_directory/emsdk" activate "$EMSDK_VERSION"
+          source "$rnaxray_emsdk_directory/emsdk_env.sh"
+          bash scripts/build-vienna-wasm.sh
+          node scripts/verify-structure-worker.cjs
+          node scripts/verify-structure-render.cjs
+
+      - name: Verify static application
+        run: |
+          test -f web/index.html
+          test -s web/build-info.js
+          test -s web/vendor/viennarna/vienna-rna.js
+          test -s web/vendor/viennarna/vienna-rna.wasm
+          test -s web/vendor/viennarna/COPYING-ViennaRNA.txt
+          for file in web/*.js; do
+            node --check "$file"
+          done
+          node --check scripts/webr-smoke/spike.mjs
+          node --check web/cplfold.worker.mjs
+          node scripts/verify-parser.cjs
+          node scripts/verify-analysis-data.cjs
+          node scripts/verify-comrades-analysis.cjs
+          node scripts/verify-webr-feasibility.cjs
+          node scripts/verify-ui-contract.cjs
+          node scripts/verify-motion-contract.cjs
+          node scripts/verify-evidence.cjs
+          node scripts/verify-report-render.cjs
+          node scripts/verify-results.cjs
+          node scripts/verify-ui-kit.cjs
+          node scripts/verify-desktop-entry.cjs
+          node scripts/verify-deseq.cjs
+          node scripts/verify-arc-map.cjs
+          node scripts/verify-region-panels.cjs
+          # runs after the ViennaRNA build above, so RNAcofold is checked too
+          node scripts/verify-folding-energy.cjs
+          # the included example end to end (~15 s): Compare maps, differential
+          # test, arc map, regions and RNAcofold energies vs the R pipeline
+          node scripts/verify-example.cjs
+
+      - name: Build and verify pinned browser CPLfold runtime
+        run: |
+          bash scripts/build-cplfold-web.sh
+          test -s web/vendor/pyodide-cplfold/pyodide.mjs
+          test -s web/vendor/pyodide-cplfold/pyodide.asm.wasm
+          test -s web/vendor/pyodide-cplfold/numpy-2.2.5-cp313-cp313-pyemscripten_2025_0_wasm32.whl
+          test -s web/vendor/pyodide-cplfold/CPLfold-THIRD_PARTY_NOTICES.md
+          test -s web/vendor/pyodide-cplfold/CPLfold-GPL-2.0-or-later.txt
+          test -s web/vendor/pyodide-cplfold/CPLfold-LinearFold-LICENSE.txt
+          node scripts/verify-cplfold-pyodide.mjs
+          node scripts/verify-cplfold-worker.mjs
+
+      - name: Version static assets for browser cache refresh
+        run: |
+          sed -i -E "s#(\./[^\"?]+\.(css|js))\"#\1?build=${GITHUB_SHA}\"#g" web/index.html
+          grep -q "app.js?build=${GITHUB_SHA}" web/index.html
+          grep -q "styles.css?build=${GITHUB_SHA}" web/index.html
+
+      - name: Configure GitHub Pages
+        if: ${{ vars.CPLFOLD_DISTRIBUTION_APPROVED == 'true' }}
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        if: ${{ vars.CPLFOLD_DISTRIBUTION_APPROVED == 'true' }}
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./web
+
+      - name: Explain release gate
+        if: ${{ vars.CPLFOLD_DISTRIBUTION_APPROVED != 'true' }}
+        run: |
+          echo "CPLfold browser build verified, but publishing is disabled." >> "$GITHUB_STEP_SUMMARY"
+          echo "Set the repository Actions variable CPLFOLD_DISTRIBUTION_APPROVED=true only after redistribution permission or qualified licence review." >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    if: ${{ vars.CPLFOLD_DISTRIBUTION_APPROVED == 'true' }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

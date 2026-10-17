@@ -1,0 +1,178 @@
+name: Desktop app with bundled runtime (Windows, Linux, macOS)
+
+on:
+  pull_request:
+    paths:
+      - "desktop/app/**"
+      - "desktop/scripts/**"
+      - "desktop/runtime/**"
+      - "pipeline/**"
+      - "third_party/cplfold/**"
+      - ".github/workflows/desktop-release.yml"
+  workflow_dispatch:
+  # A version tag (v<mygo.json version>) also publishes the installers as a
+  # GitHub release; the web app's download links point at its latest one.
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+# Stages the native runtime on each target (desktop/scripts/README-native-release.md:
+# a pinned, checksum-verified python-build-standalone CPython, the pinned wheels,
+# pinned Bowtie2), runs the app's real-stack test against it, packages the
+# MyGo app with the runtime archive as a platform resource, and unpacks the
+# archive found inside the package to import numpy, numba and ViennaRNA.
+# The evidence worker's MCP stack (requirements-evidence.txt, hash-locked) is
+# installed into the same CPython; staging starts it once (tools/list only, no
+# network) and verify-native-release.py fails when it is missing or off-pin.
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            target: windows-x86_64
+            release_name: RNAxRay-Desktop-Windows-x64
+            go_platform: windows/amd64
+            resource_dir: windows-amd64
+            python: python/python.exe
+            cpython: cpython-3.11.17+20261009-x86_64-pc-windows-msvc-install_only.tar.gz
+            sha256: 4d307648d2fe5f8d927e10380cc33eb7afd8a34a7efe0ed786b5860b5f2d3408
+          - os: ubuntu-22.04
+            target: linux-x86_64
+            release_name: RNAxRay-Desktop-Linux-x64
+            go_platform: linux/amd64
+            resource_dir: linux-amd64
+            python: python/bin/python3
+            cpython: cpython-3.11.17+20261009-x86_64-unknown-linux-gnu-install_only.tar.gz
+            sha256: 035b0ccfe7f3d38ab3ddab505290d200c6a265b95fbd5fac76c358751d6bb6a8
+          - os: macos-14
+            target: macos-aarch64
+            release_name: RNAxRay-Desktop-macOS-arm64
+            go_platform: darwin/arm64
+            resource_dir: darwin-arm64
+            python: python/bin/python3
+            cpython: cpython-3.11.17+20261009-aarch64-apple-darwin-install_only.tar.gz
+            sha256: 7b6068989d9b6a0e2a883352b7d0d141ce8670a61360bf4ddabac0e046a08e10
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    env:
+      CGO_ENABLED: "0"
+      PYTHONDONTWRITEBYTECODE: "1"
+      CPYTHON_URL: https://github.com/astral-sh/python-build-standalone/releases/download/20261009/${{ matrix.cpython }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: The tag is the app version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          version=$(python3 -c 'import json; print(json.load(open("desktop/app/mygo.json"))["version"])')
+          test "$GITHUB_REF_NAME" = "v$version" || { echo "tag $GITHUB_REF_NAME, but mygo.json says $version"; exit 1; }
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: desktop/app/go.mod
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Acquire the verified CPython
+        run: python desktop/scripts/acquire-native-runtime.py --platform ${{ matrix.target }} --url "$CPYTHON_URL" --sha256 ${{ matrix.sha256 }} --output "$RUNNER_TEMP/cpython"
+      - name: Install the pinned wheels into it
+        run: |
+          if [ -x "$RUNNER_TEMP/cpython/python.exe" ]; then PY="$RUNNER_TEMP/cpython/python.exe"; else PY="$RUNNER_TEMP/cpython/bin/python3"; fi
+          "$PY" -m pip install --only-binary=:all: -r desktop/runtime/requirements-native.txt
+          # Evidence worker (RNAcentral MCP client): exact pins, SHA-256 for every wheel.
+          "$PY" -m pip install --only-binary=:all: --require-hashes -r desktop/runtime/requirements-evidence.txt
+      - name: Acquire pinned Bowtie2
+        run: python desktop/scripts/acquire-bowtie2.py --platform ${{ matrix.target }} --output "$RUNNER_TEMP/bowtie2"
+      - name: Stage and verify the runtime
+        run: |
+          python desktop/scripts/stage-native.py --standalone-python "$RUNNER_TEMP/cpython" \
+            --source-id "$CPYTHON_URL; sha256=${{ matrix.sha256 }}" --bowtie2 "$RUNNER_TEMP/bowtie2" \
+            --output desktop/resources/native
+          python desktop/scripts/verify-native-release.py
+          test "$(find desktop/resources/native -name '*.pyc' | wc -l)" -eq 0
+      - name: Real-stack test on the staged runtime
+        working-directory: desktop/app
+        run: go test -run 'TestRealStackHeadless|TestDetectSummary' -v .
+      - name: Package the app with the runtime
+        working-directory: desktop/app
+        run: |
+          # The runtime ships as one archive (MyGo leaves hidden files such as
+          # numpy/.dylibs out of resources); the app unpacks it on first launch.
+          python ../scripts/pack-runtime.py --platform ${{ matrix.resource_dir }}
+          # Releases ship the installers: the .dmg on macOS, NSIS Setup.exe on
+          # Windows, .tar.gz and .deb on Linux; other runs skip the disk image.
+          if [ "${{ startsWith(github.ref, 'refs/tags/v') }}" = true ]; then
+            go tool mygo build -platform ${{ matrix.go_platform }}
+          else
+            go tool mygo build -platform ${{ matrix.go_platform }} -skip-dmg
+          fi
+          find build -maxdepth 3
+          du -sh build/*
+      - name: Unpack and import the runtime shipped in the package
+        working-directory: desktop/app
+        run: |
+          archive=$(find build -name native.tar.gz -print -quit)
+          test -n "$archive" || { echo "native.tar.gz is not in the package"; exit 1; }
+          echo "shipped archive: $archive"
+          RNAXRAY_PACKED_RUNTIME="$(dirname "$archive")" go test -run TestPackedRuntime -v .
+          test "$(find build -name '*.pyc' | wc -l)" -eq 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rnaxray-desktop-${{ matrix.target }}
+          path: desktop/app/build/
+          retention-days: 7
+          if-no-files-found: error
+      - name: Collect the release files under stable names
+        if: startsWith(github.ref, 'refs/tags/v')
+        working-directory: desktop/app/build/${{ matrix.resource_dir }}
+        run: |
+          out="$RUNNER_TEMP/release"
+          name="${{ matrix.release_name }}"
+          mkdir -p "$out"
+          one() { set -- $1; test -f "$1" || { echo "missing: $1" >&2; ls -la >&2; exit 1; }; printf '%s' "$1"; }
+          shopt -s nullglob
+          case "${{ matrix.target }}" in
+            macos-*) cp "$(one "*.dmg")" "$out/$name.dmg" ;;
+            windows-*) cp "$(one "*Setup*.exe")" "$out/$name-Setup.exe" ;;
+            linux-*)
+              cp "$(one "rnaxray-desktop-*-linux-*.tar.gz")" "$out/$name.tar.gz"
+              cp "$(one "*.deb")" "$out/$name.deb" ;;
+          esac
+          ls -la "$out"
+      - uses: actions/upload-artifact@v4
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          name: release-${{ matrix.target }}
+          path: ${{ runner.temp }}/release/
+          retention-days: 7
+          if-no-files-found: error
+
+  publish:
+    # Only for a version tag, after all three platforms packaged and passed.
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: release
+          merge-multiple: true
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd release
+          sha256sum -- * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "RNAxRay Desktop $GITHUB_REF_NAME" \
+            --notes-file ../desktop/RELEASE_NOTES.md -- *

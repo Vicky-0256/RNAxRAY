@@ -1,0 +1,51 @@
+name: Verify CPLfold Python
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "third_party/cplfold/**"
+      - "bin/cplfold"
+      - "requirements/cplfold-core.txt"
+      - "scripts/verify-cplfold-python.py"
+      - ".gitignore"
+      - ".github/workflows/verify-cplfold-python.yml"
+  pull_request:
+    paths:
+      - "third_party/cplfold/**"
+      - "bin/cplfold"
+      - "requirements/cplfold-core.txt"
+      - "scripts/verify-cplfold-python.py"
+      - ".gitignore"
+      - ".github/workflows/verify-cplfold-python.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements/cplfold-core.txt
+
+      - name: Install core dependencies
+        run: python -m pip install -r requirements/cplfold-core.txt
+
+      - name: Verify source-only snapshot
+        run: |
+          if find third_party/cplfold -type f \( -name '*.pyc' -o -name '*.nbc' -o -name '*.nbi' -o -name '*.so' \) | grep -q .; then
+            echo "Generated or native artifacts are present in the CPLfold snapshot" >&2
+            exit 1
+          fi
+          python scripts/verify-cplfold-python.py

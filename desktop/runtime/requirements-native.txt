@@ -1,0 +1,5 @@
+# Standalone release runtime: CPython 3.11.x; install only target-platform wheels.
+numpy==1.24.4
+numba==0.58.1
+llvmlite==0.41.1
+ViennaRNA==2.7.2

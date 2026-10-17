@@ -1,0 +1,30 @@
+RNAxRay Desktop: from raw chimeric reads (FASTQ) to hybrids, interactions and
+RNA structure, on your own computer. Your data is not uploaded anywhere. The
+only network use is the optional RNAcentral lookup, which is off until you
+turn it on in Preferences.
+
+## Download
+
+| Computer | File |
+|---|---|
+| Mac with Apple silicon (M1 or later) | `RNAxRay-Desktop-macOS-arm64.dmg` |
+| Windows 10/11, 64-bit | `RNAxRay-Desktop-Windows-x64-Setup.exe` |
+| Linux x86-64 (Debian/Ubuntu) | `RNAxRay-Desktop-Linux-x64.deb` |
+| Linux x86-64 (other) | `RNAxRay-Desktop-Linux-x64.tar.gz` (run `install.sh`) |
+
+`SHA256SUMS.txt` lists the checksum of every file.
+
+## First launch
+
+The app is not yet signed with an Apple or Microsoft developer certificate,
+so the system asks you to confirm the first time you open it:
+
+- **macOS**: open the .dmg and drag RNAxRay Desktop to Applications. Open it
+  once. If macOS says it cannot verify the app, go to System Settings →
+  Privacy & Security and click **Open Anyway**.
+- **Windows**: if SmartScreen shows "Windows protected your PC", click
+  **More info** and then **Run anyway**.
+
+On first launch the app unpacks its bundled analysis runtime (Python with
+NumPy, Numba and ViennaRNA, plus Bowtie2), which takes a few seconds. After
+that it starts straight away and works offline.

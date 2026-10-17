@@ -1,0 +1,12 @@
+{
+  "protocol_version": "1.0",
+  "task_id": "contact-map-demo",
+  "kind": "contact_map",
+  "status": "succeeded",
+  "inputs": ["example-hyb"],
+  "parameters": {"bin_size": 10, "colour_cap": "95"},
+  "execution": "browser",
+  "capabilities": ["web.analysis"],
+  "progress": 1,
+  "outputs": [{"path": "runs/demo/outputs/contact-map.json", "kind": "output"}]
+}

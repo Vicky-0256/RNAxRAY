@@ -1,0 +1,62 @@
+#!/bin/bash 
+
+# Step 1: Move file and set VARNAcmd.jar path
+mv bin/environment.yml .
+echo "$PWD"/VARNA/build/jar/VARNAcmd.jar > bin/VARNA.dir
+echo 'cat '"$PWD"/bin/VARNA.dir >> bin/VARNAcmd.sh
+
+# Step 2: Add rnaxray to PATH
+# echo 'export PATH=$PATH:'"$PWD/bin" >> ~/.zshrc
+# source ~/.zshrc
+
+# Function to source the appropriate configuration file and export a new PATH
+source_config_file() {
+    case "$SHELL" in
+        */zsh)
+            echo 'export PATH=$PATH:'"$PWD/bin" >> ~/.zshrc
+            echo 'alias RNAxRay='"$PWD" >> ~/.zshrc
+            echo 'alias RNAxRay='"$PWD" >> ~/.zshrc
+            echo "Sourcing .zshrc"
+            source ~/.zshrc
+            ;;
+        */bash)
+            echo 'export PATH=$PATH:'"$PWD/bin" >> ~/.bashrc
+            echo 'alias RNAxRay='"$PWD" >> ~/.bashrc
+            echo 'alias RNAxRay='"$PWD" >> ~/.bashrc
+            echo "Sourcing .bashrc"
+            if [ -f ~/.bashrc ]; then
+                source ~/.bashrc
+            fi
+            ;;
+        *)
+            echo "Unknown shell: $SHELL. Please source the correct configuration file manually to export to PATH."
+            ;;
+    esac
+}
+
+source_config_file
+
+# Step 3: Create and activate the rnaxray conda environments
+echo "Creating rnaxray conda environments"
+conda env create -f bin/rnaxray_macOS.yml
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate rnaxray_macOS
+
+# Step 5: Initialize renv (creates a new renv.lock file)
+# echo "Ignore warnings: package(s) were not installed successfully, reinstall before snapshotting the lockfile."
+Rscript -e 'renv::init()'
+
+# Step 6: Replace the new renv.lock with the one in rnaxray/bin
+cp bin/renv.lock .
+
+# Step 7: Restore the R environment using renv
+Rscript -e 'renv::restore()'
+
+# Step 8: Add rnaxray to PATH in R
+Rscript -e 'Sys.setenv(PATH=paste(Sys.getenv("PATH"), "'$PWD/bin'", sep=":"))'
+
+cp -r renv ~/
+cp bin/rnaxray_shiny.R ~/
+rm .Rprofile
+
+echo "RNAxRay Installation Complete"

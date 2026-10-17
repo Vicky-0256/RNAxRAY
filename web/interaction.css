@@ -1,0 +1,673 @@
+/*
+ * Interaction layer styles: command palette, chord HUD, canvas lens and
+ * crosshair, press ripples, card spotlight, scroll rail, shortcut hints.
+ * Pairs with interaction.js.
+ */
+
+kbd {
+  display: inline-grid;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--muted-strong);
+  font-family: var(--font-mono);
+  font-size: var(--text-caps);
+  font-weight: 700;
+  line-height: 1;
+  text-transform: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Header trigger                                                      */
+/* ------------------------------------------------------------------ */
+
+.cmdk-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 6px 0 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 620;
+  transition: border-color var(--dur-feedback, 150ms) var(--ease-out, ease), color var(--dur-feedback, 150ms) var(--ease-out, ease), box-shadow var(--dur-feedback, 150ms) var(--ease-out, ease);
+}
+
+.cmdk-trigger svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.8;
+}
+
+.cmdk-trigger span {
+  min-width: 52px;
+  text-align: left;
+}
+
+.cmdk-trigger:hover,
+.cmdk-trigger:focus-visible {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--line));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--ink);
+}
+
+@media (max-width: 1240px) {
+  .cmdk-trigger span {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .toolbar-actions .text-button {
+    white-space: nowrap;
+  }
+
+  .workspace-header-left,
+  .header-file {
+    min-width: 0;
+  }
+}
+
+/* Phones: the header is already full and the palette is keyboard-led.
+   On the landing header the trigger also ran over the "Web" label. */
+@media (max-width: 767px) {
+  .workspace-header .cmdk-trigger,
+  .landing-header .cmdk-trigger {
+    display: none;
+  }
+
+  .landing-header > :first-child {
+    flex-shrink: 0;
+  }
+
+  .cmdk-trigger span,
+  .cmdk-trigger kbd {
+    display: none;
+  }
+
+  .cmdk-trigger {
+    width: 36px;
+    justify-content: center;
+    padding: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Command palette                                                     */
+/* ------------------------------------------------------------------ */
+
+.cmdk {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  padding: min(16vh, 140px) 16px 16px;
+}
+
+.cmdk[hidden] {
+  display: none;
+}
+
+.cmdk-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(12 26 41 / 38%);
+  -webkit-backdrop-filter: blur(6px) saturate(1.1);
+  backdrop-filter: blur(6px) saturate(1.1);
+  opacity: 0;
+  transition: opacity var(--dur-quick, 240ms) var(--ease-out, ease);
+}
+
+.cmdk-panel {
+  position: relative;
+  display: flex;
+  width: min(640px, 100%);
+  max-height: min(560px, 72vh);
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--surface) 70%, white) inset,
+    0 40px 90px -30px rgb(12 26 41 / 45%),
+    0 16px 32px -20px rgb(12 26 41 / 30%);
+  opacity: 0;
+  transform: translate3d(0, -10px, 0) scale(.97);
+  transform-origin: 50% 0;
+  transition: opacity var(--dur-feedback, 150ms) var(--ease-out, ease), transform var(--dur-move, 400ms) var(--ease-spring, ease);
+}
+
+.cmdk-panel::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, var(--teal), var(--violet));
+  content: "";
+}
+
+.cmdk.is-open .cmdk-backdrop {
+  opacity: 1;
+}
+
+.cmdk.is-open .cmdk-panel {
+  opacity: 1;
+  transform: none;
+}
+
+.cmdk.is-leaving .cmdk-backdrop,
+.cmdk.is-leaving .cmdk-panel {
+  transition-duration: var(--dur-exit, 200ms);
+  transition-timing-function: var(--ease-in, ease-in);
+}
+
+.cmdk.is-leaving .cmdk-panel {
+  transform: translate3d(0, -6px, 0) scale(.98);
+}
+
+.cmdk-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.cmdk-icon {
+  width: 19px;
+  height: 19px;
+  flex: none;
+  fill: none;
+  stroke: var(--primary);
+  stroke-linecap: round;
+  stroke-width: 1.9;
+}
+
+.cmdk-search input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 520;
+}
+
+.cmdk-search input::placeholder {
+  color: var(--muted);
+}
+
+.cmdk-body {
+  position: relative;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px 8px 10px;
+}
+
+.cmdk-list {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cmdk-glider {
+  position: absolute;
+  z-index: 0;
+  top: 6px;
+  right: 8px;
+  left: 8px;
+  border-radius: 9px;
+  background: var(--primary-soft);
+  box-shadow: inset 3px 0 0 var(--primary);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform var(--dur-quick, 240ms) var(--ease-spring, ease), height var(--dur-feedback, 150ms) var(--ease-out, ease), opacity var(--dur-feedback, 150ms) ease;
+}
+
+.cmdk-glider.is-instant {
+  transition: opacity var(--dur-feedback, 150ms) ease;
+}
+
+.cmdk-group {
+  padding: 12px 10px 6px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-caps);
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.cmdk-item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 0 10px 0 12px;
+  border-radius: 9px;
+  color: var(--muted-strong);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color var(--dur-feedback, 150ms) ease;
+}
+
+.cmdk-item.is-active {
+  color: var(--ink);
+}
+
+.cmdk-item-icon {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--muted);
+  transition: color var(--dur-feedback, 150ms) ease, border-color var(--dur-feedback, 150ms) ease, transform var(--dur-quick, 240ms) var(--ease-pop, ease);
+}
+
+.cmdk-item.is-active .cmdk-item-icon {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
+  color: var(--primary-ink);
+  transform: scale(1.06);
+}
+
+.cmdk-item-icon svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.cmdk-item-label {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmdk-item-label mark {
+  border-radius: 2px;
+  background: transparent;
+  color: var(--primary-ink);
+  font-weight: 780;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--primary) 45%, transparent);
+  text-underline-offset: 3px;
+}
+
+.cmdk-item-meta {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-caps);
+  font-weight: 650;
+}
+
+.cmdk-item.is-current .cmdk-item-meta {
+  color: var(--primary-ink);
+}
+
+.cmdk-item-kbd {
+  letter-spacing: .08em;
+}
+
+.cmdk-empty {
+  padding: 28px 12px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.cmdk-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  padding: 10px 18px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-subtle);
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.cmdk-footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+body.cmdk-locked {
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------ */
+/* Go-to chord: HUD + hints on the sidebar                             */
+/* ------------------------------------------------------------------ */
+
+.nav-kbd {
+  margin-left: auto;
+  opacity: 0;
+  transform: translateX(4px);
+  transition: opacity var(--dur-feedback, 150ms) ease, transform var(--dur-quick, 240ms) var(--ease-out, ease);
+}
+
+.nav-button:hover .nav-kbd,
+.nav-button:focus-visible .nav-kbd,
+.is-chording .nav-kbd {
+  opacity: 1;
+  transform: none;
+}
+
+.is-chording .sidebar .nav-button[aria-keyshortcuts] .nav-kbd {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary-ink);
+}
+
+.is-chording .sidebar .nav-button:nth-of-type(n) .nav-kbd {
+  transition-delay: calc(var(--stagger, 0) * var(--stagger-list, 30ms) / 2);
+}
+
+.chord-hud {
+  position: fixed;
+  z-index: 70;
+  bottom: 22px;
+  left: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 12px;
+  max-width: min(760px, calc(100vw - 32px));
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 44px -22px rgb(12 26 41 / 40%);
+  color: var(--muted);
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(-50%, 12px, 0) scale(.97);
+  transition: opacity var(--dur-feedback, 150ms) ease, transform var(--dur-move, 400ms) var(--ease-spring, ease);
+}
+
+.is-chording .chord-hud {
+  opacity: 1;
+  transform: translate3d(-50%, 0, 0);
+}
+
+.chord-hud-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted-strong);
+  font-weight: 620;
+}
+
+/* ------------------------------------------------------------------ */
+/* Canvas lens + crosshair                                             */
+/* ------------------------------------------------------------------ */
+
+.canvas-wrap {
+  position: relative;
+}
+
+.canvas-crosshair {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-feedback, 150ms) ease;
+}
+
+.canvas-crosshair.is-on {
+  opacity: 1;
+}
+
+.canvas-crosshair-x,
+.canvas-crosshair-y {
+  position: absolute;
+  background: color-mix(in srgb, var(--ink) 38%, transparent);
+}
+
+.canvas-crosshair-x {
+  top: var(--cy);
+  right: 0;
+  left: 0;
+  height: 1px;
+  -webkit-mask-image: radial-gradient(circle 220px at var(--cx) 50%, #000 0%, transparent 100%);
+  mask-image: radial-gradient(circle 220px at var(--cx) 50%, #000 0%, transparent 100%);
+}
+
+.canvas-crosshair-y {
+  top: var(--top, 0);
+  left: var(--cx);
+  width: 1px;
+  height: var(--height, 100%);
+}
+
+.canvas-crosshair:not(.is-1d) .canvas-crosshair-y {
+  -webkit-mask-image: radial-gradient(circle 220px at 50% calc(var(--cy) - var(--top, 0px)), #000 0%, transparent 100%);
+  mask-image: radial-gradient(circle 220px at 50% calc(var(--cy) - var(--top, 0px)), #000 0%, transparent 100%);
+}
+
+.canvas-crosshair.is-1d .canvas-crosshair-x {
+  display: none;
+}
+
+.canvas-crosshair.is-1d .canvas-crosshair-y {
+  background: linear-gradient(transparent, color-mix(in srgb, var(--primary) 70%, transparent) 30%, color-mix(in srgb, var(--primary) 70%, transparent) 70%, transparent);
+}
+
+.canvas-lens {
+  position: fixed;
+  z-index: 60;
+  top: 0;
+  left: 0;
+  display: grid;
+  gap: 2px;
+  max-width: 360px;
+  padding: 8px 11px;
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--navy) 94%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 16px 34px -16px rgb(12 26 41 / 55%);
+  color: #c8d6e2;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity var(--dur-feedback, 150ms) ease;
+}
+
+:root[data-theme="dark"] .canvas-lens {
+  border-color: var(--line-strong);
+  background: color-mix(in srgb, #0c1a29 94%, transparent);
+}
+
+.canvas-lens.is-on {
+  opacity: 1;
+}
+
+.canvas-lens strong {
+  color: #ffffff;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.canvas-lens span:first-of-type {
+  color: #7fe3df;
+}
+
+/* The fixed status line under maps stays for keyboard and screen-reader
+   users; with a fine pointer the lens carries the same text. */
+@media (pointer: fine) {
+  .heatmap-tooltip[data-contact-tooltip] {
+    transition: opacity var(--dur-feedback, 150ms) ease;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Press ripple                                                        */
+/* ------------------------------------------------------------------ */
+
+.quiet-button,
+.text-button,
+.nav-button,
+.icon-button,
+.local-chip,
+.tweaks-trigger {
+  position: relative;
+  overflow: hidden;
+}
+
+.press-ripple {
+  position: absolute;
+  z-index: 0;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .16;
+  pointer-events: none;
+  transform: scale(0);
+  animation: press-ripple var(--dur-move, 400ms) var(--ease-out, ease-out) forwards;
+}
+
+.button .press-ripple {
+  z-index: -1;
+  background: #ffffff;
+  opacity: .32;
+}
+
+@keyframes press-ripple {
+  to { opacity: 0; transform: scale(1); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Card spotlight                                                      */
+/* ------------------------------------------------------------------ */
+
+.metric-card,
+.web-capability-card,
+.hero-stage {
+  background-image: radial-gradient(360px circle at var(--mx, -400px) var(--my, -400px), color-mix(in srgb, var(--primary) 9%, transparent), transparent 60%);
+}
+
+.file-card-inner {
+  background-image: radial-gradient(520px circle at var(--mx, -600px) var(--my, -600px), color-mix(in srgb, var(--primary) 5%, transparent), transparent 60%);
+}
+
+/* ------------------------------------------------------------------ */
+/* Scroll rail + header shadow                                         */
+/* ------------------------------------------------------------------ */
+
+.scroll-rail {
+  position: fixed;
+  z-index: 11;
+  top: 59px;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--teal), var(--violet));
+  pointer-events: none;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+body:not(.has-workspace) .scroll-rail {
+  display: none;
+}
+
+.workspace-header {
+  transition: box-shadow var(--dur-quick, 240ms) ease, background var(--dur-quick, 240ms) ease;
+}
+
+body.is-scrolled .workspace-header {
+  box-shadow: 0 10px 24px -18px rgb(12 26 41 / 35%);
+}
+
+/* ------------------------------------------------------------------ */
+/* Form fields: the label follows focus                                */
+/* ------------------------------------------------------------------ */
+
+.control-field > span {
+  transition: color var(--dur-feedback, 150ms) ease;
+}
+
+.control-field:focus-within > span {
+  color: var(--primary-ink);
+}
+
+.control-field input:focus,
+.control-field select:focus,
+.control-field textarea:focus {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.virtual-row {
+  position: relative;
+}
+
+.virtual-row::before {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--primary);
+  content: "";
+  transform: scaleY(0);
+  transition: transform var(--dur-quick, 240ms) var(--ease-pop, ease);
+}
+
+.virtual-row:hover::before,
+.virtual-row:focus-visible::before {
+  transform: scaleY(1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Reduced motion                                                      */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .cmdk-panel,
+  .cmdk-backdrop,
+  .cmdk-glider,
+  .chord-hud {
+    transition: none;
+  }
+}

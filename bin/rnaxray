@@ -1,0 +1,256 @@
+#!/bin/bash -e
+#rnaxray
+#takes aligned proximity ligation reads from different mapping tools in the SAM format to be processed in the hyb pipeline
+#generates a list of chimeric interactions with their coordinates, sequence, and folding energy
+#plots contact density map of selected genes
+#generates intra-/intermolecular RNA structure of any selected regions
+
+#rnaxray split into 3 steps
+#processing SAM file -i input_SAM_file -1 fasta_file_used_for_mapping -2 -o Output_ID -v BLAST_THRESHOLD -m MAX_OVERLAP -h MAX_HITS_PER_SEQUENCE 
+#heatmap 2nd_fasta_file_if_different_from_1st -a GENE_ID_of_interest -b 2nd_GENE_ID_of interest_if_different -q Upperlimit%_for_heatmap_chimeric_count 
+#RNA folding -x START_COORD_of_1st_strand/gene -y START_COORD_of_2nd_strand/gene -l length_of_fragments -j directory_of_VARNAcmd.jar
+
+#FOLD=1 for ViennaRNA, 0 for UNAFold
+hval=0.1
+gmax=4
+hmax=10
+LIMIT=0.95
+ENERGY=0
+FOLD=1
+VARNA="$(VARNAcmd.sh)"
+
+# Help message function
+print_help() {
+    echo "No Options Specified!"
+    echo "Usage:"
+    echo "To run rnaxray, make sure you've activated the conda environment:"
+    echo "conda activate <rnaxray/rnaxray_macOS/rnaxray_macOS-arm>"
+    echo "rnaxray -i <Input.Fastq/SAM> -d <Fasta_File> -o <Output_ID> -a <GENE_ID_1> -x <START_COORD_1> -y <START_COORD_2> -l <Length_of_Fragments>"
+    echo "Options:"
+    echo "  -i   Input Fastq/SAM file"
+    echo "  -d   Fasta file used for mapping"
+    echo "  -o   Output ID"
+    echo "  -v   BLAST threshold (default=0.1)"
+    echo "  -m   Maximum overlap (default=4)"
+    echo "  -h   Maximum hits per sequence (default=10)"
+    echo "  -a   Gene ID of interest"
+    echo "  -b   Second gene ID of interest (if different)"
+    echo "  -q   Upper limit for heatmap chimeric count (default=0.95)"
+    echo "  -x   Start coordinate of 1st strand/gene for zoomed-in contact and folding"
+    echo "  -y   Start coordinate of 2nd strand/gene for zoomed-in contact and folding"
+    echo "  -l   Length of fragments for zoomed-in contact and folding"
+    echo "  -j   Directory of VARNAcmd.jar (default set when installing rnaxray)"
+    echo "  -e   Calculate Folding Energy: 1 to calculate, 0 to skip and save on runtime (default=0)"
+    echo "  -r   Folding Algorithm: 1 for ViennaRNA, 0 for UNAFold (if installed separately) (default=1)"
+    echo " "
+    echo "To only plot contact density map after generating hyb output:"
+    echo "rnaxray -i <Output.hyb> -a <GENE_ID_1>"
+    echo "Or:"
+    echo "rnaxray_coverage -i <Output.hyb> -a <GENE_ID_1> -w <X_COORD_1> -x <X_COORD_2> -y <Y_COORD_1> -z <Y_COORD_2>"
+    echo "  -i   Output.hyb from running rnaxray"
+    echo "  -a   Gene ID of interest"
+    echo "  -b   Second gene ID of interest (if different)"
+    echo "  -q   Upper limit for heatmap chimeric count (default=0.95)"
+    echo "  -w   Start coordinate of x1 for zoomed-in contact"
+    echo "  -x   Start coordinate of x2 for zoomed-in contact"
+    echo "  -y   Start coordinate of y1 for zoomed-in contact (or 2nd gene coord_1 if -b)"
+    echo "  -z   Start coordinate of y2 for zoomed-in contact (or 2nd gene coord_2 if -b)"
+    echo " "
+    echo "To only fold RNA structures:"
+    echo "rnaxray_fold -i <Output.hyb> -d <Fasta_File> -a <GENE_ID_1> -x <START_COORD_1> -y <START_COORD_2> -l <Length_of_Fragments>"
+    echo "  -i   Output.hyb from running rnaxray"
+    echo "  -d   Fasta file used for mapping"
+    echo "  -a   Gene ID of interest"
+    echo "  -b   Second gene ID of interest (if different)"
+    echo "  -x   Start coordinate of 1st strand/gene for folding"
+    echo "  -y   Start coordinate of 2nd strand/gene for folding"
+    echo "  -j   Directory of VARNAcmd.jar (default set when installing rnaxray)"
+    echo "  -r   Folding Algorithm: 1 for ViennaRNA, 0 for UNAFold (if installed separately) (default=1)"
+    echo "  -0   Interactive Mode for VARNA Pop-up: 0 to disable, 1 to activate (default=0)"
+    echo " "
+    echo "To start GUI:"
+    echo "rnaxray_app -i <Output.hyb> -d <Fasta_File> -a <GENE_ID_1> "
+    echo "  -i   Output.hyb from running rnaxray"
+    echo "  -d   Fasta file used for mapping"
+    echo "  -a   Gene ID of interest"
+    echo "  -b   Second gene ID of interest (if different)"
+    echo "  -j   Directory of VARNAcmd.jar (default set when installing rnaxray)"
+    echo " "
+    echo "To compare between datasets after generating rnaxray files:"
+    echo "rnaxray_compare -i <Input.table> -o <Outpud_ID> -a <GENE_ID> -d <Fasta_File>"
+    echo "Run rnaxray_compare without options for more help details regarding rnaxray_compare"
+    echo " "
+    echo "Any other queries, email me at laujianyou@live.com"
+    exit 0
+}
+
+# parsing command line options
+while getopts "i:d:o:v:m:h:a:b:q:x:y:l:j:r:e:" OPTION
+do
+     case $OPTION in
+         i) IN_FILE=$OPTARG ;;
+         d) DB_1=$OPTARG ;;
+         o) OUT=$OPTARG ;;
+         v) hval=$OPTARG ;;
+         m) gmax=$OPTARG;;
+         h) hmax=$OPTARG;;
+         a) GENE_1=$OPTARG ;;
+         b) GENE_2=$OPTARG ;;
+         q) LIMIT=$OPTARG ;;
+         x) X_COORD=$OPTARG ;;
+         y) Y_COORD=$OPTARG ;;
+         l) LEN=$OPTARG ;;
+	 j) VARNA=$OPTARG ;;
+	 e) ENERGY=$OPTARG ;;
+	 r) FOLD=$OPTARG ;;
+         ?)
+
+             echo "incorrect option"
+             exit 0
+             ;;
+     esac
+done
+
+if (( $OPTIND == 1 )); then
+     print_help
+fi
+
+#Step1 --------------------------------------------------------------------------------------------------------------------------------------------------
+#Process SAM files to Hyb format
+
+#Reformat reference sequence files
+if grep -qm1 '|' $DB_1
+then
+	fasta_rnaxray_formatting -i $DB_1
+	DB_1=${DB_1/.fasta/.hyb.fasta}
+fi
+
+if [ ! -z $DB_2 ]
+then
+	if grep -qm1 '|' $DB_2
+	then
+		fasta_rnaxray_formatting -i $DB_2
+		DB_2=${DB_2/.fasta/.hyb.fasta}
+	fi
+fi
+
+if [ -z $DB_2 ]
+then
+        DB_2=$DB_1
+fi
+
+#If input is in fastq/gz or fasta format, convert to SAM using bowtie2
+if [ ! -f $OUT".hyb" ] && [[ "$IN_FILE"  == *fastq.gz ]]
+then
+	if bowtie2_fastq.gz2sam -i $IN_FILE -d $DB_1 -o $OUT
+        then
+                echo "SAM file generated"
+        else
+                echo "Error! Aborting! Check input arguments." 1>&2
+        fi
+elif [ ! -f $OUT".hyb" ] && [[ "$IN_FILE"  == *fastq ]]
+then
+	if bowtie2_fastq2sam -i $IN_FILE -d $DB_1 -o $OUT
+	then
+		echo "SAM file generated"
+	else
+		echo "Error! Aborting! Check input arguments." 1>&2
+	fi
+elif [ ! -f $OUT".hyb" ] && [[ "$IN_FILE"  == *fasta ]]
+then
+	if bowtie2_fasta2sam -i $IN_FILE -d $DB_1 -o $OUT
+	then
+		echo "SAM file generated"
+	else
+		echo "Error! Aborting! Check input arguments." 1>&2
+	fi
+fi
+
+SAM=$OUT".sam"
+
+if [[ "$IN_FILE"  == *hyb ]]
+then
+	OUT=${IN_FILE/.hyb/}
+	echo "Hyb Format As Input Detected"
+fi
+
+#Convert SAM to Hyb Format
+if [ ! -f $OUT".hyb" ] && [[ "$IN_FILE"  != *sam ]]
+then
+	if sam2hyb -i $SAM -d $DB_1 -o $OUT -v $hval -g $gmax -e $ENERGY -r $FOLD
+	then
+		echo "Hyb File Generated."
+	else
+		echo "Error! Aborting! Check input arguments." 1>&2
+	fi
+elif [ ! -f $OUT".hyb" ] && [[ "$IN_FILE"  == *sam ]]
+then
+	sam_filt $IN_FILE > ${SAM/.sam/.filt.sam} && mv ${SAM/.sam/.filt.sam} $SAM
+	if sam2hyb -i $SAM -d $DB_1 -o $OUT -v $hval -g $gmax -e $ENERGY -r $FOLD
+	then
+		echo "Hyb File Generated."
+        else
+                echo "Error! Aborting! Check input arguments." 1>&2
+        fi
+else
+	echo "Hyb File Exist. Next Step."
+fi
+
+#Step2 --------------------------------------------------------------------------------------------------------------------------------------------------
+#Plot contact density map of selected genes
+if [ ! -z $GENE_1 ]
+then
+	rnaxray_coverage -i $OUT".hyb" -q $LIMIT -a $GENE_1
+fi
+
+if [ ! -z $GENE_2 ]
+then
+	rnaxray_coverage -i $OUT".hyb" -q $LIMIT -a $GENE_1 -b $GENE_2
+else
+	echo "To plot contact density map of second gene, add to command: -b <GENE_ID_2>." 1>&2
+fi
+
+if [ -z $GENE_2 ] && [ -z $Y_COORD ] && [ ! -z $LEN ]
+then
+	X_END=$(($X_COORD+$LEN-1))
+	rnaxray_coverage -i $OUT".hyb" -q $LIMIT -a $GENE_1 -w $X_COORD -x $X_END -y $X_COORD -z $X_END
+elif [ -z $GENE_2 ] && [ ! -z $Y_COORD ] && [ ! -z $LEN ]
+then
+	X_END=$(($X_COORD+$LEN-1))
+	Y_END=$(($Y_COORD+$LEN-1))
+	rnaxray_coverage -i $OUT".hyb" -q $LIMIT -a $GENE_1 -w $X_COORD -x $X_END -y $Y_COORD -z $Y_END
+elif [ ! -z $GENE_2 ] && [ ! -z $Y_COORD ] && [ ! -z $LEN ]
+then
+	X_END=$(($X_COORD+$LEN-1))
+	Y_END=$(($Y_COORD+$LEN-1))
+	rnaxray_coverage -i $OUT".hyb" -q $LIMIT -a $GENE_1 -b $GENE_2 -w $X_COORD -x $X_END -y $Y_COORD -z $Y_END
+else
+	echo "To plot zoomed-in contact density map, add to command: -x <X_Coord> -y <Y_Coord> -l <Length>." 1>&2
+fi
+
+#Plot viewpoint graphs of selected genes
+if [ -z $GENE_2 ]
+then
+	plot_viewpoint -i $OUT".hyb" -1 $DB_1 -2 $DB_2 -a $GENE_1
+else
+	plot_viewpoint -i $OUT".hyb" -1 $DB_1 -2 $DB_2 -a $GENE_1 -b $GENE_2
+fi
+#Step3 --------------------------------------------------------------------------------------------------------------------------------------------------
+#Generate RNA Secondary Structure of selected strands
+if [ ! -z $X_COORD ] && [ ! -z $LEN ] && [ -z $GENE_2 ] && [ -z $Y_COORD ]
+then
+	rnaxray_fold -i $OUT".hyb" -a $GENE_1 -1 $DB_1 -x $X_COORD -l $LEN -j $VARNA -r $FOLD
+elif [ ! -z $X_COORD ] && [ ! -z $LEN ] && [ -z $GENE_2 ] && [ ! -z $Y_COORD ]
+then
+	rnaxray_fold -i $OUT".hyb" -a $GENE_1 -1 $DB_1 -x $X_COORD -y $Y_COORD -l $LEN -j $VARNA -r $FOLD
+elif [ ! -z $X_COORD ] && [ ! -z $LEN ] && [ ! -z $GENE_2 ] && [ ! -z $Y_COORD ]
+then
+	rnaxray_fold -i $OUT".hyb" -a $GENE_1 -b $GENE_2 -1 $DB_1 -2 $DB_2 -x $X_COORD -y $Y_COORD -l $LEN -j $VARNA -r $FOLD
+else
+	echo "No Options Specified to Generate Secondary Structure." 1>&2
+fi
+
+echo "Analysis completed."
+echo "To compare between different datasets and plot differential coverage map, similarity heatmap, and differential structures, use:"
+echo "rnaxray_compare -i <input.table> -a <GENE_ID> -d <FASTA>"
+echo "For more details, run: rnaxray_compare"

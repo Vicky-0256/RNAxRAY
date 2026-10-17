@@ -1,0 +1,350 @@
+{
+ "ok": true,
+ "path": "/projects/zikv.rnaxrayproj",
+ "samples": [
+  {
+   "id": "SUB_REP1",
+   "name": "SUB_REP1",
+   "condition": "SUB",
+   "replicate": 1,
+   "reference_id": "ZAFR",
+   "gene_id": "ZIKV_African_KX377335-1_virusRNA",
+   "reads": {
+    "path": "/data/zikv/ZAFR_REP1_sub.fastq",
+    "mode": "linked",
+    "format": "fastq",
+    "size_bytes": 30519358,
+    "mtime": 1791987569.370599,
+    "quick_hash": "0d9849d59772d0d7bf4ba7aa93ca1ea2733a121a18bff4ea9df85a4dfd1fbc11",
+    "sha256": null
+   },
+   "settings": {},
+   "outputs": {
+    "hyb": "samples/SUB_REP1/SUB_REP1.hyb",
+    "homodimers": "samples/SUB_REP1/SUB_REP1_homodimers.hyb",
+    "stats": "samples/SUB_REP1/SUB_REP1_hybrids.hyb_stats.txt",
+    "contact": "samples/SUB_REP1/SUB_REP1.ZIKV_African_KX377335-1_virusRNA.contact.txt",
+    "index": "samples/SUB_REP1/SUB_REP1.index.sqlite"
+   },
+   "stages": {
+    "map": {
+     "status": "succeeded",
+     "task_id": "sample-pipeline-1791990260440",
+     "updated_at": "2026-10-14T15:04:27Z"
+    },
+    "hyb": {
+     "status": "succeeded",
+     "task_id": "sample-pipeline-1791990260440",
+     "updated_at": "2026-10-14T15:04:27Z"
+    },
+    "index": {
+     "status": "succeeded",
+     "task_id": "sample-pipeline-1791990260440",
+     "updated_at": "2026-10-14T15:04:27Z"
+    }
+   },
+   "created_at": "2026-10-14T15:04:08Z",
+   "metadata": {
+    "condition": "SUB",
+    "sheet_row": 2
+   },
+   "ready": true,
+   "stage_summary": "done"
+  },
+  {
+   "id": "SUB_REP2",
+   "name": "SUB_REP2",
+   "condition": "SUB",
+   "replicate": 2,
+   "reference_id": "ZAFR",
+   "gene_id": "ZIKV_African_KX377335-1_virusRNA",
+   "reads": {
+    "path": "/data/zikv/ZAFR_REP2_sub.fastq",
+    "mode": "linked",
+    "format": "fastq",
+    "size_bytes": 29352692,
+    "mtime": 1791987569.482765,
+    "quick_hash": "bfbf4456681c7f20364d60e14b0f36588808ad26f1ca3a9dbd72a65361f12e33",
+    "sha256": null
+   },
+   "settings": {},
+   "outputs": {
+    "hyb": "samples/SUB_REP2/SUB_REP2.hyb",
+    "homodimers": "samples/SUB_REP2/SUB_REP2_homodimers.hyb",
+    "stats": "samples/SUB_REP2/SUB_REP2_hybrids.hyb_stats.txt",
+    "contact": "samples/SUB_REP2/SUB_REP2.ZIKV_African_KX377335-1_virusRNA.contact.txt",
+    "index": "samples/SUB_REP2/SUB_REP2.index.sqlite"
+   },
+   "stages": {
+    "map": {
+     "status": "succeeded",
+     "task_id": "sample-pipeline-1791990260455",
+     "updated_at": "2026-10-14T15:04:27Z"
+    },
+    "hyb": {
+     "status": "succeeded",
+     "task_id": "sample-pipeline-1791990260455",
+     "updated_at": "2026-10-14T15:04:27Z"
+    },
+    "index": {
+     "status": "succeeded",
+     "task_id": "sample-pipeline-1791990260455",
+     "updated_at": "2026-10-14T15:04:27Z"
+    }
+   },
+   "created_at": "2026-10-14T15:04:08Z",
+   "metadata": {
+    "condition": "SUB",
+    "sheet_row": 3
+   },
+   "ready": true,
+   "stage_summary": "done"
+  },
+  {
+   "id": "AFR_REP1",
+   "name": "AFR_REP1",
+   "condition": "AFR",
+   "replicate": 1,
+   "reference_id": "ZAFR",
+   "gene_id": "ZIKV_African_KX377335-1_virusRNA",
+   "reads": {
+    "path": "/data/zikv/ZAFR_REP1.hyb",
+    "mode": "linked",
+    "format": "hyb",
+    "size_bytes": 64190988,
+    "mtime": 1791413849.873636,
+    "quick_hash": "019bac0f0f922436e24dfd7d03297b63a1344c5710c2e725daf960830e0ed2df",
+    "sha256": null
+   },
+   "settings": {},
+   "outputs": {
+    "hyb": null,
+    "homodimers": null,
+    "stats": null,
+    "contact": "samples/AFR_REP1/AFR_REP1.ZIKV_African_KX377335-1_virusRNA.contact.txt",
+    "index": "samples/AFR_REP1/AFR_REP1.index.sqlite"
+   },
+   "stages": {
+    "map": {
+     "status": "skipped",
+     "task_id": "sample-pipeline-1791990260486",
+     "updated_at": "2026-10-14T15:04:20Z"
+    },
+    "hyb": {
+     "status": "skipped",
+     "task_id": "sample-pipeline-1791990260486",
+     "updated_at": "2026-10-14T15:04:20Z"
+    },
+    "index": {
+     "status": "succeeded",
+     "task_id": "sample-pipeline-1791990260486",
+     "updated_at": "2026-10-14T15:04:27Z"
+    }
+   },
+   "created_at": "2026-10-14T15:04:08Z",
+   "metadata": {
+    "condition": "AFR",
+    "sheet_row": 4
+   },
+   "ready": true,
+   "stage_summary": "done"
+  },
+  {
+   "id": "AFR_REP2",
+   "name": "AFR_REP2",
+   "condition": "AFR",
+   "replicate": 2,
+   "reference_id": "ZAFR",
+   "gene_id": "ZIKV_African_KX377335-1_virusRNA",
+   "reads": {
+    "path": "/data/zikv/ZAFR_REP2.hyb",
+    "mode": "linked",
+    "format": "hyb",
+    "size_bytes": 97915957,
+    "mtime": 1791417611.048393,
+    "quick_hash": "4aa653bf896fcf9e1dd4539f422bbb90162c56941580ad7f35c61c2297e91f17",
+    "sha256": null
+   },
+   "settings": {},
+   "outputs": {
+    "hyb": null,
+    "homodimers": null,
+    "stats": null,
+    "contact": "samples/AFR_REP2/AFR_REP2.ZIKV_African_KX377335-1_virusRNA.contact.txt",
+    "index": "samples/AFR_REP2/AFR_REP2.index.sqlite"
+   },
+   "stages": {
+    "map": {
+     "status": "skipped",
+     "task_id": "sample-pipeline-1791990260505",
+     "updated_at": "2026-10-14T15:04:20Z"
+    },
+    "hyb": {
+     "status": "skipped",
+     "task_id": "sample-pipeline-1791990260505",
+     "updated_at": "2026-10-14T15:04:20Z"
+    },
+    "index": {
+     "status": "succeeded",
+     "task_id": "sample-pipeline-1791990260505",
+     "updated_at": "2026-10-14T15:04:28Z"
+    }
+   },
+   "created_at": "2026-10-14T15:04:08Z",
+   "metadata": {
+    "condition": "AFR",
+    "sheet_row": 5
+   },
+   "ready": true,
+   "stage_summary": "done"
+  },
+  {
+   "id": "ZBRA_REP1",
+   "name": "ZBRA_REP1",
+   "condition": "BRA",
+   "replicate": null,
+   "reference_id": "ZBRA",
+   "gene_id": "ZIKV_Brazilian_MF073357-1_virusRNA",
+   "reads": {
+    "path": "/data/zikv/ZBRA_REP1.hyb",
+    "mode": "linked",
+    "format": "hyb",
+    "size_bytes": 79512135,
+    "mtime": 1791421217.160333,
+    "quick_hash": "7e6c208aa82cba3d93388b7148b66881b7bb1b5adcc6f4ae3ecdfdd09117538a",
+    "sha256": null
+   },
+   "settings": {},
+   "outputs": {
+    "hyb": null,
+    "homodimers": null,
+    "stats": null,
+    "contact": "samples/ZBRA_REP1/ZBRA_REP1.ZIKV_Brazilian_MF073357-1_virusRNA.contact.txt",
+    "index": "samples/ZBRA_REP1/ZBRA_REP1.index.sqlite"
+   },
+   "stages": {
+    "map": {
+     "status": "skipped",
+     "task_id": null,
+     "updated_at": null
+    },
+    "hyb": {
+     "status": "skipped",
+     "task_id": null,
+     "updated_at": null
+    },
+    "index": {
+     "status": "succeeded",
+     "task_id": "index-ZBRA_REP1",
+     "updated_at": "2026-10-14T17:20:13Z"
+    }
+   },
+   "created_at": "2026-10-14T17:20:10Z",
+   "ready": true,
+   "stage_summary": "done"
+  },
+  {
+   "id": "ZBRA_REP2",
+   "name": "ZBRA_REP2",
+   "condition": "BRA",
+   "replicate": null,
+   "reference_id": "ZBRA",
+   "gene_id": "ZIKV_Brazilian_MF073357-1_virusRNA",
+   "reads": {
+    "path": "/data/zikv/ZBRA_REP2.hyb",
+    "mode": "linked",
+    "format": "hyb",
+    "size_bytes": 72269777,
+    "mtime": 1791345003.138517,
+    "quick_hash": "14df2529bd4ffd410bd998c4e1f84493d640487b85d4ec989975b5b19e1e0808",
+    "sha256": null
+   },
+   "settings": {},
+   "outputs": {
+    "hyb": null,
+    "homodimers": null,
+    "stats": null,
+    "contact": "samples/ZBRA_REP2/ZBRA_REP2.ZIKV_Brazilian_MF073357-1_virusRNA.contact.txt",
+    "index": "samples/ZBRA_REP2/ZBRA_REP2.index.sqlite"
+   },
+   "stages": {
+    "map": {
+     "status": "skipped",
+     "task_id": null,
+     "updated_at": null
+    },
+    "hyb": {
+     "status": "skipped",
+     "task_id": null,
+     "updated_at": null
+    },
+    "index": {
+     "status": "succeeded",
+     "task_id": "index-ZBRA_REP2",
+     "updated_at": "2026-10-14T17:20:15Z"
+    }
+   },
+   "created_at": "2026-10-14T17:20:13Z",
+   "ready": true,
+   "stage_summary": "done"
+  }
+ ],
+ "conditions": [
+  {
+   "name": "SUB",
+   "sample_ids": [
+    "SUB_REP1",
+    "SUB_REP2"
+   ]
+  },
+  {
+   "name": "AFR",
+   "sample_ids": [
+    "AFR_REP1",
+    "AFR_REP2"
+   ]
+  },
+  {
+   "name": "BRA",
+   "sample_ids": [
+    "ZBRA_REP1",
+    "ZBRA_REP2"
+   ]
+  }
+ ],
+ "references": [
+  {
+   "id": "ZAFR",
+   "label": "ZAFR",
+   "path": "/data/zikv/ZAFR.fasta",
+   "mode": "linked",
+   "size_bytes": 10842,
+   "mtime": 1791321382.354322,
+   "quick_hash": "cfdf0a3a09b60d85c2900d07c983c2b2827591c7e4fc9c02e9475db6874a13d7",
+   "sha256": null,
+   "sequences": [
+    {
+     "name": "ZIKV_African_KX377335-1_virusRNA",
+     "length": 10807
+    }
+   ]
+  },
+  {
+   "id": "ZBRA",
+   "label": "ZBRA",
+   "path": "/data/zikv/ZBRA.fasta",
+   "mode": "linked",
+   "size_bytes": 10844,
+   "mtime": 1791321382.523135,
+   "quick_hash": "3c0e8868e1fab06f3ff1515751c9feefdd8e994a54901d7e4888470049fe943f",
+   "sha256": null,
+   "sequences": [
+    {
+     "name": "ZIKV_Brazilian_MF073357-1_virusRNA",
+     "length": 10807
+    }
+   ]
+  }
+ ],
+ "normalized": []
+}

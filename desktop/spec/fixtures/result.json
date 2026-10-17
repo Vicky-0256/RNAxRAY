@@ -1,0 +1,16 @@
+{
+  "protocol_version": "1.0",
+  "result_id": "contact-map-demo",
+  "kind": "contact_map",
+  "status": "complete",
+  "inputs": [{"id": "example-hyb", "format": "hyb"}],
+  "parameters": {"bin_size": 10, "colour_cap": "95"},
+  "provenance": {
+    "engine": "rnaxray-web-parser",
+    "engine_version": "0.1.0",
+    "runtime": "web",
+    "capabilities": ["web.analysis"],
+    "rules": {"bin_size": 10, "colour_cap": "95", "coordinate_system": "1-based-inclusive"}
+  },
+  "payload": {"records": [], "bins": []}
+}

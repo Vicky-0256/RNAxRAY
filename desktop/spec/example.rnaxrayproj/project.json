@@ -1,0 +1,96 @@
+{
+  "format": "rnaxray-project",
+  "schema_version": "1.0",
+  "project_id": "4b7a0a92-0f8d-4f9f-a13f-28f7b9b0e4c6",
+  "name": "RNAxRay example project",
+  "description": "Small portable fixture for checking project open, migration, and provenance handling.",
+  "created_at": "2026-10-08T00:00:00Z",
+  "updated_at": "2026-10-08T00:00:00Z",
+  "application": {
+    "name": "RNAxRay Desktop",
+    "version": "0.1.0",
+    "commit": "example-fixture"
+  },
+  "inputs": [
+    {
+      "id": "example-hyb",
+      "role": "hyb",
+      "path": "inputs/example.hyb",
+      "format": "hyb",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "size_bytes": 0,
+      "label": "Example HYB input",
+      "imported_at": "2026-10-08T00:00:00Z",
+      "metadata": {
+        "fixture": true,
+        "note": "Replace this placeholder with a real HYB file before running an analysis."
+      }
+    }
+  ],
+  "runs": [
+    {
+      "id": "overview-demo",
+      "kind": "contact_map",
+      "status": "succeeded",
+      "input_ids": ["example-hyb"],
+      "parameters": {
+        "reference": null,
+        "min_score": 0
+      },
+      "output_paths": ["runs/20261008-demo/outputs/README.txt"],
+      "started_at": "2026-10-08T00:01:00Z",
+      "finished_at": "2026-10-08T00:01:01Z",
+      "exit_code": 0,
+      "engine": "web-parser",
+      "runtime_capabilities": ["web.analysis"] ,
+      "log_paths": [
+        "runs/20261008-demo/logs/stdout.log",
+        "runs/20261008-demo/logs/stderr.log"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "runs/20261008-demo/outputs/README.txt",
+      "kind": "output",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "size_bytes": 0,
+      "produced_by_run": "overview-demo",
+      "media_type": "text/plain"
+    }
+  ],
+  "runtime": {
+    "detected_at": "2026-10-08T00:00:00Z",
+    "detector_version": "0.1.0",
+    "platform": {
+      "os": "unknown",
+      "architecture": "fixture",
+      "release": "fixture",
+      "wsl": false,
+      "wsl_distributions": []
+    },
+    "capabilities": [
+      {
+        "id": "web.analysis",
+        "status": "available",
+        "execution": "browser",
+        "summary": "HYB parsing, filtering, maps, regions, comparison and report rendering in the web layer.",
+        "version": null,
+        "executable": null,
+        "requires": [],
+        "remediation": null
+      }
+    ]
+  },
+  "settings": {
+    "default_region": null,
+    "max_parallel_tasks": 1
+  },
+  "ui_state": {
+    "desktop": {
+      "route": "home"
+    },
+    "analysis": {}
+  },
+  "extensions": {}
+}

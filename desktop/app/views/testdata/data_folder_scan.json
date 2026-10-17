@@ -1,0 +1,221 @@
+{
+ "ok": true,
+ "path": "/projects/zikv.rnaxrayproj",
+ "folder": "/data/zika_files",
+ "samples": [
+  {
+   "path": "/data/zika_files/Aag-1.assembled.collapse.fasta.gz",
+   "format": "fasta.gz",
+   "size_bytes": 291564500,
+   "name": "Aag-1",
+   "condition": "Aag",
+   "replicate": 1,
+   "reference": "/data/zika_files/Zika.fasta",
+   "reference_guessed": true,
+   "notes": [
+    "reference guessed (no file name matched); check it"
+   ]
+  },
+  {
+   "path": "/data/zika_files/Aag-2.assembled.collapse.fasta.gz",
+   "format": "fasta.gz",
+   "size_bytes": 418477564,
+   "name": "Aag-2",
+   "condition": "Aag",
+   "replicate": 2,
+   "reference": "/data/zika_files/Zika.fasta",
+   "reference_guessed": true,
+   "notes": [
+    "reference guessed (no file name matched); check it"
+   ]
+  },
+  {
+   "path": "/data/zika_files/Livefire1_comp.fasta.gz",
+   "format": "fasta.gz",
+   "size_bytes": 319415770,
+   "name": "Livefire1",
+   "condition": "Livefire",
+   "replicate": 1,
+   "reference": "/data/zika_files/Zika.fasta",
+   "reference_guessed": true,
+   "notes": [
+    "reference guessed (no file name matched); check it"
+   ]
+  },
+  {
+   "path": "/data/zika_files/Livefire2_comp.fasta.gz",
+   "format": "fasta.gz",
+   "size_bytes": 279110188,
+   "name": "Livefire2",
+   "condition": "Livefire",
+   "replicate": 2,
+   "reference": "/data/zika_files/Zika.fasta",
+   "reference_guessed": true,
+   "notes": [
+    "reference guessed (no file name matched); check it"
+   ]
+  },
+  {
+   "path": "/data/zika_files/Livefire3_comp.fasta.gz",
+   "format": "fasta.gz",
+   "size_bytes": 226427557,
+   "name": "Livefire3",
+   "condition": "Livefire",
+   "replicate": 3,
+   "reference": "/data/zika_files/Zika.fasta",
+   "reference_guessed": true,
+   "notes": [
+    "reference guessed (no file name matched); check it"
+   ]
+  },
+  {
+   "path": "/data/zika_files/ZAFR_REP1.fastq.gz",
+   "format": "fastq.gz",
+   "size_bytes": 1706052926,
+   "name": "ZAFR_REP1",
+   "condition": "ZAFR",
+   "replicate": 1,
+   "reference": "/data/zika_files/ZAFR.fasta",
+   "reference_guessed": false,
+   "notes": []
+  },
+  {
+   "path": "/data/zika_files/ZAFR_REP2.fastq.gz",
+   "format": "fastq.gz",
+   "size_bytes": 2128584951,
+   "name": "ZAFR_REP2",
+   "condition": "ZAFR",
+   "replicate": 2,
+   "reference": "/data/zika_files/ZAFR.fasta",
+   "reference_guessed": false,
+   "notes": []
+  },
+  {
+   "path": "/data/zika_files/ZBRA_REP1.fastq.gz",
+   "format": "fastq.gz",
+   "size_bytes": 2167691987,
+   "name": "ZBRA_REP1",
+   "condition": "ZBRA",
+   "replicate": 1,
+   "reference": "/data/zika_files/ZBRA.fasta",
+   "reference_guessed": false,
+   "notes": []
+  },
+  {
+   "path": "/data/zika_files/ZBRA_REP2.fastq.gz",
+   "format": "fastq.gz",
+   "size_bytes": 2134356330,
+   "name": "ZBRA_REP2",
+   "condition": "ZBRA",
+   "replicate": 2,
+   "reference": "/data/zika_files/ZBRA.fasta",
+   "reference_guessed": false,
+   "notes": []
+  },
+  {
+   "path": "/data/zika_files/ZILM_REP2.fastq.gz",
+   "format": "fastq.gz",
+   "size_bytes": 2025715434,
+   "name": "ZILM_REP2",
+   "condition": "ZILM",
+   "replicate": 2,
+   "reference": "/data/zika_files/ZILM.fasta",
+   "reference_guessed": false,
+   "notes": []
+  },
+  {
+   "path": "/data/zika_files/ZILM_REP3.fastq.gz",
+   "format": "fastq.gz",
+   "size_bytes": 1492848074,
+   "name": "ZILM_REP3",
+   "condition": "ZILM",
+   "replicate": 3,
+   "reference": "/data/zika_files/ZILM.fasta",
+   "reference_guessed": false,
+   "notes": []
+  },
+  {
+   "path": "/data/zika_files/ZSIN_REP1.fastq.gz",
+   "format": "fastq.gz",
+   "size_bytes": 2126378676,
+   "name": "ZSIN_REP1",
+   "condition": "ZSIN",
+   "replicate": 1,
+   "reference": "/data/zika_files/ZSIN.fasta",
+   "reference_guessed": false,
+   "notes": []
+  },
+  {
+   "path": "/data/zika_files/ZSIN_REP2.fastq.gz",
+   "format": "fastq.gz",
+   "size_bytes": 2110441361,
+   "name": "ZSIN_REP2",
+   "condition": "ZSIN",
+   "replicate": 2,
+   "reference": "/data/zika_files/ZSIN.fasta",
+   "reference_guessed": false,
+   "notes": []
+  },
+  {
+   "path": "/data/zika_files/ZSIN_REP3.fastq.gz",
+   "format": "fastq.gz",
+   "size_bytes": 1757732185,
+   "name": "ZSIN_REP3",
+   "condition": "ZSIN",
+   "replicate": 3,
+   "reference": "/data/zika_files/ZSIN.fasta",
+   "reference_guessed": false,
+   "notes": []
+  }
+ ],
+ "references": [
+  "/data/zika_files/ZAFR.fasta",
+  "/data/zika_files/ZBRA.fasta",
+  "/data/zika_files/ZILM.fasta",
+  "/data/zika_files/ZSIN.fasta",
+  "/data/zika_files/Zika.fasta"
+ ],
+ "duplicates": [
+  {
+   "path": "/data/zika_files/ZAFR_REP1.fastq",
+   "kept": "/data/zika_files/ZAFR_REP1.fastq.gz"
+  },
+  {
+   "path": "/data/zika_files/ZAFR_REP2.fastq",
+   "kept": "/data/zika_files/ZAFR_REP2.fastq.gz"
+  },
+  {
+   "path": "/data/zika_files/ZBRA_REP1.fastq",
+   "kept": "/data/zika_files/ZBRA_REP1.fastq.gz"
+  },
+  {
+   "path": "/data/zika_files/ZBRA_REP2.fastq",
+   "kept": "/data/zika_files/ZBRA_REP2.fastq.gz"
+  },
+  {
+   "path": "/data/zika_files/ZILM_REP2.fastq",
+   "kept": "/data/zika_files/ZILM_REP2.fastq.gz"
+  },
+  {
+   "path": "/data/zika_files/ZILM_REP3.fastq",
+   "kept": "/data/zika_files/ZILM_REP3.fastq.gz"
+  },
+  {
+   "path": "/data/zika_files/ZSIN_REP1.fastq",
+   "kept": "/data/zika_files/ZSIN_REP1.fastq.gz"
+  },
+  {
+   "path": "/data/zika_files/ZSIN_REP2.fastq",
+   "kept": "/data/zika_files/ZSIN_REP2.fastq.gz"
+  },
+  {
+   "path": "/data/zika_files/ZSIN_REP3.fastq",
+   "kept": "/data/zika_files/ZSIN_REP3.fastq.gz"
+  }
+ ],
+ "ignored": {
+  "named FASTA but not FASTA content": 1,
+  "Bowtie2 index files (RNAxRay builds its own)": 30,
+  ".tab files": 5
+ }
+}

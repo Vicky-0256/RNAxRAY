@@ -1,0 +1,7 @@
+/build/
+/.mygo/
+mygo_windows_*.syso
+# Packed runtime (desktop/scripts/pack-runtime.py), not in git
+/resources/*/native.tar.gz
+/resources/*/native.tar.gz.sha256
+/resources/*/native

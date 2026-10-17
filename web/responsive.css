@@ -1,0 +1,483 @@
+@container (max-width: 680px) {
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1199px) {
+  .workspace {
+    grid-template-columns: 68px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    width: 68px;
+    padding: 16px 8px;
+  }
+
+  .sidebar-file,
+  .nav-label {
+    font-size: 0;
+  }
+
+  .nav-label {
+    display: none;
+  }
+
+  .sidebar-file {
+    display: grid;
+    min-height: 41px;
+    margin: 0 1px 21px;
+    padding: 0;
+    place-items: center;
+  }
+
+  .sidebar-file::before {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--success);
+    content: "";
+  }
+
+  .sidebar-file * {
+    display: none;
+  }
+
+  .nav-button {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .nav-button::before,
+  .nav-button:not(.is-active)::before {
+    display: none;
+  }
+
+  .nav-button-label {
+    display: none;
+  }
+
+  .nav-button-short {
+    display: inline-flex;
+    min-width: 34px;
+    min-height: 28px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface-subtle);
+  }
+
+  .nav-button.is-active .nav-button-short {
+    border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
+    background: var(--surface);
+  }
+
+  .local-status {
+    padding: 9px;
+    text-align: center;
+  }
+
+  .local-status span {
+    display: none;
+  }
+
+  .clear-session {
+    font-size: 0;
+    text-align: center;
+  }
+
+  .clear-session::before {
+    content: "×";
+    font-size: 21px;
+  }
+
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .landing-main {
+    grid-template-columns: 1fr;
+    gap: 45px;
+    min-height: auto;
+    padding-top: 56px;
+  }
+
+  .landing-copy {
+    max-width: 720px;
+  }
+
+  .landing-copy h1 {
+    max-width: 600px;
+  }
+
+  .landing-panel {
+    max-width: 650px;
+  }
+
+  /* One column: heading and lede, then the file card, then the
+     illustration, so the drop zone is on the first screen. */
+  .landing-copy {
+    display: contents;
+  }
+
+  .landing-main {
+    row-gap: 16px;
+  }
+
+  .landing-copy > * {
+    max-width: 720px;
+  }
+
+  .landing-copy > .eyebrow,
+  .landing-copy > h1,
+  .landing-copy > .landing-lede {
+    order: 0;
+  }
+
+  .landing-copy > .eyebrow {
+    justify-self: start;
+  }
+
+  .landing-copy > h1,
+  .landing-copy > .landing-lede {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .landing-panel {
+    order: 1;
+    margin: 12px 0;
+  }
+
+  .landing-copy > .promise-list,
+  .landing-copy > .hero-stage {
+    order: 2;
+  }
+
+  .landing-ways {
+    order: 3;
+  }
+
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .landing-header {
+    width: min(100% - 32px, 1280px);
+    height: 64px;
+  }
+
+  .header-actions .text-button {
+    display: none;
+  }
+
+  .local-chip {
+    min-height: 29px;
+    padding: 4px 8px;
+    font-size: var(--text-label);
+  }
+
+  .landing-main {
+    width: min(100% - 32px, 1180px);
+    padding: 49px 0 45px;
+  }
+
+  .landing-copy h1 {
+    font-size: 48px;
+  }
+
+  .landing-lede {
+    font-size: 17px;
+  }
+
+  .page-heading h1 {
+    font-size: 30px;
+  }
+
+  .file-card-inner {
+    min-height: auto;
+    padding: 20px;
+  }
+
+  .file-card-header {
+    margin-bottom: 20px;
+  }
+
+  .prepared-file-row {
+    grid-template-columns: 48px minmax(0, 1fr) 68px;
+  }
+
+  .prepared-file-row > .prepared-file-status {
+    grid-column: 3;
+  }
+
+  .prepared-file-row > button {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  .prepared-next-step {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .prepared-next-step .button {
+    width: 100%;
+  }
+
+  .dropzone {
+    min-height: 0;
+  }
+
+  .dropzone-content {
+    padding: 18px 16px;
+  }
+
+  .dropzone-kicker {
+    margin-bottom: 6px;
+  }
+
+  .workspace {
+    display: block;
+  }
+
+  .workspace-header {
+    min-height: 58px;
+    padding: 0 15px;
+  }
+
+  .workspace-header .brand-subtitle,
+  .header-file,
+  .workspace-header .local-chip {
+    display: none;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .workspace-main {
+    padding: 84px 16px 93px;
+  }
+
+  .page-heading {
+    display: block;
+    margin-bottom: 22px;
+  }
+
+  .page-heading .button {
+    margin-top: 16px;
+  }
+
+  .overview-callout {
+    display: block;
+  }
+
+  .overview-callout .quiet-button {
+    margin-top: 12px;
+  }
+
+  .metric-grid {
+    gap: 10px;
+  }
+
+  .metric-card {
+    min-height: 128px;
+    padding: 15px;
+  }
+
+  .metric-value {
+    margin-top: 16px;
+    font-size: 25px;
+  }
+
+  .data-card,
+  .placeholder-card,
+  .validation-card {
+    padding: 17px;
+  }
+
+  .quality-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .quality-stat + .quality-stat {
+    padding-left: 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+
+  .mobile-nav {
+    position: fixed;
+    z-index: 12;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 8px 12px;
+    border-top: 1px solid var(--line);
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    backdrop-filter: blur(14px);
+    scrollbar-width: none;
+  }
+
+  .mobile-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Faded edges say there are more tabs to scroll to: sticky overlays at
+     each end, shown only while there is more in that direction. */
+  .mobile-nav::before,
+  .mobile-nav::after {
+    position: sticky;
+    z-index: 1;
+    flex: 0 0 28px;
+    align-self: stretch;
+    margin: -8px 0;
+    opacity: 0;
+    content: "";
+    pointer-events: none;
+    transition: opacity var(--dur-feedback) var(--ease-out);
+  }
+
+  .mobile-nav::before {
+    left: 0;
+    margin-right: -28px;
+    margin-left: -12px;
+    background: linear-gradient(to right, var(--surface), transparent);
+  }
+
+  .mobile-nav::after {
+    right: 0;
+    margin-right: -12px;
+    margin-left: -28px;
+    background: linear-gradient(to left, var(--surface), transparent);
+  }
+
+  .mobile-nav.can-scroll-left::before,
+  .mobile-nav.can-scroll-right::after {
+    opacity: 1;
+  }
+
+  .mobile-nav .nav-button {
+    width: auto;
+    min-width: max-content;
+    padding: 0 10px;
+    font-size: var(--text-label);
+  }
+
+  .mobile-nav .nav-button-label {
+    display: inline;
+  }
+
+  .mobile-nav .nav-button-short {
+    display: none;
+  }
+
+  .mobile-nav .nav-button::before,
+  .mobile-nav .nav-button:not(.is-active)::before {
+    display: none;
+  }
+
+  .reference-upload {
+    display: block;
+  }
+
+  .reference-upload-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .reference-file-name {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+}
+
+@media (max-width: 420px) {
+  /* The four Overview metrics stay a compact 2 x 2 block on phones. */
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .metric-card {
+    min-height: auto;
+    padding: 12px;
+  }
+
+  .metric-value {
+    margin-top: 8px;
+    font-size: 22px;
+  }
+
+  .metric-description {
+    margin-top: 6px;
+    line-height: 1.3;
+  }
+
+  .validation-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .file-card-header {
+    display: block;
+  }
+
+  .landing-copy h1 {
+    font-size: 42px;
+  }
+
+  .example-line {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .example-badge {
+    display: inline-flex;
+    margin-top: 10px;
+  }
+
+  .example-actions {
+    align-items: stretch;
+  }
+
+  .example-actions .button,
+  .example-actions .example-link {
+    flex: 1 1 100%;
+  }
+
+  .reference-upload-actions {
+    flex-wrap: wrap;
+  }
+
+  .reference-file-name {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  /* Status stays in its own column (from the 767px layout) so every
+     Ready lines up; the FASTA button keeps the second row. */
+  .prepared-file-row {
+    gap: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

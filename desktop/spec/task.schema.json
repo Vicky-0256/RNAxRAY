@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rnaxray.org/schemas/rnaxray-task-1.0.json",
+  "title": "RNAxRay task record",
+  "description": "The task request and lifecycle record exchanged by the web adapter and desktop task runner.",
+  "type": "object",
+  "required": ["protocol_version", "task_id", "kind", "status", "inputs", "parameters", "execution"],
+  "properties": {
+    "protocol_version": { "const": "1.0" },
+    "task_id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,127}$" },
+    "kind": {
+      "type": "string",
+      "enum": ["mapping", "sam_to_hyb", "hyb_filter", "contact_map", "viewpoint", "compare", "structure", "cplfold", "varna", "report", "custom"]
+    },
+    "status": { "enum": ["queued", "running", "succeeded", "failed", "cancelled", "paused"] },
+    "inputs": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "parameters": { "type": "object", "additionalProperties": true },
+    "execution": { "enum": ["browser", "native", "wsl", "hybrid"] },
+    "capabilities": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "command": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "progress": { "type": "number", "minimum": 0, "maximum": 1 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "started_at": { "type": "string", "format": "date-time" },
+    "finished_at": { "type": "string", "format": "date-time" },
+    "outputs": { "type": "array", "items": { "$ref": "#/$defs/artifact" }, "uniqueItems": true },
+    "error": { "$ref": "#/$defs/error" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "required": ["path", "kind"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$" },
+        "kind": { "enum": ["output", "log", "report", "export", "other"] },
+        "media_type": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "object",
+      "required": ["code", "message"],
+      "properties": { "code": { "type": "string" }, "message": { "type": "string" }, "details": { "type": "object", "additionalProperties": true } },
+      "additionalProperties": false
+    }
+  }
+}

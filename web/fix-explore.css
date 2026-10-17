@@ -1,0 +1,169 @@
+/* Owned by Agent B (Contact Map, Viewpoint, Region Explorer). WEB_UI_FIX_PLAN.md: new rules for this agent go here, not at the end of other agents' files. */
+
+/* B13: Contact Map and Viewpoint headings keep their Export menu beside the
+   title at every width (responsive.css stacks .page-heading on phones) */
+.page-heading.page-heading--menu {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page-heading--menu > .inline-actions {
+  flex: none;
+  margin-top: 0;
+}
+
+.page-heading--menu .export-menu > .button {
+  margin-top: 0;
+}
+
+/* B9: layout.css stacks the side card's footer as a grid */
+.contact-workbench-side .heatmap-footer {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* B10: Coordinate range, Start and End share one row of the Viewpoint
+   controls; dense flow fills the cells the three-column group leaves */
+.viewpoint-control-grid {
+  grid-auto-flow: row dense;
+}
+
+.viewpoint-range-group {
+  display: grid;
+  grid-column: span 3;
+  grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .viewpoint-range-group {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .viewpoint-range-group > .control-field:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* B11: Region controls. layout.css auto-fills the grid; here the anchor,
+   its Start / End and the overlap rule make the first row and the partner
+   fields the second */
+.analysis-controls .region-control-grid {
+  grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 767px) {
+  .analysis-controls .region-control-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .analysis-controls .region-control-grid > .control-field:first-child,
+  .analysis-controls .region-control-grid > .control-field:nth-child(4),
+  .analysis-controls .region-control-grid > .control-field:nth-child(5) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* B11: profile and Top partners side by side inside the summary card */
+.region-summary-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  gap: 24px;
+  align-items: start;
+}
+
+.region-profile-block {
+  min-width: 0;
+}
+
+.region-partners {
+  min-width: 0;
+  padding-left: 24px;
+  border-left: 1px solid var(--line);
+}
+
+.region-partners .card-title-row {
+  margin-bottom: 14px;
+}
+
+.region-partners h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 720;
+}
+
+/* a partner's full name on its own line, the bar and value under it */
+.region-partners .bar-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  row-gap: 5px;
+}
+
+.region-partners .bar-name {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+  .region-summary-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .region-partners {
+    padding: 16px 0 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+}
+
+/* B11: the reference in 10 nt groups, one coordinate per 50 nt line */
+.reference-sequence--grouped {
+  overflow-x: auto;
+  font-size: 12px;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+.reference-sequence--grouped .sequence-line {
+  display: block;
+}
+
+.reference-sequence--grouped .sequence-position {
+  display: inline-block;
+  min-width: 7ch;
+  margin-right: 1.5ch;
+  color: var(--muted);
+  text-align: right;
+  user-select: none;
+}
+
+.reference-panel .table-note {
+  margin-top: 8px;
+}
+
+/* B12: Region records follow K3. Column widths: the ID narrow, the RNA
+   names share what is left; below 760px the table scrolls in its card
+   instead of folding names onto two lines */
+.region-records-table {
+  min-width: 760px;
+  table-layout: fixed;
+}
+
+.region-records-table th:nth-child(1) { width: 9%; }
+.region-records-table th:nth-child(2),
+.region-records-table th:nth-child(4) { width: 27%; }
+.region-records-table th:nth-child(3),
+.region-records-table th:nth-child(5) { width: 11%; }
+.region-records-table th:nth-child(6) { width: 8%; }
+.region-records-table th:nth-child(7) { width: 7%; }
+
+.region-records-table .cell-truncate {
+  max-width: none;
+}
+
+.region-records .card-title-row .export-menu-list {
+  right: 0;
+}

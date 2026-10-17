@@ -1,0 +1,426 @@
+/* Owned by Agent C (Compare page). WEB_UI_FIX_PLAN.md: new rules for this agent go here, not at the end of other agents' files. */
+
+/* ---- C1 in-page navigation (renderCompareNav; analysis-ui.js bindCompareNav) */
+
+.compare-subnav {
+  position: sticky;
+  z-index: 8;
+  top: var(--header-h, 60px);
+  margin: 0 0 16px;
+  padding: 8px 0;
+  background: color-mix(in srgb, var(--canvas) 92%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.workspace-embedded .compare-subnav {
+  top: 0;
+}
+
+.compare-subnav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.compare-subnav-item {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted-strong);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--dur-feedback) var(--ease-out), border-color var(--dur-feedback) var(--ease-out), color var(--dur-feedback) var(--ease-out);
+}
+
+.compare-subnav-item:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.compare-subnav-item:focus-visible {
+  outline: 2px solid var(--primary-ink);
+  outline-offset: 2px;
+}
+
+.compare-subnav-item.is-current {
+  border-color: var(--primary-ink);
+  background: var(--primary-soft);
+  color: var(--primary-ink);
+}
+
+/* a section reached from the navigation is focused, not outlined */
+#compare-sec-datasets:focus,
+#compare-sec-maps:focus,
+#deseq-card:focus,
+#arcmap-card:focus,
+#region-panels-card:focus,
+#folding-energy-card:focus {
+  outline: none;
+}
+
+@media (max-width: 767px) {
+  .compare-subnav {
+    margin: 0 -16px 16px;
+    padding: 8px 16px;
+  }
+
+  /* phone: one row of chips that scrolls sideways */
+  .compare-subnav-list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  }
+
+  .compare-subnav-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .compare-subnav-item {
+    flex: 0 0 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compare-subnav-item {
+    transition: none;
+  }
+}
+
+/* ---- C4/C5 maps: room for the axis titles and the colour bar drawn in the canvas */
+
+.comparison-canvas-wrap,
+.comparison-canvas {
+  height: 480px;
+}
+
+@media (max-width: 767px) {
+  .comparison-canvas-wrap,
+  .comparison-canvas {
+    height: 440px;
+  }
+}
+
+/* panel A: the canvas grew by its colour bar */
+.deseq-canvas-wrap {
+  aspect-ratio: 1 / 1.1;
+}
+
+/* ---- C6 file pickers (arc map, region and folding-energy references) */
+
+.file-pick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  min-width: 0;
+}
+
+/* the native input stays focusable but invisible (beats .control-field input) */
+.control-field .file-pick input[type="file"] {
+  position: absolute;
+  width: 1px;
+  min-width: 0;
+  height: 1px;
+  min-height: 0;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  white-space: nowrap;
+}
+
+.file-pick-button {
+  position: relative;
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 14px;
+  cursor: pointer;
+}
+
+.file-pick-button:focus-within {
+  outline: 2px solid var(--primary-ink);
+  outline-offset: 2px;
+}
+
+/* the file's name and summary on their own line, above Replace / Remove */
+.file-pick-name {
+  order: -1;
+  flex: 1 1 100%;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.file-pick-name b {
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.file-pick-name.is-empty {
+  font-style: italic;
+}
+
+.arcmap-file .file-pick .quiet-button {
+  flex: 0 0 auto;
+  align-self: center;
+  min-height: 32px;
+  padding: 0 4px;
+}
+
+/* ---- C7 compact statistics: label next to its value, 2-3 per row */
+
+.selection-stats.stats-compact {
+  /* at most three columns, fewer when narrow */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, max(180px, calc((100% - 48px) / 3))), 1fr));
+  gap: 8px 24px;
+  margin: 12px 0;
+}
+
+.selection-stats.stats-compact > div {
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.selection-stats.stats-compact dd {
+  text-align: left;
+}
+
+/* ---- C11 empty From / To read as editable, not disabled */
+
+.arcmap-card .control-field input::placeholder {
+  color: var(--muted);
+}
+
+/* ---- C9 "What this page can and cannot tell you": neutral, first sentence first */
+
+.comparison-note.compare-note {
+  display: block;
+  padding: 12px 14px;
+}
+
+.compare-note-more > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.compare-note-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.compare-note-more > summary:focus-visible {
+  outline: 2px solid var(--primary-ink);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.comparison-note.compare-note strong {
+  color: var(--muted-strong);
+}
+
+.compare-note-lead {
+  flex: 1 1 320px;
+  color: var(--ink);
+}
+
+.compare-note-toggle {
+  color: var(--primary-ink);
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.compare-note-toggle::after {
+  content: "More";
+}
+
+.compare-note-more[open] .compare-note-toggle::after {
+  content: "Less";
+}
+
+.compare-note-body {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.compare-note-body .comparison-note-details {
+  grid-column: auto;
+}
+
+@media (max-width: 767px) {
+  /* a phone shows the title line only until the note is opened */
+  .compare-note-more:not([open]) .compare-note-lead {
+    display: none;
+  }
+
+  .compare-note-more > summary {
+    justify-content: space-between;
+  }
+}
+
+/* ---- C10 Datasets table (K3) */
+
+.comparison-dataset-table .compare-dataset-name {
+  width: 28%;
+  min-width: 170px;
+}
+
+.comparison-dataset-table .compare-dataset-action {
+  width: 96px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.comparison-dataset-table td.compare-dataset-action .quiet-button {
+  min-height: 28px;
+  padding: 0 10px;
+}
+
+.compare-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  color: var(--muted-strong);
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  font-weight: 650;
+  letter-spacing: .02em;
+}
+
+/* ---- C8 page heading: the primary action and the Export menu on one line */
+
+.page-heading .compare-heading-actions {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.page-heading .compare-heading-actions .button {
+  margin-top: 0;
+}
+
+@media (max-width: 767px) {
+  .page-heading .compare-heading-actions {
+    margin-top: 16px;
+  }
+}
+
+/* ---- Comparison data table: virtual scrolling as on the Interactions page
+   (K3). Row heights are exact, not minimums: comparisonTableWindow
+   (analysis-pages.js) places rows at index * 36px (30px compact), so a row
+   that grew by even 1px would drift over 838,000 rows. The head reserves
+   the scroller's scrollbar gutter so its columns stay over the rows. */
+
+.comparison-table-head,
+.comparison-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.1fr) minmax(120px, 1.1fr) repeat(2, minmax(96px, 1fr)) minmax(96px, 1fr) minmax(112px, 1fr) minmax(96px, 1fr);
+  column-gap: 16px;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.comparison-table-head {
+  min-height: 32px;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-subtle);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-caps);
+  font-weight: 720;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+
+.comparison-table-head > span,
+.comparison-row > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.virtual-table-frame > .comparison-virtual-table,
+.comparison-table-frame > .comparison-table-head {
+  min-width: 820px;
+}
+
+.comparison-virtual-table {
+  scrollbar-gutter: stable;
+}
+
+.comparison-table-spacer {
+  position: relative;
+  overflow: hidden;
+}
+
+.comparison-table-rows {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+}
+
+.comparison-row {
+  box-sizing: border-box;
+  width: 100%;
+  height: 36px;
+  min-height: 36px;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted-strong);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-feedback) var(--ease-out), color var(--dur-feedback) var(--ease-out);
+}
+
+[data-density="compact"] .comparison-row {
+  height: 30px;
+  min-height: 30px;
+  font-size: 11px;
+}
+
+.comparison-row:hover,
+.comparison-row:focus-visible {
+  background: var(--primary-soft);
+  color: var(--ink);
+  outline-offset: -3px;
+}
+
+.comparison-row.is-selected {
+  background: var(--primary-soft);
+  color: var(--ink);
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comparison-row {
+    transition: none;
+  }
+}

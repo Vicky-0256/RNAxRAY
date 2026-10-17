@@ -1,0 +1,76 @@
+{
+ "ok": true,
+ "path": "/projects/zikv.rnaxrayproj",
+ "items": [
+  {
+   "kind": "reference",
+   "id": "ZAFR",
+   "path": "/data/zikv/ZAFR.fasta",
+   "mode": "linked",
+   "status": "ok",
+   "detail": ""
+  },
+  {
+   "kind": "reference",
+   "id": "ZBRA",
+   "path": "/data/zikv/ZBRA.fasta",
+   "mode": "linked",
+   "status": "ok",
+   "detail": ""
+  },
+  {
+   "kind": "sample",
+   "id": "SUB_REP1",
+   "path": "/data/zikv/ZAFR_REP1_sub.fastq",
+   "mode": "linked",
+   "status": "ok",
+   "detail": ""
+  },
+  {
+   "kind": "sample",
+   "id": "SUB_REP2",
+   "path": "/data/zikv/ZAFR_REP2_sub.fastq",
+   "mode": "linked",
+   "status": "ok",
+   "detail": ""
+  },
+  {
+   "kind": "sample",
+   "id": "AFR_REP1",
+   "path": "/data/zikv/ZAFR_REP1.hyb",
+   "mode": "linked",
+   "status": "ok",
+   "detail": ""
+  },
+  {
+   "kind": "sample",
+   "id": "AFR_REP2",
+   "path": "/data/zikv/ZAFR_REP2.hyb",
+   "mode": "linked",
+   "status": "ok",
+   "detail": ""
+  },
+  {
+   "kind": "sample",
+   "id": "ZBRA_REP1",
+   "path": "/data/zikv/ZBRA_REP1.hyb",
+   "mode": "linked",
+   "status": "ok",
+   "detail": ""
+  },
+  {
+   "kind": "sample",
+   "id": "ZBRA_REP2",
+   "path": "/data/zikv/ZBRA_REP2.hyb",
+   "mode": "linked",
+   "status": "ok",
+   "detail": ""
+  }
+ ],
+ "summary": {
+  "ok": 8,
+  "missing": 0,
+  "changed": 0
+ },
+ "all_ok": true
+}

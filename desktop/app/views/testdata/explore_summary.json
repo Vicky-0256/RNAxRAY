@@ -1,0 +1,193 @@
+{
+ "indexes": [
+  {
+   "index": "/projects/zikv.rnaxrayproj/samples/SUB_REP1/SUB_REP1.index.sqlite",
+   "source": "/projects/zikv.rnaxrayproj/samples/SUB_REP1/SUB_REP1.hyb",
+   "built_at": "2026-10-14T15:04:27Z",
+   "records": 757,
+   "reads": 757,
+   "records_with_reads": 757,
+   "with_dg": 0,
+   "intra_records": 757,
+   "inter_records": 0,
+   "invalid": 0,
+   "skipped": 0,
+   "errors": [],
+   "genes": [
+    {
+     "name": "ZIKV_African_KX377335-1_virusRNA",
+     "length": 10807,
+     "max_end": 10807,
+     "min_start": 1,
+     "records": 1514,
+     "reads": 1514,
+     "length_source": "reference"
+    }
+   ],
+   "types": [
+    {
+     "name": "Type_2",
+     "records": 416,
+     "reads": 416
+    },
+    {
+     "name": "Type_1",
+     "records": 327,
+     "reads": 327
+    },
+    {
+     "name": "Type_7",
+     "records": 10,
+     "reads": 10
+    },
+    {
+     "name": "Type_13",
+     "records": 4,
+     "reads": 4
+    }
+   ],
+   "pairs": [
+    {
+     "gene1": "ZIKV_African_KX377335-1_virusRNA",
+     "gene2": "ZIKV_African_KX377335-1_virusRNA",
+     "records": 757,
+     "reads": 757
+    }
+   ],
+   "extents": {
+    "ZIKV_African_KX377335-1_virusRNA": {
+     "min": 1,
+     "max": 10807
+    }
+   }
+  },
+  {
+   "index": "/projects/zikv.rnaxrayproj/samples/SUB_REP2/SUB_REP2.index.sqlite",
+   "source": "/projects/zikv.rnaxrayproj/samples/SUB_REP2/SUB_REP2.hyb",
+   "built_at": "2026-10-14T15:04:27Z",
+   "records": 967,
+   "reads": 968,
+   "records_with_reads": 967,
+   "with_dg": 0,
+   "intra_records": 967,
+   "inter_records": 0,
+   "invalid": 0,
+   "skipped": 0,
+   "errors": [],
+   "genes": [
+    {
+     "name": "ZIKV_African_KX377335-1_virusRNA",
+     "length": 10807,
+     "max_end": 10807,
+     "min_start": 1,
+     "records": 1934,
+     "reads": 1936,
+     "length_source": "reference"
+    }
+   ],
+   "types": [
+    {
+     "name": "Type_2",
+     "records": 538,
+     "reads": 538
+    },
+    {
+     "name": "Type_1",
+     "records": 408,
+     "reads": 409
+    },
+    {
+     "name": "Type_7",
+     "records": 13,
+     "reads": 13
+    },
+    {
+     "name": "Type_13",
+     "records": 7,
+     "reads": 7
+    },
+    {
+     "name": "Type_11",
+     "records": 1,
+     "reads": 1
+    }
+   ],
+   "pairs": [
+    {
+     "gene1": "ZIKV_African_KX377335-1_virusRNA",
+     "gene2": "ZIKV_African_KX377335-1_virusRNA",
+     "records": 967,
+     "reads": 968
+    }
+   ],
+   "extents": {
+    "ZIKV_African_KX377335-1_virusRNA": {
+     "min": 1,
+     "max": 10807
+    }
+   }
+  }
+ ],
+ "merged": {
+  "records": 1724,
+  "reads": 1725,
+  "records_with_reads": 1724,
+  "with_dg": 0,
+  "intra_records": 1724,
+  "inter_records": 0,
+  "invalid": 0,
+  "skipped": 0,
+  "genes": [
+   {
+    "name": "ZIKV_African_KX377335-1_virusRNA",
+    "length": 10807,
+    "max_end": 10807,
+    "min_start": 1,
+    "records": 3448,
+    "reads": 3450,
+    "length_source": "reference"
+   }
+  ],
+  "types": [
+   {
+    "name": "Type_2",
+    "records": 954,
+    "reads": 954
+   },
+   {
+    "name": "Type_1",
+    "records": 735,
+    "reads": 736
+   },
+   {
+    "name": "Type_7",
+    "records": 23,
+    "reads": 23
+   },
+   {
+    "name": "Type_13",
+    "records": 11,
+    "reads": 11
+   },
+   {
+    "name": "Type_11",
+    "records": 1,
+    "reads": 1
+   }
+  ],
+  "pairs": [
+   {
+    "gene1": "ZIKV_African_KX377335-1_virusRNA",
+    "gene2": "ZIKV_African_KX377335-1_virusRNA",
+    "records": 1724,
+    "reads": 1725
+   }
+  ],
+  "extents": {
+   "ZIKV_African_KX377335-1_virusRNA": {
+    "min": 1,
+    "max": 10807
+   }
+  }
+ }
+}

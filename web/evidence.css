@@ -1,0 +1,270 @@
+/* Related research panel (evidence.js) on the RNA Structure page, and its
+   report section. Colours and motion come from the shared tokens. */
+
+.evidence-panel {
+  margin-top: 20px;
+}
+
+.evidence-kicker {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.evidence-lede {
+  max-width: 72ch;
+  margin: 0 0 10px;
+  color: var(--muted-strong);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.evidence-boundary,
+.evidence-sends,
+.evidence-note {
+  max-width: 78ch;
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.evidence-boundary strong {
+  color: var(--ink);
+}
+
+.evidence-sends code,
+.evidence-query-line code {
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.evidence-query {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(180px, 1fr);
+  gap: 12px;
+  max-width: 760px;
+}
+
+.evidence-query input[type="text"] {
+  font-family: var(--font-mono);
+}
+
+.evidence-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 8px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.evidence-chip {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  transition: border-color var(--dur-feedback) var(--ease-out), background var(--dur-feedback) var(--ease-out);
+}
+
+.evidence-chip.is-selected {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary-ink);
+}
+
+.evidence-confirm,
+.evidence-include {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 6px 0 10px;
+  color: var(--ink);
+  font-size: 13.5px;
+  cursor: pointer;
+}
+
+.evidence-confirm input,
+.evidence-include input {
+  margin-top: 2px;
+  accent-color: var(--primary);
+}
+
+.evidence-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.evidence-running {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.evidence-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.evidence-card {
+  position: relative;
+  min-width: 0;
+  padding: 14px 16px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.evidence-card header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.evidence-provider {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.evidence-status {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  color: var(--muted-strong);
+  font-size: 11.5px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.evidence-card.is-success .evidence-status {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.evidence-card.is-upstream_error .evidence-status,
+.evidence-card.is-network_error .evidence-status,
+.evidence-card.is-timeout .evidence-status,
+.evidence-card.is-unexpected_response .evidence-status {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.evidence-query-line,
+.evidence-status-line {
+  margin: 0 0 8px;
+  color: var(--muted-strong);
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+
+.evidence-entries {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.evidence-entries li {
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.evidence-entries a {
+  color: var(--primary-ink);
+}
+
+.evidence-meta,
+.evidence-litsumm {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.evidence-litsumm {
+  color: var(--accent);
+}
+
+.evidence-label {
+  margin: 0 0 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.evidence-label a {
+  color: var(--primary-ink);
+}
+
+.evidence-review {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.8fr) minmax(0, 2fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.evidence-review .evidence-include {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.evidence-remove {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  min-height: 28px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.evidence-earlier {
+  margin-top: 16px;
+}
+
+.evidence-earlier summary {
+  color: var(--muted-strong);
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.evidence-earlier .evidence-card {
+  margin-top: 10px;
+  opacity: .82;
+}
+
+.report-evidence-card ul {
+  margin: 6px 0 8px;
+  padding-left: 18px;
+  font-size: 12.5px;
+}
+
+@media (max-width: 767px) {
+  .evidence-query,
+  .evidence-review {
+    grid-template-columns: 1fr;
+  }
+
+  .evidence-remove {
+    position: static;
+    margin-top: 8px;
+  }
+}

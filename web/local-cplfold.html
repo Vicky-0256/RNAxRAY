@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Run RNAxRay CPLfold inputs locally with FASTA and optional HYB-derived bonus matrix files." />
+    <meta name="theme-color" content="#132c47" />
+    <link rel="icon" href="./assets/rnaxray-logo.png" type="image/png" />
+    <title>Run CPLfold Locally - RNAxRay Web</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./structure.css" />
+    <link rel="stylesheet" href="./responsive.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div class="landing local-run-shell">
+      <header class="landing-header local-run-header">
+        <a class="brand" href="./" aria-label="RNAxRay Web home">
+          <span class="brand-mark"><img src="./assets/rnaxray-logo.png" alt="RNAxRay"></span>
+          <span>
+            <span class="brand-name">Web</span>
+            <span class="brand-subtitle">Lite</span>
+          </span>
+        </a>
+        <div class="header-actions">
+          <a class="quiet-button" href="./#/workspace/structure">RNA Structure</a>
+          <a class="button button-secondary" href="./">Open app</a>
+        </div>
+      </header>
+
+      <main id="main-content" class="local-run-main">
+        <section class="local-run-hero" aria-labelledby="local-run-title">
+          <span class="eyebrow">Local CPLfold</span>
+          <h1 id="local-run-title">Run longer sequences locally</h1>
+          <p>Use RNAxRay Web to prepare the exact input files, then run <code>bin/cplfold</code> on your own machine for longer or Numba-accelerated jobs.</p>
+        </section>
+
+        <section class="local-run-grid" aria-label="Local CPLfold instructions">
+          <article class="local-run-card">
+            <span class="drawer-kicker">1. Prepare inputs in the web app</span>
+            <h2>Download the generated files</h2>
+            <p>Keep your RNA Structure tab open. After selecting CPLfold, click <strong>Download local inputs</strong> below the sequence preview.</p>
+            <div class="cplfold-guide-file"><code>cplfold-input.fasta</code><span>Always downloaded. It contains the prepared single-record sequence.</span></div>
+            <div class="cplfold-guide-file"><code>cplfold-bonus-matrix.tsv</code><span>Downloaded for HYB-guided mode. It stores the sparse 1-based bonus matrix built from all eligible HYB rows in the selected reference region.</span></div>
+          </article>
+
+          <article class="local-run-card">
+            <span class="drawer-kicker">2. Place files in the repository root</span>
+            <h2>Use the same folder as <code>bin/</code></h2>
+            <p>The commands below assume the downloaded files are next to the RNAxRay <code>bin/</code> and <code>requirements/</code> directories.</p>
+            <pre class="cplfold-command"><code>rnaxray/
+  bin/cplfold
+  requirements/cplfold-core.txt
+  cplfold-input.fasta
+  cplfold-bonus-matrix.tsv</code></pre>
+          </article>
+
+          <article class="local-run-card local-run-card-wide">
+            <span class="drawer-kicker">3. Install once</span>
+            <h2>Create a local Python environment</h2>
+            <pre class="cplfold-command"><code>python3.11 -m venv .venv-cplfold
+. .venv-cplfold/bin/activate
+python -m pip install -r requirements/cplfold-core.txt</code></pre>
+          </article>
+
+          <article class="local-run-card local-run-card-wide">
+            <span class="drawer-kicker">4. Run CPLfold</span>
+            <h2>HYB-guided run with bonus matrix</h2>
+            <pre class="cplfold-command"><code>bin/cplfold \
+  --sequence-file cplfold-input.fasta \
+  --bonus-matrix-file cplfold-bonus-matrix.tsv \
+  --beam 20 \
+  --delta 5 \
+  --max-phase1 3 \
+  --max-phase2 1 \
+  --model DP09 \
+  --beta 0 \
+  --alpha 0.5 \
+  --output cplfold-results.txt</code></pre>
+            <p class="cplfold-guide-note">Sequence-only mode can omit <code>--bonus-matrix-file</code> and <code>--alpha</code>.</p>
+          </article>
+
+          <article class="local-run-card local-run-card-wide">
+            <span class="drawer-kicker">Longer than 1,000 nt</span>
+            <h2>Raise the local guard deliberately</h2>
+            <p>The local wrapper keeps a conservative 1,000 nt default guard. On a stronger machine, raise it after checking available memory.</p>
+            <pre class="cplfold-command"><code>RNAXRAY_CPLFOLD_MAX_NT=2000 bin/cplfold \
+  --sequence-file cplfold-input.fasta \
+  --bonus-matrix-file cplfold-bonus-matrix.tsv \
+  --beam 20 \
+  --delta 5 \
+  --max-phase1 3 \
+  --max-phase2 1 \
+  --model DP09 \
+  --beta 0 \
+  --alpha 0.5 \
+  --output cplfold-results.txt</code></pre>
+          </article>
+
+          <article class="local-run-card local-run-card-wide">
+            <span class="drawer-kicker">Important</span>
+            <h2>Keep the bonus matrix as downloaded</h2>
+            <p>The web export already uses the format expected by <code>bin/cplfold</code>. Do not transpose the matrix or convert coordinates. The local CLI reconstructs the symmetric matrix before folding.</p>
+          </article>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

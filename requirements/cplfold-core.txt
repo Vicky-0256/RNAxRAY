@@ -1,0 +1,4 @@
+# Local verification uses CPython 3.8; CI runs the same pins on CPython 3.11.
+numpy==1.24.4
+numba==0.58.1
+llvmlite==0.41.1

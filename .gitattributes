@@ -1,0 +1,4 @@
+# Golden outputs are compared byte-for-byte on every OS.
+pipeline/tests/golden/** -text
+data/*.sam -text
+data/*.fasta -text

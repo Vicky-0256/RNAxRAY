@@ -1,0 +1,259 @@
+/* Owned by Agent D (Overview, Interactions, shared controls). WEB_UI_FIX_PLAN.md: new rules for this agent go here, not at the end of other agents' files. */
+
+/* ---- D1 Overview grid: Top interacting RNAs and Top RNA pairs stacked on
+   the left, Chimera types spanning both rows on the right, so the grid has
+   no holes whichever column is taller. Overrides workspace.css .overview-grid
+   and layout.css:39 (align-items: start). */
+
+.overview-grid {
+  grid-template-rows: auto 1fr;
+  align-items: stretch;
+}
+
+.overview-grid > .overview-top-rnas {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.overview-grid > .overview-top-pairs {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.overview-grid > .overview-types {
+  display: flex;
+  flex-direction: column;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.overview-types > .type-split {
+  margin-bottom: 18px;
+}
+
+@media (max-width: 1199px) {
+  .overview-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+
+  .overview-grid > .overview-top-rnas,
+  .overview-grid > .overview-top-pairs,
+  .overview-grid > .overview-types {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+
+/* Chimera types: count and share on the label row, so the card is about as
+   tall as the two stacked cards beside it. */
+.overview-types > .type-split {
+  gap: 16px;
+}
+
+.overview-types .type-item {
+  align-items: baseline;
+}
+
+.overview-types .type-value {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Top RNA pairs in the narrower column: fixed number columns, the two RNA
+   columns share the rest (K3: names truncate with a title). */
+.overview-pairs-table {
+  min-width: 560px;
+  table-layout: fixed;
+}
+
+.overview-pairs-table th:nth-child(3) { width: 104px; }
+.overview-pairs-table th:nth-child(4) { width: 112px; }
+.overview-pairs-table th:nth-child(5) { width: 136px; }
+
+/* ---- D2 one 12px rhythm between every Overview block: the reference
+   banner, the metric row, the legacy-column notice, the grid and Data
+   quality. */
+.overview-callout {
+  margin-bottom: 12px;
+}
+
+.metric-grid + .notice {
+  margin: 0 0 12px;
+}
+
+.overview-grid + .data-card {
+  margin-top: 0;
+}
+
+/* ---- D3 RNA names in the bar lists (Overview Top interacting RNAs and the
+   Interactions partner panel): a label column wide enough for a full
+   genome-length name at 1440, and up to two lines where the card is narrow.
+   The full name stays in the title attribute. */
+.overview-top-rnas .bar-row,
+.partner-card .bar-row {
+  grid-template-columns: minmax(66px, min(42%, 260px)) minmax(80px, 1fr) auto;
+}
+
+.overview-top-rnas .bar-name,
+.partner-card .bar-name {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+/* ---- D4 reference loaded: one compact secondary line, not a tinted card. */
+.overview-callout--compact {
+  align-items: center;
+  min-height: 0;
+  padding: 4px 4px 4px 14px;
+  border-color: var(--line);
+  background: var(--surface-subtle);
+}
+
+.overview-callout--compact .overview-callout-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  min-width: 0;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.overview-callout--compact .overview-callout-line strong {
+  color: var(--muted-strong);
+  font-weight: 680;
+}
+
+.overview-callout--compact .quiet-button {
+  flex: none;
+  min-height: 34px;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .overview-callout--compact {
+    display: flex;
+    padding: 8px 6px 8px 12px;
+  }
+
+  .overview-callout--compact .quiet-button {
+    margin-top: 0;
+  }
+}
+
+/* ---- D5 "View interactions": text starts on the card's content edge (the
+   button's 12px padding + 1px border pulled back), pinned to the card foot. */
+.overview-types-link {
+  align-self: flex-start;
+  margin-top: auto;
+  margin-left: -13px;
+}
+
+/* ---- D6 page-heading export menu (K2) on Overview and Interactions. When
+   the heading stacks (<=900px) the menu sits at the left edge, so its list
+   opens rightwards instead of off-screen. */
+@media (max-width: 900px) {
+  .heading-export .export-menu > summary {
+    margin-top: 0;
+  }
+
+  .heading-export .export-menu-list {
+    right: auto;
+    left: 0;
+  }
+}
+
+/* ---- K3 refinements (D11). ui-kit.css gives .num / .cell-truncate their
+   table-cell rules; these extend them to grid "tables" built from
+   role="row" containers (the Interactions virtual table). A non-cell
+   .cell-truncate must not take the table-cell max-width: 0 trick. */
+[role="row"] > .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cell-truncate:not(td):not(th) {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* ---- D7 Interactions virtual table (K3). Sequence ID narrow, the RNA
+   columns get the space, numbers right-aligned, headers on one line.
+   Row heights are exact, not minimums: the virtual window positions rows
+   at index * 46px (38px compact) in renderInteractionTable and
+   updateVirtualRows, so a row that grew by even 1px would drift over
+   22,416 rows. Overrides analysis.css / layout.css (B / A). */
+.virtual-table-head,
+.virtual-row {
+  grid-template-columns: 120px minmax(150px, 1fr) 100px minmax(150px, 1fr) 100px minmax(92px, .5fr) 64px 104px;
+  column-gap: 16px;
+  min-width: 1040px;
+}
+
+.virtual-table-frame > .virtual-table {
+  min-width: 1040px;
+}
+
+.virtual-table-head > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.virtual-table-rows > .virtual-row {
+  height: 46px;
+  min-height: 46px;
+}
+
+[data-density="compact"] .virtual-table-rows > .virtual-row {
+  height: 38px;
+  min-height: 38px;
+}
+
+/* ---- D9 RNA partner analysis before an RNA is chosen: a hint line under
+   the filter bar instead of a card. */
+.partner-hint {
+  margin: -4px 0 12px;
+  padding: 0 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ---- D10 / K8 form controls: renderSelectControl(..., { wide: true }) and
+   renderTextControl(..., { wide: true }) span two grid columns. On phones
+   (two tracks or one) they take the whole row instead: 1 / -1 never adds an
+   implicit column the way span 2 would in a one-track grid. */
+.control-field--wide {
+  grid-column: span 2;
+}
+
+@media (max-width: 480px) {
+  .control-field--wide {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---- D12 a column the file does not provide reads as absent, not as 0%. */
+.quality-stat--absent strong {
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 23px;
+}
+
+/* ---- D13 File format: the raw-reads (RNAxRay Desktop) card sits above the
+   field table; reference pages have no grid gap between cards. */
+
+.format-raw-reads {
+  margin-bottom: 16px;
+}

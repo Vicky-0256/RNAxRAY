@@ -1,0 +1,17 @@
+/* Owned by Agent A (home page and app shell). WEB_UI_FIX_PLAN.md: new rules for this agent go here, not at the end of other agents' files. */
+
+/* A12: the workspace header is opaque, so scrolled content never shows
+   through it (light and dark: --surface is redefined per theme). */
+.workspace-header {
+  background: var(--surface);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* A15: on phones the header has no room for "Desktop app"; the Help drawer
+   keeps the entry. */
+@media (max-width: 767px) {
+  .desktop-entry {
+    display: none;
+  }
+}

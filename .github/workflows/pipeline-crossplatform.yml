@@ -1,0 +1,55 @@
+name: Python pipeline (Windows, Linux, macOS)
+
+on:
+  pull_request:
+    paths:
+      - "pipeline/**"
+      - "data/**"
+      - "desktop/runtime/**"
+      - "desktop/scripts/acquire-bowtie2.py"
+      - "third_party/cplfold/**"
+      - ".github/workflows/pipeline-crossplatform.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# The pure-Python rnaxray port must give byte-identical .hyb output on every
+# desktop target, and FASTQ input must map with the pinned Bowtie2 -s binaries
+# (no Perl, awk or shell).
+jobs:
+  pipeline:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            target: windows-x86_64
+          - os: ubuntu-22.04
+            target: linux-x86_64
+          - os: macos-14
+            target: macos-aarch64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      # The bundled runtime's packages: numpy (rnaxrayanalysis), numba
+      # (DESeq2 port, CPLfold) and ViennaRNA (pipeline -e 1).
+      - name: Install the desktop runtime packages
+        run: 'python -m pip install --only-binary=:all: -r desktop/runtime/requirements-native.txt'
+      - name: Acquire pinned Bowtie2
+        run: python desktop/scripts/acquire-bowtie2.py --platform "${{ matrix.target }}" --output "$RUNNER_TEMP/bowtie2"
+      - name: Pipeline golden and unit tests
+        env:
+          RNAXRAYPIPE_TOOL_DIR: ${{ runner.temp }}/bowtie2/bin
+        run: python -m unittest discover -s pipeline/tests -p 'test_*.py' -v
+      - name: Desktop runtime tests
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -m unittest discover -s desktop/runtime/tests -p 'test_*.py'
