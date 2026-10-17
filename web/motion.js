@@ -516,14 +516,51 @@
       }
     });
 
-    // Chimeric contacts: long-range arcs below, weighted by read support.
-    const contacts = [
-      { i: 22, j: 128, reads: 214 },
-      { i: 70, j: 156, reads: 131 },
-      { i: 36, j: 104, reads: 88 },
-      { i: 12, j: 176, reads: 62 },
-      { i: 88, j: 120, reads: 47 }
-    ];
+    // Chimeric reads below: many, messy. Most sit near a stem's two arms, off
+    // by a few nucleotides as real ligation sites are; the rest are noise.
+    // `stem` is the stem a read supports, or -1.
+    const READS = 260;
+    const SUPPORT_SHARE = 0.68;
+    function jitter(spread) {
+      return Math.round((random() + random() + random() - 1.5) * spread);
+    }
+    function sampleRead() {
+      if (random() < SUPPORT_SHARE) {
+        const pair = stems[(random() * stems.length) | 0];
+        const i = Math.max(0, Math.min(N - 1, pair.i + jitter(4)));
+        const j = Math.max(0, Math.min(N - 1, pair.j + jitter(4)));
+        if (j - i >= 6) {
+          return { i: i, j: j, stem: pair.stem };
+        }
+      }
+      const i = (random() * (N - 10)) | 0;
+      return { i: i, j: Math.min(N - 1, i + 8 + ((random() * (N - i - 8)) | 0)), stem: -1 };
+    }
+    const contacts = [];
+    for (let k = 0; k < READS; k += 1) {
+      const read = sampleRead();
+      read.arrive = 500 + random() * 2600;
+      contacts.push(read);
+    }
+    contacts.sort(function (x, y) { return x.arrive - y.arrive; });
+
+    // The predicted structure is drawn stem by stem once the reads are in,
+    // best-supported stem first, as if the fold were being computed from them.
+    const support = stemSpecs.map(function () { return 0; });
+    contacts.forEach(function (read) {
+      if (read.stem >= 0) {
+        support[read.stem] += 1;
+      }
+    });
+    const stemOrder = stemSpecs.map(function (_, k) { return k; }).sort(function (x, y) { return support[y] - support[x]; });
+    const FOLD_START = 2200;
+    const STEM_GAP = 260;
+    const STEM_DRAW = 420;
+    const stemStart = {};
+    stemOrder.forEach(function (stem, rank) {
+      stemStart[stem] = FOLD_START + rank * STEM_GAP;
+    });
+    const SETTLED = FOLD_START + stemOrder.length * STEM_GAP + STEM_DRAW;
 
     let host = null;
     let canvas = null;
@@ -534,15 +571,12 @@
     let rafId = 0;
     let visible = true;
     let born = 0;
-    let lastFrame = 0;
     let pointer = null;
     let palette = null;
-    let reads = 0;
+    let resampled = 0;
     let readsNode = null;
     let probeNode = null;
-    let particles = [];
-    let nextSpawn = 0;
-    let ripples = [];
+    let nextResample = 0;
     let resizeObserver = null;
     let visibilityObserver = null;
 
@@ -610,9 +644,6 @@
       const stage = slot.closest(".hero-stage");
       readsNode = stage && stage.querySelector("[data-hero-reads]");
       probeNode = stage && stage.querySelector("[data-hero-probe]");
-      if (readsNode) {
-        readsNode.textContent = reads.toLocaleString("en-US");
-      }
       if (canvas.parentNode !== slot) {
         slot.appendChild(canvas);
         if (resizeObserver) {
@@ -715,10 +746,6 @@
       }
       const reduced = motionReduced();
       const elapsed = reduced ? 1e9 : now - born;
-      // a frame stamp before the last one (a timer restarted on navigation) is
-      // no time at all: a negative dt would grow the ripples past their size
-      const dt = lastFrame ? Math.max(0, Math.min(64, now - lastFrame)) : 16;
-      lastFrame = now;
       const g = geometry();
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -733,18 +760,19 @@
         const below = pointer.y > g.base;
         let best = Infinity;
         (below ? contacts : stems).forEach(function (arc) {
+          if (below && arc.arrive > elapsed) {
+            return;
+          }
           const d = Math.min(Math.abs(arc.i - probeIndex), Math.abs(arc.j - probeIndex));
           const inside = probeIndex > arc.i && probeIndex < arc.j;
-          const score = d + (inside ? 0 : 40) + (below ? -arc.reads / 100 : 0);
+          const score = d + (inside ? 0 : 40) + (arc.j - arc.i) / 400;
           if (score < best && (d <= 3 || inside)) {
             best = score;
-            focus = { arc: arc, below: below };
+            focus = { arc: arc, below: below, stem: arc.stem };
           }
         });
-        if (focus && !focus.below) {
-          focus.stem = focus.arc.stem;
-        }
       }
+      const focusStem = focus ? focus.stem : -2;
 
       // Baseline sweep.
       const lineT = easeOut(elapsed / 800);
@@ -756,15 +784,41 @@
       ctx.lineTo(g.x(0) + (g.x(N - 1) - g.x(0)) * lineT, g.base);
       ctx.stroke();
 
-      // Stems above.
+      // Reads below: thin, translucent, overlapping; each lands quickly.
+      let arrived = 0;
+      contacts.forEach(function (read) {
+        const t = easeOut((elapsed - read.arrive) / 240);
+        if (t <= 0) {
+          return;
+        }
+        arrived += 1;
+        const s = arcShape(g, read.i, read.j, false);
+        const fresh = Math.max(0, 1 - (elapsed - read.arrive) / 500);
+        const supports = focusStem >= 0 && read.stem === focusStem;
+        const isFocus = focus && focus.below && focus.arc === read;
+        const dim = focus && !supports && !isFocus;
+        ctx.globalAlpha = dim ? 0.06 : (supports || isFocus ? 0.75 : (palette.dark ? 0.2 : 0.26) + fresh * 0.5);
+        ctx.strokeStyle = palette.violet;
+        ctx.lineWidth = isFocus ? 2 : (supports ? 1.4 : 0.8);
+        ctx.beginPath();
+        ctx.ellipse(s.cx, g.base, s.rx, s.ry * t, 0, Math.PI, 0, true);
+        ctx.stroke();
+      });
+      ctx.globalAlpha = 1;
+      const shown = arrived + resampled;
+      if (readsNode && readsNode.textContent !== shown.toLocaleString("en-US")) {
+        readsNode.textContent = shown.toLocaleString("en-US");
+      }
+
+      // Predicted structure above: each stem is drawn outer pair first.
       stems.forEach(function (arc) {
-        const delay = 500 + arc.stem * 120 + (arc.outer ? 0 : 60);
-        const t = easeOut((elapsed - delay) / 900);
+        const k = arc.i - arc.start;
+        const t = easeOut((elapsed - stemStart[arc.stem] - k * 50) / STEM_DRAW);
         if (t <= 0) {
           return;
         }
         const s = arcShape(g, arc.i, arc.j, true);
-        const highlighted = focus && !focus.below && focus.stem === arc.stem;
+        const highlighted = focusStem === arc.stem;
         const dim = focus && !highlighted;
         ctx.globalAlpha = dim ? 0.18 : (arc.outer ? 0.95 : 0.55);
         ctx.strokeStyle = palette.teal;
@@ -772,28 +826,6 @@
         ctx.beginPath();
         ctx.ellipse(s.cx, g.base, s.rx, s.ry, 0, Math.PI, Math.PI + Math.PI * t, false);
         ctx.stroke();
-      });
-
-      // Contacts below, thickness by support.
-      contacts.forEach(function (arc, index) {
-        const delay = 1500 + index * 160;
-        const t = easeOut((elapsed - delay) / 1100);
-        if (t <= 0) {
-          return;
-        }
-        const s = arcShape(g, arc.i, arc.j, false);
-        const highlighted = focus && focus.below && focus.arc === arc;
-        const dim = focus && !highlighted;
-        const pulse = arc.pulse ? Math.max(0, arc.pulse) : 0;
-        ctx.globalAlpha = dim ? 0.15 : 0.35 + 0.35 * (arc.reads / 214) + pulse * 0.3;
-        ctx.strokeStyle = palette.violet;
-        ctx.lineWidth = 1 + 3.2 * (arc.reads / 214) + (highlighted ? 1.4 : 0) + pulse * 1.6;
-        ctx.beginPath();
-        ctx.ellipse(s.cx, g.base, s.rx, s.ry, 0, Math.PI, Math.PI - Math.PI * t, true);
-        ctx.stroke();
-        if (arc.pulse) {
-          arc.pulse = Math.max(0, arc.pulse - dt / 700);
-        }
       });
       ctx.globalAlpha = 1;
 
@@ -823,63 +855,19 @@
       }
       ctx.globalAlpha = 1;
 
-      // Reads travel along contacts; arrival bumps the HUD counter.
-      if (!reduced && elapsed > 2600) {
-        if (now >= nextSpawn) {
-          const weights = contacts.map(function (c) { return c.reads; });
-          const total = weights.reduce(function (a, b) { return a + b; }, 0);
-          let pick = random() * total;
-          let chosen = contacts[0];
-          for (let k = 0; k < contacts.length; k += 1) {
-            pick -= weights[k];
-            if (pick <= 0) {
-              chosen = contacts[k];
-              break;
-            }
-          }
-          particles.push({ arc: chosen, t: 0, forward: random() > 0.5, speed: 0.00055 + random() * 0.0004 });
-          nextSpawn = now + 180 + random() * 380;
+      // After the fold, reads keep arriving: one read is re-sampled at a time,
+      // so the data below stays messy while the structure above holds.
+      if (!reduced && elapsed > SETTLED) {
+        if (now >= nextResample) {
+          const read = contacts[(random() * contacts.length) | 0];
+          const next = sampleRead();
+          read.i = next.i;
+          read.j = next.j;
+          read.stem = next.stem;
+          read.arrive = elapsed;
+          resampled += 1;
+          nextResample = now + 160 + random() * 340;
         }
-        particles = particles.filter(function (p) {
-          p.t += p.speed * dt;
-          if (p.t >= 1) {
-            p.arc.pulse = 1;
-            const s = arcShape(g, p.arc.i, p.arc.j, false);
-            ripples.push({ x: p.forward ? s.cx + s.rx : s.cx - s.rx, life: 1 });
-            reads += 1;
-            if (readsNode) {
-              readsNode.textContent = reads.toLocaleString("en-US");
-            }
-            return false;
-          }
-          const s = arcShape(g, p.arc.i, p.arc.j, false);
-          const angle = p.forward ? Math.PI - Math.PI * p.t : Math.PI * p.t;
-          // Ellipse below baseline: angle runs π → 0 through π/2 (bottom).
-          const px = s.cx + s.rx * Math.cos(angle);
-          const py = g.base + s.ry * Math.sin(angle);
-          ctx.shadowColor = palette.violet;
-          ctx.shadowBlur = 12;
-          ctx.fillStyle = palette.dark ? "#ffffff" : palette.violet;
-          ctx.beginPath();
-          ctx.arc(px, py, 2.4, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.shadowBlur = 0;
-          return true;
-        });
-        ripples = ripples.filter(function (r) {
-          r.life -= dt / 650;
-          if (r.life <= 0) {
-            return false;
-          }
-          ctx.globalAlpha = r.life * 0.6;
-          ctx.strokeStyle = palette.violet;
-          ctx.lineWidth = 1.4;
-          ctx.beginPath();
-          ctx.arc(r.x, g.base, (1 - r.life) * 14 + 2, 0, Math.PI * 2);
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-          return true;
-        });
       }
 
       // Scanner line + probe readout.
@@ -901,7 +889,9 @@
         ctx.fill();
         let label = "nt " + (probeIndex + 1) + " · " + sequence[probeIndex];
         if (focus && focus.below) {
-          label += "  —  contact " + (focus.arc.i + 1) + " ⇄ " + (focus.arc.j + 1) + " · " + focus.arc.reads + " reads";
+          const read = focus.arc;
+          const stem = read.stem >= 0 ? stemSpecs[read.stem] : null;
+          label += "  —  read " + (read.i + 1) + " ⇄ " + (read.j + 1) + (stem ? " · supports stem " + (stem[0] + 1) + "–" + (stem[1] + 1) : " · no stem");
         } else if (focus) {
           const arc = focus.arc;
           label += "  —  stem " + (arc.start + 1) + "–" + (arc.end + 1) + " · " + arc.bp + " bp";
