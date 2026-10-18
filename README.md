@@ -114,4 +114,12 @@ The browser's ViennaRNA and CPLfold runtimes are built by `scripts/build-vienna-
 
 ## Licence
 
+RNAxRay is free software under the [MIT licence](LICENSE), copyright the RNAxRay authors ([`AUTHORS`](AUTHORS)); to cite it, see [`CITATION.cff`](CITATION.cff). This covers the web app, the desktop app and the build scripts. Three parts keep the licence of the code they come from:
+
+- `pipeline/` ports scripts from [hyb](https://github.com/gkudla/hyb) and is GPL-3.0-or-later ([`pipeline/NOTICE.md`](pipeline/NOTICE.md)).
+- `bin/` contains scripts from hyb and [comrades](https://github.com/gkudla/comrades) and is GPL-3.0, apart from the three RNAxRay files listed in [`bin/NOTICE.md`](bin/NOTICE.md).
+- `third_party/cplfold/` is described below.
+
+Every third-party component in the repository, the website and the desktop app is listed, with its licence, in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
 CPLfold's own code is licensed GPL-2.0-or-later by its author ([`third_party/cplfold/LICENSE`](third_party/cplfold/LICENSE)), as is its HotKnots-derived energy evaluator. Its LinearFold-derived parser keeps LinearFold's terms, which add conditions beyond the GPL, so the combination does not yet have one resolved licence; see [`third_party/cplfold/THIRD_PARTY_NOTICES.md`](third_party/cplfold/THIRD_PARTY_NOTICES.md), with the upstream texts in `third_party/cplfold/LICENSES`. The bundled ViennaRNA, Bowtie2, Pyodide and other components keep their own licences, listed with their files.

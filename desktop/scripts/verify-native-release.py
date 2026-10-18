@@ -12,7 +12,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 PINS = {"numpy":"1.24.4", "numba":"0.58.1", "llvmlite":"0.41.1"}
 EXPECTED = "..(((((..[[[[)))))......]]]]"
-LICENSE_FILES = ["third_party/bowtie2/LICENSE",
+LICENSE_FILES = ["LICENSE", "AUTHORS", "THIRD_PARTY_NOTICES.md", "pipeline/LICENSE", "pipeline/NOTICE.md",
+                 "third_party/bowtie2/LICENSE",
                  "third_party/cplfold/LICENSE",
                  "third_party/cplfold/THIRD_PARTY_NOTICES.md",
                  "third_party/cplfold/LICENSES/LinearFold-LICENSE.txt",

@@ -216,6 +216,9 @@ def main():
         for relative in SOURCE_DIRS:
             shutil.copytree(ROOT / relative, stage / relative,
                             ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '*.nbc', '*.nbi', 'tests', 'data'))
+        # RNAxRay's own licence and authors, and the notices for everything else in the app.
+        for name in ('LICENSE', 'AUTHORS', 'THIRD_PARTY_NOTICES.md'):
+            shutil.copy2(ROOT / name, stage / name)
         (stage / 'bin').mkdir()
         shutil.copy2(ROOT / 'bin/cplfold', stage / 'bin/cplfold')
         if args.bowtie2:

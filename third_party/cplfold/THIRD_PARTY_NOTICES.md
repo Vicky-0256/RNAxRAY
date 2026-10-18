@@ -4,7 +4,8 @@ This directory is a vendored snapshot of CPLfold with two upstream code
 lineages besides CPLfold's own. CPLfold's own code is licensed GPL-2.0-or-later
 (`LICENSE`); the combination with the LinearFold-derived parser does **not** yet
 have one resolved license (see "Compatibility review required"). Do not relabel
-it, or the RNAxRay repository, as MIT or Apache licensed.
+it as MIT or Apache licensed; the MIT license in the RNAxRay repository's
+top-level `LICENSE` covers RNAxRay's own code, not this directory.
 
 ## CPLfold-authored code
 

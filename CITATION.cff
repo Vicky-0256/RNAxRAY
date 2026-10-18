@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use RNAxRay, please cite it as below."
+title: RNAxRay
+abstract: "Explore RNA–RNA interactions from CLASH, PARIS and COMRADES data, and fold structures guided by them with CPLfold, in the browser or on the desktop."
+type: software
+version: 0.1.7
+license: MIT
+repository-code: "https://github.com/Vicky-0256/RNAxRAY"
+url: "https://vicky-0256.github.io/RNAxRAY"
+authors:
+  - family-names: "<Family name 1>"
+    given-names: "<Given name 1>"
+  - family-names: "<Family name 2>"
+    given-names: "<Given name 2>"
+# Once the paper is out, add it here so GitHub's "Cite this repository" points to it:
+# preferred-citation:
+#   type: article
+#   title: "<paper title>"
+#   journal: "<journal>"
+#   year: <year>
+#   doi: "<doi>"
+#   authors: (same as above)
