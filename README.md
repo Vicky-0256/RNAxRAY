@@ -12,6 +12,14 @@
   <a href="https://github.com/Vicky-0256/RNAxRAY/releases/latest"><strong>Download RNAxRay Desktop</strong></a>
 </p>
 
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=dQaVTGbUNvY">
+    <img src="https://img.youtube.com/vi/dQaVTGbUNvY/maxresdefault.jpg" alt="RNAxRay demo video on YouTube" width="720">
+  </a>
+  <br>
+  <a href="https://www.youtube.com/watch?v=dQaVTGbUNvY">▶ Watch the RNAxRay demo video on YouTube</a>
+</p>
+
 RNAxRay reads the chimeric reads of CLASH, PARIS, COMRADES and similar experiments, shows where two RNAs (or two parts of one RNA) touch, compares conditions, and folds structures with **CPLfold**, which turns the chimeric reads into soft evidence for base pairs and can predict pseudoknots.
 
 It comes in two forms that share the same analysis pages and folding engine:
